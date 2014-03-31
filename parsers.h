@@ -11,10 +11,12 @@ struct FastaReferenceData{
     uint64_t end; //endpoint relative to entire length of whole ref
 };
 
-struct BedInterval{
+struct BedInterval{ // make clas?
     string chr;
     uint64_t start;
     uint64_t end;
+    bool contains(int pos);
+    void set_open();
 };
 
 typedef vector<FastaReferenceData> FastaReferenceVector;

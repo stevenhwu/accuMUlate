@@ -41,6 +41,16 @@ void FastaReference::get_ref_id(string search_name, int& chr_id){
     chr_id = idx;
 }
 
+void BedInterval::set_open(){
+    chr = "NA";
+    start = 0;
+    end = -1;
+}
+bool BedInterval::contains(int pos){
+    return (pos >= start) && (pos <= end);
+}
+
+
 
 BedFile::BedFile(string bed_file_name){
      bed_file.open(bed_file_name);
