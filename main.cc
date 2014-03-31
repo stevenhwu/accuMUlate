@@ -25,27 +25,20 @@ class VariantVisitor : public PileupVisitor{
                        const ModelParams& p,  
                        BamAlignment& ali, 
                        int qual_cut,
-                       double prob_cut,
-                       const BedInterval& region):
+                       double prob_cut):
 
             PileupVisitor(), m_idx_ref(idx_ref), m_bam_ref(bam_references), 
                              m_samples(samples), m_qual_cut(qual_cut), m_params(p), 
-                             m_ali(ali), m_ostream(out_stream), m_prob_cut(prob_cut),
-                             m_region(region)
+                             m_ali(ali), m_ostream(out_stream), m_prob_cut(prob_cut)
                               { }
         ~VariantVisitor(void) { }
     public:
          void Visit(const PileupPosition& pileupData) {
              string chr = m_bam_ref[pileupData.RefId].RefName;
              uint64_t pos  = pileupData.Position;
-             if (!m_region.contains(pos)){
-                 cout << "Skipping " << pos << endl;
-                return;
-             }
              m_idx_ref.GetBase(pileupData.RefId, pos, current_base);
              ReadDataVector bcalls (m_samples.size(), ReadData{{ 0,0,0,0 }}); 
              string tag_id;
-             cout << "calculating from " << pos << endl;
              for(auto it = begin(pileupData.PileupAlignments);
                       it != end(pileupData.PileupAlignments); 
                       ++it){
@@ -62,14 +55,12 @@ class VariantVisitor : public PileupVisitor{
             uint16_t ref_base_idx = base_index(current_base);
             if (ref_base_idx < 4  ){ //TODO Model for bases at which reference is 'N'
                 ModelInput d = {ref_base_idx, bcalls};
-                double prob_one = TetMAProbOneMutation(m_params,d);
-                double prob = TetMAProbability(m_params, d);
+                double prob = TetMAProbOneMutation(m_params,d);
                 if(prob >= m_prob_cut){
                      *m_ostream << chr << '\t' 
                                 << pos << '\t' 
                                 << current_base << '\t' 
                                 << prob << '\t' 
-                                << prob_one << '\t' 
                                 << endl;          
                 }
             }
@@ -85,7 +76,6 @@ class VariantVisitor : public PileupVisitor{
         double m_prob_cut;
         char current_base;
         uint64_t chr_index;
-        BedInterval m_region;
             
 };
 
@@ -150,41 +140,9 @@ int main(int argc, char** argv){
     Fasta reference_genome; // BamTools::Fasta
     reference_genome.Open(ref_file);
     reference_genome.CreateIndex(ref_file + ".fai");
-
-   
-    if (vm.count("intervals")){
-        BedFile bed (vm["intervals"].as<string>());
-        FastaReference my_ref (ref_file + ".fai");
-        BedInterval region;
-        while(bed.get_interval(region) == 0){    
-            PileupEngine pileup;
-            BamAlignment ali;
-            int ref_id = experiment.GetReferenceID(region.chr);
-            VariantVisitor *v = new VariantVisitor(
-                references,
-                reference_genome, 
-                &result_stream,
-                vm["sample-name"].as<vector< string> >(),
-                params, 
-                ali, 
-                vm["qual"].as<int>(), 
-                vm["prob"].as<double>(),
-                region);
-            pileup.AddVisitor(v);
-
-            while( experiment.GetNextAlignment(ali) ){
-                pileup.AddAlignment(ali);
-            }
-            pileup.Flush();
-        }
-
-    }
-    else{
-        BedInterval region;
-        region.set_open();
-        PileupEngine pileup;
-        BamAlignment ali;
-        VariantVisitor *v = new VariantVisitor(
+    PileupEngine pileup;
+    BamAlignment ali;
+    VariantVisitor *v = new VariantVisitor(
             references,
             reference_genome, 
             &result_stream,
@@ -192,15 +150,30 @@ int main(int argc, char** argv){
             params, 
             ali, 
             vm["qual"].as<int>(), 
-            vm["prob"].as<double>(),
-            region );
-        pileup.AddVisitor(v);
+            vm["prob"].as<double>() );
+    pileup.AddVisitor(v);
+   
+    if (vm.count("intervals")){
+        BedFile bed (vm["intervals"].as<string>());
+        FastaReference my_ref (ref_file + ".fai");
+        BedInterval region;
+        while(bed.get_interval(region) == 0){
+            int ref_id = experiment.GetReferenceID(region.chr;
+            experiment.SetRegion(ref_id, region.start, ref_id, region.end-1);
+            while( experiment.GetNextAlignment(ali) ){
+                pileup.AddAlignment(ali);
+            }
+        }
+    }
+    else{
+
+        BamAlignment ali;
         while( experiment.GetNextAlignment(ali)){
             pileup.AddAlignment(ali);
         };
-        pileup.Flush();
-    }
+    pileup.Flush();
     return 0;
+    }
 }
         
         
