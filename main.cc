@@ -158,8 +158,8 @@ int main(int argc, char** argv){
         FastaReference my_ref (ref_file + ".fai");
         BedInterval region;
         while(bed.get_interval(region) == 0){
-            int ref_id = experiment.GetReferenceID(region.chr;
-            experiment.SetRegion(ref_id, region.start, ref_id, region.end-1);
+            int ref_id = experiment.GetReferenceID(region.chr);
+            experiment.SetRegion(ref_id, region.start, ref_id, region.end);
             while( experiment.GetNextAlignment(ali) ){
                 pileup.AddAlignment(ali);
             }
