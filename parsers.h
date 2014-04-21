@@ -40,8 +40,25 @@ class BedFile{
         
 };
 //Helper functions
+
+//operations on genomic intervals
+
+uint32_t genomic_distance(BedInterval a, BedInterval b){
+    if(a.chr != b.chr){
+       return -1;
+    }
+    else{
+        //onyl for zero base indices!!
+        int overlap =  min(a.end, b.end) - max(a.start, b.start);
+        if(overlap > 0){
+            return 0;
+        }
+        else return abs(overlap);        
+    }
+}
+
+
 uint16_t base_index(char b);
-string get_sample(string& tag);
 uint32_t find_sample_index(string, SampleNames);
 
 #endif
