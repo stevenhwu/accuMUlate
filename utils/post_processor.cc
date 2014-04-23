@@ -89,47 +89,57 @@ class ExperimentSiteData{
 
         void summarize(ostream* out_stream){
 
-            // call genotypes, keep track of each sample and number of each 
+           // call genotypes, keep track of each sample and number of each 
             // possible allele
-            vector<uint16_t> genotypes;
-            ReadData gfreqs;
-            gfreqs.key = 0;
-            for(size_t i=0; i < sample_data.size(); i++){
+           // vector<uint16_t> genotypes;
+           // ReadData gfreqs;
+           // gfreqs.key = 0;
+           for(size_t i=0; i < sample_data.size(); i++){
                 uint16_t g = sample_data[i].get_genotype();
-                if(g < 4){//no data == npos
-                    gfreqs.reads[g] += 1;
-                }
-                genotypes.push_back(g);             
+           //     if(g < 4){//no data == npos
+           //         gfreqs.reads[g] += 1;
+           //     }
+           //     genotypes.push_back(g);             
             }
             //Now find the mutant (should be the only one with it's allele)
-            uint16_t mutant_base;
-            uint16_t n_mutant = 0;
-            for(size_t i = 0; i<4; i++){
-                if (gfreqs.reads[i] == 1){
-                    n_mutant += 1;
-                    mutant_base = i;
-                }
+           // uint16_t mutant_base;
+           // uint16_t n_mutant = 0;
+           // for(size_t i = 0; i<4; i++){
+           //     if (gfreqs.reads[i] == 1){
+           //         n_mutant += 1;
+           //         mutant_base = i;
+           //     }
+           // }
+           // if (n_mutant != 1){
+           //     //Looks like messy data. Print out the read matrix so we can
+           //     //unerstand what going on, add an empty line to the output
+           //     *out_stream  << m_initial_data
+           //        << "\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\t" << endl;
+           //     cerr << "Skipping " << m_initial_data <<  endl;
+           //     cerr << "Read Matrix:" << endl;
+           //     for (size_t i=0; i < sample_data.size(); i++){
+           //         cerr << snames[i] << '\t';
+           //         for (size_t j=0; j<4; j++){
+           //             cerr << sample_data[i].all_reads.reads[j] << '\t';
+           //         }
+           //         cerr << endl;
+           //     }
+           //     return; // 
+           // }
+           // auto it = find_if(genotypes.begin(), genotypes.end(), 
+           //         [&](int v) {return v==mutant_base;});
+           // uint32_t mutant = distance(genotypes.begin(), it);
+           
+            //randomly chose a sample to act as mutant
+
+            uint16_t ref_bindex = base_index(m_ref_base);
+            uint16_t mutant_base = ref_bindex;
+            uint16_t mutant = rand() % sample_data.size() + 1;
+            if(sample_data[mutant].depth == 0){
+                //we are doing thousands of these, can skip this one
+                return;
             }
-            if (n_mutant != 1){
-                //Looks like messy data. Print out the read matrix so we can
-                //unerstand what going on, add an empty line to the output
-                *out_stream  << m_initial_data
-                   << "\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\t" << endl;
-                cerr << "Skipping " << m_initial_data <<  endl;
-                cerr << "Read Matrix:" << endl;
-                for (size_t i=0; i < sample_data.size(); i++){
-                    cerr << snames[i] << '\t';
-                    for (size_t j=0; j<4; j++){
-                        cerr << sample_data[i].all_reads.reads[j] << '\t';
-                    }
-                    cerr << endl;
-                }
-                return; // 
-            }
-            auto it = find_if(genotypes.begin(), genotypes.end(), 
-                    [&](int v) {return v==mutant_base;});
-            uint32_t mutant = distance(genotypes.begin(), it);
-            
+
             //summarise the data from the mutant strain
             SampleSiteData * ms = &sample_data[mutant];
             double f_mutant_m = ms->all_reads.reads[mutant_base]/(double)ms->depth;
@@ -159,7 +169,6 @@ class ExperimentSiteData{
             int wt_BQs_sum = 0;
             int wt_depth = 0;
 
-            uint16_t ref_bindex  = base_index(m_ref_base);
             for (size_t i=0; i < sample_data.size(); i++){
                 if (i != mutant){
                     SampleSiteData* s = &sample_data[i];
