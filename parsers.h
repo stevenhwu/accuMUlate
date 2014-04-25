@@ -43,19 +43,54 @@ class BedFile{
 
 //operations on genomic intervals
 
-uint32_t genomic_distance(BedInterval a, BedInterval b){
+uint32_t genomic_distance(const BedInterval& a, const BedInterval& b){
     if(a.chr != b.chr){
        return -1;
     }
     else{
         //onyl for zero base indices!!
-        int overlap =  min(a.end, b.end) - max(a.start, b.start);
-        if(overlap > 0){
-            return 0;
+        int d =   max(a.start, b.start) - min(a.end , b.end);
+        if(d < 0){
+            return -1;
         }
-        else return abs(overlap);        
+        return d;        
     }
 }
+
+uint32_t genomic_overlap(const BedInterval& a, const BedInterval& b){
+    if(a.chr != b.chr){ 
+        return 0;
+    }
+    else{
+       int overlap = min(a.end - b.end) - max(a.start - b.start);
+       if (overlap < 0){
+           return 0;
+       }
+       return overlap;
+    }
+}
+
+inline bool operator==(const BedInterval& a, const BedInterval& b){ 
+    if (a.chr == b.chr){
+        if (a.start == a.start){
+            return a.end == b.end;
+        }
+    }
+    return false;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+        
 
 
 uint16_t base_index(char b);
