@@ -37,14 +37,14 @@ double DirichletMultinomialLogProbability(double alphas[4], ReadData data) {
 //			cout << lgamma(alphas[i]+x) << endl;
 
 		}
-		cout<< result << "\n";
+//		cout<< result << "\n";
 	}
 //	double sum = 0;
 	for(int x = 0; x < read_count; ++x){
 		result -= log(alpha_total+x);
 //		sum += log(alpha_total+x);
 	}
-	cout<< result << "\n";
+//	cout<< result << "\n";
 //	exit(-1);
 //	printf("sum denom:%f\n",sum);
 	return result;

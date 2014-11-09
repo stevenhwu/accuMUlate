@@ -27,42 +27,42 @@ DirichletMultinomialDistribution::~DirichletMultinomialDistribution() {
 }
 
 
-
-double DirichletMultinomialDistribution::DirichletMultinomialLogProbability(double alphas[4], ReadData data) {
-	// TODO: Cache most of the math here
-	// TODO: Does not include the multinomail coefficient
-
-//	for (int i = 0; i < 4; ++i) {
-//			data.reads[i] = 0;
-//			cout << alphas[i] << endl;
-//			alphas[i] = 0.25;
+//
+//double DirichletMultinomialDistribution::DirichletMultinomialLogProbability(double alphas[4], ReadData data) {
+//	// TODO: Cache most of the math here
+//	// TODO: Does not include the multinomail coefficient
+//
+////	for (int i = 0; i < 4; ++i) {
+////			data.reads[i] = 0;
+////			cout << alphas[i] << endl;
+////			alphas[i] = 0.25;
+////		}
+////	data.reads[0] = 3;
+//
+//	int read_count = data.reads[0]+data.reads[1]+data.reads[2]+data.reads[3];
+//
+////	printf("RC:%d\n",read_count);
+//	double alpha_total = alphas[0]+alphas[1]+alphas[2]+alphas[3];
+//	double result = 0.0;
+//	for(int i : {0,1,2,3}) {
+//		for(int x = 0; x < data.reads[i]; ++x) {
+//			result += log(alphas[i]+x);
+////			cout << alphas[i]+x << "\t";
+////			cout << lgamma(alphas[i]+x) << endl;
+//
 //		}
-//	data.reads[0] = 3;
-
-	int read_count = data.reads[0]+data.reads[1]+data.reads[2]+data.reads[3];
-
-//	printf("RC:%d\n",read_count);
-	double alpha_total = alphas[0]+alphas[1]+alphas[2]+alphas[3];
-	double result = 0.0;
-	for(int i : {0,1,2,3}) {
-		for(int x = 0; x < data.reads[i]; ++x) {
-			result += log(alphas[i]+x);
-//			cout << alphas[i]+x << "\t";
-//			cout << lgamma(alphas[i]+x) << endl;
-
-		}
-		std::cout<< result << "\n";
-	}
-//	double sum = 0;
-	for(int x = 0; x < read_count; ++x){
-		result -= log(alpha_total+x);
-//		sum += log(alpha_total+x);
-	}
-	std::cout<< result << "\n";
-//	exit(-1);
-//	printf("sum denom:%f\n",sum);
-	return result;
-}
+//		std::cout<< result << "\n";
+//	}
+////	double sum = 0;
+//	for(int x = 0; x < read_count; ++x){
+//		result -= log(alpha_total+x);
+////		sum += log(alpha_total+x);
+//	}
+//	std::cout<< result << "\n";
+////	exit(-1);
+////	printf("sum denom:%f\n",sum);
+//	return result;
+//}
 
 void DirichletMultinomialDistribution::DirichletMultinomialRandom(
 		double alphas[4], ReadData& data) {
@@ -104,4 +104,43 @@ function (J = 10, K = 20, n, pi, theta)
 	*/
 
 
+}
+
+
+
+
+double DirichletMultinomialLogProbability(double alphas[4], ReadData data) {
+	// TODO: Cache most of the math here
+	// TODO: Does not include the multinomail coefficient
+
+//	for (int i = 0; i < 4; ++i) {
+//			data.reads[i] = 0;
+//			cout << alphas[i] << endl;
+//			alphas[i] = 0.25;
+//		}
+//	data.reads[0] = 3;
+
+	int read_count = data.reads[0]+data.reads[1]+data.reads[2]+data.reads[3];
+
+//	printf("RC:%d\n",read_count);
+	double alpha_total = alphas[0]+alphas[1]+alphas[2]+alphas[3];
+	double result = 0.0;
+	for(int i : {0,1,2,3}) {
+		for(int x = 0; x < data.reads[i]; ++x) {
+			result += log(alphas[i]+x);
+//			cout << alphas[i]+x << "\t";
+//			cout << lgamma(alphas[i]+x) << endl;
+
+		}
+		std::cout<< result << "\n";
+	}
+//	double sum = 0;
+	for(int x = 0; x < read_count; ++x){
+		result -= log(alpha_total+x);
+//		sum += log(alpha_total+x);
+	}
+	std::cout<< result << "\n";
+//	exit(-1);
+//	printf("sum denom:%f\n",sum);
+	return result;
 }

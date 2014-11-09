@@ -15,8 +15,12 @@ public:
 	DirichletMultinomialDistribution();
 	virtual ~DirichletMultinomialDistribution();
 
-	double DirichletMultinomialLogProbability(double alphas[4], ReadData data);
+//	double DirichletMultinomialLogProbability(double alphas[4], ReadData data);
 	void DirichletMultinomialRandom(double alhpas[4], ReadData &data);
+
+
 };
+
+double DirichletMultinomialLogProbability(double alphas[4], ReadData data);
 
 #endif /* DIRICHLETMULTINOMIALDISTRIBUTION_H_ */
