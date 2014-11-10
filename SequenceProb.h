@@ -25,6 +25,8 @@ class SequenceProb{
 
 	double likelihood;
 
+	ModelInput data;
+
 public:
 	SequenceProb(){};
 	SequenceProb(const ModelParams &params, const ModelInput site_data, MutationProb muProb);
@@ -37,6 +39,7 @@ public:
 
 	double GetLikelihood();
 
+	ModelInput GetData();
 protected:
 	DiploidProbs DiploidPopulation(int ref_allele);
 	HaploidProbs HaploidSequencing(ReadData data);

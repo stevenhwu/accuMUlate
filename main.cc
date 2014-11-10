@@ -320,7 +320,7 @@ for (auto t : samples) {
 		}
 		sp[0] = SequenceProb(params, base_counts[598], muProb);
 //		sp[1] = SequenceProb(params, base_counts[4195], muProb);
-//		sp[1] = SequenceProb(params, base_counts[5391], muProb);
+		sp[1] = SequenceProb(params, base_counts[5391], muProb);
 //		sp[2] = SequenceProb(params, base_counts[5391], muProb);
 //		sp[3] = SequenceProb(params, base_counts[6589], muProb);
 
@@ -345,7 +345,7 @@ for (auto t : samples) {
 //			cout << likelihood << (1 - likelihood) << endl;
 //		}
 
-		int size = 10;
+		int size = 20;
 		double muArray[size];
 		double likelihood[size];
 		muArray[0] = 1;
@@ -366,6 +366,58 @@ for (auto t : samples) {
 		double mma = *std::max_element( likelihood, likelihood+size);
 		double mmi = *std::min_element( likelihood, likelihood+size);
 		cout << mma <<"\t"<< mmi << endl;
+
+
+		const int cat = 2;
+		muArray[cat];
+		muArray[0] = 1e-2;
+		muArray[0] = 1e-5;
+
+		likelihood[cat];
+		double proportion[cat];
+		double weight[2];
+		for (auto t : sp) {
+			for (int i = 0; i < cat; ++i) {
+				muProb.UpdateMu(muArray[i]);
+
+				t.UpdateMuProb(muProb);
+//				cout << log( t.GetLikelihood() )<< " ";
+				likelihood[i] = t.GetLikelihood();
+//				likelihood[i] += log( t.GetLikelihood() );
+			}
+			double sum = likelihood[0] + likelihood[1];
+
+			proportion[0] = likelihood[0]/sum;
+			proportion[1] = likelihood[1]/sum;
+
+
+
+			cout << proportion[0] << "\t" << proportion[1] << endl;
+
+			ModelInput m = t.GetData();
+//			m.all_reads
+
+			ModelInput mA, mB;
+			ReadData vA, vB;
+			//Might have to redo this part, with double[4] TODO:
+			mA.all_reads = vector<ReadData>(7);
+			for (int b = 0; b < m.all_reads.size(); ++b) {
+				ReadData v = m.all_reads[b];
+
+				cout << v.reads[0] << "\t" << v.reads[1] << "\t"<< v.reads[2] << "\t"<< v.reads[3] << "\t" <<endl;
+				for (int bb = 0; bb < 3; ++bb) {
+					vA.reads[bb] = v.reads[bb] * proportion[0];
+					vB.reads[bb] = v.reads[bb] * proportion[1];
+				}
+				cout << vA.reads[0] << "\t" << vA.reads[1] << "\t"<< vA.reads[2] << "\t"<< vA.reads[3] << "\t" <<endl;
+				cout << "AA" << endl;
+				mA.all_reads[b] = vA;
+				cout << "BB" << endl;
+				mB.all_reads.push_back( vB );
+				cout << "??" << endl;
+			}
+		}
+		cout << muArray[0] << "\t" << muArray[2] << endl;
     return 0;
 
 

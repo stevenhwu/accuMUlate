@@ -43,7 +43,7 @@ SequenceProb::SequenceProb(const ModelParams &model_params,
 	params = model_params; //TODO check copy method/ref
 
 	UpdateMuProb(muProb);
-
+	data = site_data;
 	pop_genotypes = DiploidPopulation(site_data.reference);
 
 	auto it = site_data.all_reads.begin();
@@ -175,4 +175,7 @@ double SequenceProb::GetLikelihood() {
 	return likelihood;
 }
 
-
+//ModelInput GetData();
+ModelInput SequenceProb::GetData(){
+	return data;
+}
