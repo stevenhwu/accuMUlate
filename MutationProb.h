@@ -18,7 +18,7 @@ class MutationProb {
 	MutationMatrix mutation;
 
 	ModelParams params;
-
+	int beta0;
 
 public:
 	MutationProb(const ModelParams &model_params);

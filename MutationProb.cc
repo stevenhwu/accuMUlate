@@ -12,6 +12,12 @@
 MutationProb::MutationProb(const ModelParams &model_params) {
 
 	params = model_params; //TODO check copy method/ref
+
+	beta0 = 1.0;
+	for (auto d : params.nuc_freq) {
+		beta0 -= d * d;
+	}
+	beta0 = 1.0 / beta0;
 	UpdateMu();
 }
 
@@ -23,6 +29,7 @@ MutationProb::~MutationProb() {
 void MutationProb::UpdateMu() {
 	UpdateMu(params.mutation_rate);
 }
+
 void MutationProb::UpdateMu(double mu) {
 	params.mutation_rate = mu;
 
@@ -150,11 +157,7 @@ MutationMatrix MutationProb::GetNonMutation() {
 }
 
 double MutationProb::CalculateBeta(){
-	double beta = 1.0;
-	for (auto d : params.nuc_freq) {
-		beta -= d * d;
-	}
-	beta = 1.0 / beta;
-	beta = exp(-beta * params.mutation_rate);
+
+	double beta = exp(-beta0 * params.mutation_rate);
 	return beta;
 }
