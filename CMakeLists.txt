@@ -33,10 +33,14 @@ include_directories(${INCLUDE_DIR})
 
 ADD_SUBDIRECTORY(distributions)
 
-SET(SOURCE_FILES main.cc model.cc parsers.cc SequenceProb.cc MutationProb.cc)
+SET(SOURCE_FILES model.cc parsers.cc SequenceProb.cc MutationProb.cc VariantVisitor.cc)
 
-add_executable(accuMUlate ${SOURCE_FILES})
+add_executable(accuMUlate main.cc ${SOURCE_FILES})
 target_link_libraries(accuMUlate ${LIBS} )
+
+add_executable(EMTest EMTest.cc ${SOURCE_FILES})
+target_link_libraries(EMTest ${LIBS} )
+
 #target_link_libraries(accuMUlate distributions)
 #target_link_libraries(accuMUlate bamtools bamtools-utils ${LIBS} distributions)
 

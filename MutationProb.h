@@ -29,6 +29,8 @@ public:
 	MutationMatrix GetMutation();
 	MutationMatrix GetNonMutation();
 
+    double GetMu();
+
 protected:
 
 	MutationMatrix MutationAccumulation(const ModelParams &params, bool and_mut);

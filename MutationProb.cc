@@ -45,7 +45,7 @@ void MutationProb::UpdateMu(double mu) {
 //	std::cout << mutation << endl;
 //	std::cout << non_mutation << endl;
 
-	MutationAccumulation2(false);
+//	MutationAccumulation2(false);//TODO: change to this version later
 //	UpdateLikelihood();
 }
 
@@ -160,4 +160,8 @@ double MutationProb::CalculateBeta(){
 
 	double beta = exp(-beta0 * params.mutation_rate);
 	return beta;
+}
+
+double MutationProb::GetMu() {
+    return params.mutation_rate;
 }

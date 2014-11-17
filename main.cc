@@ -15,10 +15,10 @@
 using namespace std;
 using namespace BamTools;
 
-                             
-class VariantVisitor : public PileupVisitor{
+                               
+class VariantVisitorMain : public PileupVisitor{
     public:
-        VariantVisitor(const RefVector& bam_references, 
+        VariantVisitorMain(const RefVector& bam_references,
                        const SamHeader& header,
                        const Fasta& idx_ref,
                        GenomeData& all_the_data,
@@ -35,7 +35,7 @@ class VariantVisitor : public PileupVisitor{
                              m_all_the_data(all_the_data), m_prob_cut(prob_cut),
                              m_mapping_cut(mapping_cut)
                               { }
-        ~VariantVisitor(void) { }
+        ~VariantVisitorMain(void) { }
     public:
          void Visit(const PileupPosition& pileupData) {
              string chr = m_bam_ref[pileupData.RefId].RefName;
@@ -192,7 +192,7 @@ int main(int argc, char** argv){
         }
     }
 
-    VariantVisitor *v = new VariantVisitor(
+    VariantVisitorMain *v = new VariantVisitorMain(
             references,
             header,
             reference_genome, 

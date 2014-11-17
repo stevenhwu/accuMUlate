@@ -1,10 +1,9 @@
 #include <iostream>
-#include <stdint.h>
 #include <map>
 #include <vector>
-#include <string>
 
 #include <boost/program_options.hpp>
+
 #include "api/BamReader.h"
 #include "utils/bamtools_pileup_engine.h"
 #include "utils/bamtools_fasta.h"
@@ -12,90 +11,21 @@
 #include "model.h"
 #include "parsers.h"
 #include "SequenceProb.h"
-#include "MutationProb.h"
-
-#include <algorithm>
+#include "VariantVisitor.h"
 
 using namespace std;
 using namespace BamTools;
 
 
-class VariantVisitor : public PileupVisitor{
-public:
-    VariantVisitor(const RefVector& bam_references,
-            const SamHeader& header,
-            const Fasta& idx_ref,
-            GenomeData& all_the_data,
-//                      const ModelParams& p,  
-            const SampleMap& samples,
-            BamAlignment& ali,
-            int qual_cut,
-            int mapping_cut,
-            double prob_cut):
+namespace po = boost::program_options;
+int RunBasicProbCalc(GenomeData base_counts, ModelParams params);
 
-            PileupVisitor(), m_idx_ref(idx_ref), m_bam_ref(bam_references),
-            m_header(header), m_samples(samples),
-            m_qual_cut(qual_cut), m_ali(ali),
-            m_all_the_data(all_the_data), m_prob_cut(prob_cut),
-            m_mapping_cut(mapping_cut)
-    { }
-    ~VariantVisitor(void) { }
-public:
-    void Visit(const PileupPosition& pileupData) {
-        string chr = m_bam_ref[pileupData.RefId].RefName;
-        uint64_t pos  = pileupData.Position;
-        m_idx_ref.GetBase(pileupData.RefId, pos, current_base);
-        ReadDataVector bcalls (m_samples.size(), ReadData{{ 0,0,0,0 }});
-        string tag_id;
-        for(auto it = begin(pileupData.PileupAlignments);
-            it !=  end(pileupData.PileupAlignments);
-            ++it){
-            if( include_site(*it, m_mapping_cut, m_qual_cut) ){
-                it->Alignment.GetTag("RG", tag_id);
-                string sm =  m_header.ReadGroups[tag_id].Sample;
-                uint32_t sindex = m_samples[sm]; //TODO check samples existed!
-                uint16_t bindex  = base_index(it->Alignment.QueryBases[it->PositionInAlignment]);
-                if (bindex < 4 ){
-                    bcalls[sindex].reads[bindex] += 1;
-                }
-            }
-        }
-        uint16_t ref_base_idx = base_index(current_base);
-        if (ref_base_idx < 4  ){ //TODO Model for bases at which reference is 'N'
-//                ModelInput d = {ref_base_idx, bcalls};
-            m_all_the_data.push_back(ModelInput{ ref_base_idx, bcalls });
-//                std::cout << m_all_the_data.size() << endl;
-//                ModelInput d = {ref_base_idx, bcalls};
-//                double prob_one = TetMAProbOneMutation(m_params,d);
-//                double prob = TetMAProbability(m_params, d);
-//                if(prob >= m_prob_cut){
-//                     *m_ostream << chr << '\t' 
-//                                << pos << '\t' 
-//                                << current_base << '\t' 
-//                                << prob << '\t' 
-//                                << prob_one << '\t' 
-//                               << endl;          
-//                }
-        }
-    }
-private:
-    RefVector m_bam_ref;
-    SamHeader m_header;
-    Fasta m_idx_ref;
-    GenomeData& m_all_the_data;
-    SampleMap m_samples;
-    BamAlignment& m_ali;
-//        ModelParams m_params;
-    int m_qual_cut;
-    int m_mapping_cut;
-    double m_prob_cut;
-    char current_base;
-    uint64_t chr_index;
-};
+void testCalLikelihood(MutationProb muProb, SequenceProb sp[]);
+
+void testCalWeighting(MutationProb muProb,SequenceProb sp[]);
 
 int main(int argc, char** argv){
 
-//	exit(-1);
     namespace po = boost::program_options;
     string ref_file;
     string config_path;
@@ -144,8 +74,8 @@ int main(int argc, char** argv){
 //        vm["theta"].as<double>(),
 //        vm["nfreqs"].as<vector< double> >(),
 //        vm["mu"].as<double>(),
-//        vm["seq-error"].as<double>(), 
-//        vm["phi-haploid"].as<double>(), 
+//        vm["seq-error"].as<double>(),
+//        vm["phi-haploid"].as<double>(),
 //        vm["phi-diploid"].as<double>(),
 //    };
     string bam_path = vm["bam"].as<string>();
@@ -167,11 +97,22 @@ int main(int argc, char** argv){
     PileupEngine pileup;
     BamAlignment ali;
 
-    uint32_t total_len = 0;
-    for_each(references.begin(),references.end(),[&](RefData chrom){
-        total_len += chrom.RefLength;
-    });
 
+//  Assign some memory for the big list
+    uint32_t total_len = 0;
+    if (vm.count("intervals")){
+        BedFile bed (vm["intervals"].as<string>());
+        BedInterval region;
+        while(bed.get_interval(region) == 0){
+            total_len += (region.end - region.start);
+        }
+    }
+    else {
+
+        for_each(references.begin(),references.end(),[&](RefData chrom){
+            total_len += chrom.RefLength;
+        });
+    }
     GenomeData base_counts;
     base_counts.reserve(total_len);
 
@@ -186,9 +127,6 @@ int main(int argc, char** argv){
             }
         }
     }
-    for (auto t : samples) {
-        cout << t.first << "\t" << t.second << endl;
-    }
 
     VariantVisitor *v = new VariantVisitor(
             references,
@@ -197,14 +135,14 @@ int main(int argc, char** argv){
             base_counts,
 //            &result_stream,
             samples,
-//            params, 
+//            params,
             ali,
             vm["qual"].as<int>(),
             vm["mapping-qual"].as<int>(),
             vm["prob"].as<double>()
     );
     pileup.AddVisitor(v);
-//  TODO: Only allocate interval-sized memory vector   
+//  TODO: Only allocate interval-sized memory vector
 //  if intervals are set
     if (vm.count("intervals")){
         BedFile bed (vm["intervals"].as<string>());
@@ -218,62 +156,238 @@ int main(int argc, char** argv){
         }
     }
     else{
-        cout << "here"<< endl;
+        clock_t t;
+        uint64_t ali_counter = 0;
+        t = clock();
         BamAlignment ali;
         while( experiment.GetNextAlignment(ali)){
             pileup.AddAlignment(ali);
-        };
+            ali_counter += 1;
+            if (ali_counter % 1000000 == 0){
+                t = clock() - t;
+                cout << "Processed 1 million reads ("
+                        << ((float)t)/CLOCKS_PER_SEC
+                        << " seconds)" << endl;
+            }
+        }
+    }
+    pileup.Flush();
+    cout << "Base_count: " << base_counts.size() << endl;
 
-        pileup.Flush();
+    ModelParams params = {
+        vm["theta"].as<double>(),
+        vm["nfreqs"].as<vector< double> >(),
+        vm["mu"].as<double>(),
+        vm["seq-error"].as<double>(),
+        vm["phi-haploid"].as<double>(),
+        vm["phi-diploid"].as<double>(),
+    };
+    RunBasicProbCalc(base_counts, params);
+
+}
+
+int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
+    cout << "init" << endl;
+    MutationProb muProb = MutationProb(params);
+    SequenceProb sp[3];
+
+    for (int i = 0; i < 3; ++i) {
+        sp[i] = SequenceProb(params, base_counts[500+i], muProb);
+    }
+    sp[0] = SequenceProb(params, base_counts[598], muProb);
+//		sp[1] = SequenceProb(params, base_counts[4195], muProb);
+    sp[1] = SequenceProb(params, base_counts[5391], muProb);
+//		sp[2] = SequenceProb(params, base_counts[5391], muProb);
+//		sp[3] = SequenceProb(params, base_counts[6589], muProb);
+
+    ModelInput base_custom =  base_counts[598];
+    for (int i = 0; i < 7; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            base_custom.all_reads[i].reads[j] = (uint16_t) i*2+j*3;
+        }
+    }
+
+    sp[2] = SequenceProb(params, base_custom, muProb);
+//		double d = sp[0].GetLikelihood();
+		cout << "D:\t"  << endl;
+		for (auto t : sp) {
+			t.UpdateLikelihood();
+			double likelihood = t.GetLikelihood();
+			cout << likelihood << (1 - likelihood) << endl;
+		}
+
+    cout << "Start\n\n";
+
+//    testCalLikelihood(muProb, sp);
+    testCalWeighting(muProb, sp);
+
+    return 0;
+}
+
+void testCalWeighting(MutationProb muProb, SequenceProb sp[]) {
+    const int cat = 2;
+    double muArray[cat];
+    muArray[0] = 1e-5;
+    muArray[1] = 1e-10;
+
+//    likelihood[cat];
+    double proportion[cat];
+    double weight[2];
+//cout << "here\n";
+    int num_descendant = 2;//FIXME change later
+    for (int s = 0; s < 1; ++s) {
+        auto t = sp[s];
+        for (int i = 0; i < 2; ++i) {
+
+
+            Array10D prob_AtoD = Array10D::Zero();
+            for (int d = 0; d < num_descendant; ++d) {
+                cout << "==============Start Looop:\t" << s << " " << i << " "<< d << "\n";
+//            for (int b = 0; b < 4; ++b) {
+                muProb.UpdateMu(muArray[i]);
+                t.UpdateMuProb(muProb);
+//                cout << "here1\n";
+                HaploidProbs prob_reads_given_descent = t.GetDescendantToReads(d); //Fixed value for now
+                prob_AtoD += t.CalculateAncestorToDescendant(prob_reads_given_descent);
+
+//                prob_reads_given_descent
+//                cout << "here2\n";
+//                cout << prob_for_each_base << endl;
+//                cout << prob_reads_given_descent << "\t" << prob_reads_given_descent[0]<<
+//                "\t" << prob_reads_given_descent[1]<<
+//                "\t" << prob_reads_given_descent[2]<<
+//                "\t" << prob_reads_given_descent[3]<< endl;
+
+//                likelihood[i] = t.GetLikelihood();
+            }
+
+            double summary_stat = t.CalculateExpectedValueForMu(prob_AtoD);
+            cout << "====================================summary_stat: " << summary_stat  << endl;
+        }
+//        double sum = likelihood[0] + likelihood[1];
+//
+//        proportion[0] = likelihood[0]/sum;
+//        proportion[1] = likelihood[1]/sum;
+//
+//        cout << proportion[0] << "\t" << proportion[1] << endl;
+
+//        ModelInput m = t.GetData();
+////			m.all_reads
+//
+//        ModelInput mA, mB;
+//        ReadData vA, vB;
+//        //Might have to redo this part, with double[4] TODO:
+//        mA.all_reads = std::vector<ReadData>(7);
+        /*for (int b = 0; b < m.all_reads.size(); ++b) {
+            ReadData v = m.all_reads[b];
+
+            cout << v.reads[0] << "\t" << v.reads[1] << "\t"<< v.reads[2] << "\t"<< v.reads[3] << "\t" <<endl;
+            for (int bb = 0; bb < 3; ++bb) {
+                vA.reads[bb] = v.reads[bb] * proportion[0];
+                vB.reads[bb] = v.reads[bb] * proportion[1];
+            }
+            cout << vA.reads[0] << "\t" << vA.reads[1] << "\t"<< vA.reads[2] << "\t"<< vA.reads[3] << "\t" <<endl;
+            cout << "AA" << endl;
+            mA.all_reads[b] = vA;
+            cout << "BB" << endl;
+            mB.all_reads.push_back( vB );
+            cout << "??" << endl;
+        }*/
+    }
+//    cout << muArray[0] << "\t" << muArray[2] << endl;
+}
+
+void testCalLikelihood(MutationProb muProb, SequenceProb sp[]) {
+    int size = 5;
+    double muArray[size];
+    double likelihood[size];
+    muArray[0] = 1;
+    for (int i = 1; i < size; ++i) {
+        muArray[i] = muArray[i - 1] * 0.1;
+    }
+    for (int i = 0; i < size; ++i) {
+        muProb.UpdateMu(muArray[i]);
+        for (int s = 0; s < 3; ++s) {
+            auto t = sp[s];
+            t.UpdateMuProb(muProb);
+            cout << log( t.GetLikelihood() )<< " ";
+            likelihood[i] += log( t.GetLikelihood() );
+        }
+        printf("\tI:%d\t%.1e %e %f \n", i, muArray[i], likelihood[i], likelihood[i]
+        );
+    }
+    double mma = *max_element( likelihood, likelihood+size);
+    double mmi = *min_element( likelihood, likelihood+size);
+    cout << mma <<"\t"<< mmi << endl;
+}
+
+void RunMaProb(ModelParams params, po::variables_map vm, BamReader experiment, PileupEngine pileup, GenomeData base_counts) {
+    BamAlignment ali;
+    if (vm.count("intervals")){
+        BedFile bed (vm["intervals"].as<string>());
+        BedInterval region;
+        while(bed.get_interval(region) == 0){
+            int ref_id = experiment.GetReferenceID(region.chr);
+            experiment.SetRegion(ref_id, region.start, ref_id, region.end);
+            while( experiment.GetNextAlignment(ali) ){
+                pileup.AddAlignment(ali);
+            }
+        }
+    }
+    else {
+        cout << "here" << endl;
+
+
         cout << base_counts.size() << endl;
-        cout << "here3"<< endl;
+        cout << "here3" << endl;
 
-        ModelParams params = {
-                vm["theta"].as<double>(),
-                vm["nfreqs"].as<vector< double> >(),
-                vm["mu"].as<double>(),
-                vm["seq-error"].as<double>(),
-                vm["phi-haploid"].as<double>(),
-                vm["phi-diploid"].as<double>(),
-        };
+//        ModelParams params = {
+//                vm["theta"].as<double>(),
+//                vm["nfreqs"].as<vector<double> >(),
+//                vm["mu"].as<double>(),
+//                vm["seq-error"].as<double>(),
+//                vm["phi-haploid"].as<double>(),
+//                vm["phi-diploid"].as<double>(),
+//        };
         int count = 0;
         for (auto base : base_counts) {
 
 //		ModelInput d = {ref_base_idx, bcalls};
 //		double prob_one = TetMAProbOneMutation(params,d);
             for (auto t : base.all_reads) {
-                cout << t.reads[0] <<t.reads[1]<<t.reads[2]<<t.reads[3] << endl;
+                cout << t.reads[0] << t.reads[1] << t.reads[2] << t.reads[3] << endl;
             }
-            cout <<""<< endl;
+            cout << "" << endl;
 //    	exit(-1);
-            double prob = TetMAProbability(params, base);
-            if(prob >= 0.1){
+//            double prob = TetMAProbability(params, base);
+            double prob = 0;
+            if (prob >= 0.1) {
                 cout.precision(10);
-                cout <<"=================" <<endl;
-                cout << prob << "\t" << (1-prob) << endl;
-                cout << base.reference  << "\tSIZE:\t" << base.all_reads.size() << endl;
+                cout << "=================" << endl;
+                cout << prob << "\t" << (1 - prob) << endl;
+                cout << base.reference << "\tSIZE:\t" << base.all_reads.size() << endl;
                 for (auto t : base.all_reads) {
-                    cout << t.reads[0] <<t.reads[1]<<t.reads[2]<<t.reads[3] << endl;
+                    cout << t.reads[0] << t.reads[1] << t.reads[2] << t.reads[3] << endl;
                 }
-                cout<<count<<endl;
+                cout << count << endl;
                 MutationProb muProb = MutationProb(params);
-                SequenceProb sp (params, base, muProb);
+                SequenceProb sp(params, base, muProb);
                 sp.UpdateLikelihood();
-                double likelihood = sp.GetLikelihood();
-                cout << likelihood << (1-likelihood) << endl;
+//                double likelihood = sp.GetLikelihood();
+//                cout << likelihood << (1 - likelihood) << endl;
 
                 int size = 20;
                 double muArray[size];
                 muArray[0] = 0.1;
                 for (int i = 1; i < size; ++i) {
-                    muArray[i] = muArray[i-1]*0.1;
+                    muArray[i] = muArray[i - 1] * 0.1;
                 }
-                for (int i =0; i < size; ++i) {
-                    muProb.UpdateMu(muArray[i]);
-                    sp.UpdateMuProb(muProb);
-                    likelihood = sp.GetLikelihood();
-
-                    printf("I:%d %e %e %e\n", i, muArray[i], likelihood, (1-likelihood));
+                for (int i = 0; i < size; ++i) {
+//                    muProb.UpdateMu(muArray[i]);
+//                    sp.UpdateMuProb(muProb);
+//                    likelihood = sp.GetLikelihood();
+//
+//                    printf("I:%d %e %e %e\n", i, muArray[i], likelihood, (1 - likelihood));
                 }
 
 
@@ -291,7 +405,7 @@ int main(int argc, char** argv){
 //			cout << likelihood << (1-likelihood) << endl;
 
 
-                cout <<"=================" <<endl;
+                cout << "=================" << endl;
 ////					std::cout << base.reference << base.all_reads << endl;
 ////			 *m_ostream << chr << '\t'
 ////						<< pos << '\t'
@@ -302,125 +416,10 @@ int main(int argc, char** argv){
             }
 
             count++;
-            if(count == 600){ //598 4195 5391 6589
+            if (count == 600) { //598 4195 5391 6589
                 break;
             }
         }
-
-
-        cout << count << endl;
-        MutationProb muProb = MutationProb(params);
-        int xx[3];
-        xx[0] = 1;
-//		int sp_count = 10;
-        SequenceProb sp[5];
-
-        for (int i = 0; i < 5; ++i) {
-            sp[i] = SequenceProb(params, base_counts[500+i], muProb);
-        }
-        sp[0] = SequenceProb(params, base_counts[598], muProb);
-//		sp[1] = SequenceProb(params, base_counts[4195], muProb);
-        sp[1] = SequenceProb(params, base_counts[5391], muProb);
-//		sp[2] = SequenceProb(params, base_counts[5391], muProb);
-//		sp[3] = SequenceProb(params, base_counts[6589], muProb);
-
-        ModelInput base_custom =  base_counts[598];
-        for (int i = 0; i < 7; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                base_custom.all_reads[i].reads[j] = (uint16_t) i*2+j*3;
-            }
-        }
-//		base_custom.all_reads[0].reads[0] = 12;
-//		base_custom.all_reads[1].reads = {42,65,12,35};
-//		base_custom.all_reads[2].reads = {2,6,84,5};
-//		base_custom.all_reads[3].reads = {7,48,51,21};
-//		base_custom.all_reads[4].reads = {24,24,23,29};
-
-        sp[2] = SequenceProb(params, base_custom, muProb);
-//		double d = sp[0].GetLikelihood();
-//		cout << "D:\t" << d << endl;
-//		for (auto t : sp) {
-//			t.UpdateLikelihood();
-//			double likelihood = t.GetLikelihood();
-//			cout << likelihood << (1 - likelihood) << endl;
-//		}
-
-        int size = 20;
-        double muArray[size];
-        double likelihood[size];
-        muArray[0] = 1;
-        for (int i = 1; i < size; ++i) {
-            muArray[i] = muArray[i - 1] * 0.2;
-        }
-        for (int i = 0; i < size; ++i) {
-            muProb.UpdateMu(muArray[i]);
-            for (auto t : sp) {
-                t.UpdateMuProb(muProb);
-                cout << log( t.GetLikelihood() )<< " ";
-
-                likelihood[i] += log( t.GetLikelihood() );
-            }
-            printf("\tI:%d\t%.1e %e %f \n", i, muArray[i], likelihood[i], likelihood[i]
-            );
-        }
-        double mma = *std::max_element( likelihood, likelihood+size);
-        double mmi = *std::min_element( likelihood, likelihood+size);
-        cout << mma <<"\t"<< mmi << endl;
-
-
-        const int cat = 2;
-        muArray[cat];
-        muArray[0] = 1e-2;
-        muArray[0] = 1e-5;
-
-        likelihood[cat];
-        double proportion[cat];
-        double weight[2];
-        for (auto t : sp) {
-            for (int i = 0; i < cat; ++i) {
-                muProb.UpdateMu(muArray[i]);
-
-                t.UpdateMuProb(muProb);
-//				cout << log( t.GetLikelihood() )<< " ";
-                likelihood[i] = t.GetLikelihood();
-//				likelihood[i] += log( t.GetLikelihood() );
-            }
-            double sum = likelihood[0] + likelihood[1];
-
-            proportion[0] = likelihood[0]/sum;
-            proportion[1] = likelihood[1]/sum;
-
-
-
-            cout << proportion[0] << "\t" << proportion[1] << endl;
-
-            ModelInput m = t.GetData();
-//			m.all_reads
-
-            ModelInput mA, mB;
-            ReadData vA, vB;
-            //Might have to redo this part, with double[4] TODO:
-            mA.all_reads = vector<ReadData>(7);
-            for (int b = 0; b < m.all_reads.size(); ++b) {
-                ReadData v = m.all_reads[b];
-
-                cout << v.reads[0] << "\t" << v.reads[1] << "\t"<< v.reads[2] << "\t"<< v.reads[3] << "\t" <<endl;
-                for (int bb = 0; bb < 3; ++bb) {
-                    vA.reads[bb] = v.reads[bb] * proportion[0];
-                    vB.reads[bb] = v.reads[bb] * proportion[1];
-                }
-                cout << vA.reads[0] << "\t" << vA.reads[1] << "\t"<< vA.reads[2] << "\t"<< vA.reads[3] << "\t" <<endl;
-                cout << "AA" << endl;
-                mA.all_reads[b] = vA;
-                cout << "BB" << endl;
-                mB.all_reads.push_back( vB );
-                cout << "??" << endl;
-            }
-        }
-        cout << muArray[0] << "\t" << muArray[2] << endl;
-        return 0;
-
-
     }
 }
 
