@@ -9,6 +9,8 @@
 
 #include <string>
 
+
+
 //
 //double TetMAProbability(const ModelParams &params, const ModelInput site_data) {
 //	MutationMatrix m = MutationAccumulation(params, false);
@@ -36,7 +38,9 @@
 //}
 
 
+Eigen::IOFormat nice_row(Eigen::StreamPrecision, Eigen::DontAlignCols, " ", " ");
 
+const bool DEBUG = false;
 
 SequenceProb::SequenceProb(const ModelParams &model_params,
 		const ModelInput site_data, MutationProb muProb) {
@@ -76,8 +80,7 @@ SequenceProb::SequenceProb(const ModelParams &model_params,
         all_hap.push_back(p);
 
         HaploidProbs normalised = p/p.sum();
-
-        all_norm_hap.push_back(normalised);
+        all_normalised_hap.push_back(normalised);
     }
 
 	UpdateLikelihood();
@@ -142,8 +145,6 @@ DiploidProbs SequenceProb::DiploidPopulation(int ref_allele) {
 //			printf("  %d %d: %u %u %u %u\n", i, j, d.reads[0], d.reads[1], d.reads[2], d.reads[3]);
 			result[i+j*4] = DirichletMultinomialLogProbability(alphas, d);
 			result[j+i*4] = result[i+j*4];
-//			result[i+j*4] = 5;
-//			result[j+i*4] = 3;
 		}
 		d.key = 0;
 		d.reads[ref_allele] = 1;
@@ -152,12 +153,7 @@ DiploidProbs SequenceProb::DiploidPopulation(int ref_allele) {
 		result[i+i*4] = DirichletMultinomialLogProbability(alphas, d);
 	}
 //	std::cout << result << std::endl;
-//	Eigen::Matrix4d m;
-//	for (int i = 0; i < result.rows(); ++i) {
-//		m(i)= result[i];
-//	}
-//	std::cout << m<< std::endl;
-	return result.exp();
+	return result.exp();//TODO: find out why no -maxCoef here??
 }
 
 DiploidProbs SequenceProb::DiploidSequencing(ReadData data) {
@@ -187,6 +183,8 @@ DiploidProbs SequenceProb::DiploidSequencing(ReadData data) {
 	}
 	double scale = result.maxCoeff();
 	return (result - scale).exp();
+//    result = NormaliseLogArray(result);
+//    return result;
 }
 
 HaploidProbs SequenceProb::HaploidSequencing(ReadData data) {
@@ -205,6 +203,18 @@ HaploidProbs SequenceProb::HaploidSequencing(ReadData data) {
 
 	double scale = result.maxCoeff();
 	return (result - scale).exp();
+//    result = NormaliseLogArray(result);
+//    return result;
+}
+
+template <class T> //FIXME: make sure it only take Eigen::Array class
+T SequenceProb::NormaliseLogArray(T result) {
+    result = result.exp();
+    double normalise = result.sum();
+    result /=  normalise;
+    return result;
+//    double scale = result.maxCoeff();
+//	return (result - scale).exp();
 }
 
 
@@ -244,23 +254,13 @@ ModelInput SequenceProb::GetData(){
 
 HaploidProbs SequenceProb::GetDescendantToReads(int descent_index) {
 
-//
-//
-//    ReadData data = all_descendant[descent_index];
-//    HaploidProbs prob = all_hap[descent_index];
-//    double likelihood = 0;
-////    PrintReads(data);
-//    for (int b = 0; b < 4; ++b) {
-//
-//    }
-
-    HaploidProbs cond_likelihood = all_norm_hap[descent_index];
-    return cond_likelihood;
-//    std:: cout << descent_index << "\t" << prob.size()<< "\n" <<prob <<"\n==================================\n" << endl;
-
-
-
+    return all_normalised_hap[descent_index];
 }
+
+DiploidProbs SequenceProb::GetAncGenotypesToReads() {
+    return anc_genotypes;
+}
+
 
 int index_vector[4][10] = { //Same as summary stat now, number of mismatches between D (o) and A(m,f)
         {0, 1, 1, 1, 2, 2, 2, 2, 2, 2},// A
@@ -279,7 +279,25 @@ double index_summary[4][10] ={
 //        {1, 1, 0.5, 1, 1, 0.5, 1, 0, 0.5, 1},// G
 //        {1, 1, 1, 0.5, 1, 1, 0.5, 1, 0.5, 0} // T
 };
-//index_summary = index_vector;
+/*
+10 cat version
+  AA AC AG AT CC CG CT GG GT TT
+
+  descnt = A
+      A  C  G  T
+ *AA == !! !! !!
+  AC =! =! !! !!
+  AG =! !! =! !!
+  AT =! !! !! =!
+ *CC !! == !! !!
+  CG !! =! =! !!
+  CT !! =! !! =!
+ *GG !! !! == !!
+  GT !! !! =! =!
+ *TT !! !! !! ==
+
+
+*/
 
 
 string genotype_lookup[10]= {
@@ -297,100 +315,54 @@ string genotype_lookup[10]= {
 //};
 
 Array10D SequenceProb::CalculateAncestorToDescendant(Array4D prob_reads_given_descent) {
-cout << "In Calc AtoD\n";
-//    ReadData data = all_descendant[descent_index];
-//    HaploidProbs prob = all_hap[descent_index];
+    cout << "==================In Calc AtoD====================\n";
+
     double likelihood = 0;
-    cout << "BASE FREQ\n";
-    cout << prob_reads_given_descent << "\t" << prob_reads_given_descent[0]<<
-                "\t" << prob_reads_given_descent[1]<<
-                "\t" << prob_reads_given_descent[2]<<
-                "\t" << prob_reads_given_descent[3]<< endl;
-//mu = 0.9;
-//
-////    for (int i = 0; i < 4; ++i) {
-////        prob_reads_given_descent[i] = 0;
-////    }
-//    prob_reads_given_descent[0] = 0.1;
-//    prob_reads_given_descent[1] = 0.1;
-//    prob_reads_given_descent[2] = 0.7;
-//    prob_reads_given_descent[3] = 0.1;
+//    mu = 0.9;
+//    prob_reads_given_descent[0] = 0.2;
+//    prob_reads_given_descent[1] = 0.2;
+//    prob_reads_given_descent[2] = 0.4;
+//    prob_reads_given_descent[3] = 0.2;
+    if (DEBUG) {
+        cout << "MU: " << mu <<" BASE FREQ: " << prob_reads_given_descent.format(nice_row) << endl;
+    }
+
 
     double emu = computeExpFourThirdMu(mu);//FIXME still JC, change to F81 soon
     double three_prob[3] = {probThreeEqual(emu), probOneEqual(emu), probNotEqual(emu)};
-    double sum = 0;
+    double sum_over_d = 0;
     double sum_stat = 0;
-    double all_comb[4][10];
+    double all_comb[10][4];
 //    S_t(R, X ) = sum_j [ sum_stat / sum  ]
     double overall_summary[10];
     Array10D summary_stat;
+    
     for (int a = 0; a < 10; ++a) {
-        sum = 0;
-//        cout << "==Loop A: "<<a << "\t" << genotype_lookup[a] <<endl;
-        for (int b = 0; b < 4; ++b) {
-//        prob_reads_given_descent[b] = 0.25;
-//            cout << "====stat: b=" << b << "\tMu: " << mu << endl;
-//
-//        int index[10] = index_vector[b];
-
-            all_comb[b][a] = three_prob[index_vector[b][a]] * prob_reads_given_descent[b];
-            sum += all_comb[b][a];
-
-//            cout << all_comb[b][a] << "\t";
-        }
-//        cout << endl;
+        sum_over_d = 0;
         sum_stat = 0;
-        for (int b = 0; b < 4; ++b) {
-            all_comb[b][a]  *= index_summary[b][a];
-            sum_stat += all_comb[b][a];
-//            cout << b << ":" << a << "(" << all_comb[b][a] << ")" << index_summary[b][a] << "\t";
+        if(DEBUG) {
+            cout << "==Loop A: " << a << "\t" << genotype_lookup[a] << endl;
         }
-//        cout << endl << ;
-//        cout << endl << sum << "\t" << sum_stat << "\t" << (sum_stat/sum) << endl;
-        overall_summary[a] = (sum_stat/sum);
-        summary_stat[a] =  (sum_stat/sum);
+        for (int d = 0; d < 4; ++d) {
+
+            all_comb[a][d] = three_prob[index_vector[d][a]] * prob_reads_given_descent[d];
+            sum_over_d += all_comb[a][d];
+
+            double summary_given_a_d = all_comb[a][d] * index_summary[d][a];
+            sum_stat += summary_given_a_d;
+            if(DEBUG){
+                cout << "==== Loop D: " << d << "\t" << all_comb[a][d] << "\t" << summary_given_a_d <<endl;
+            }
+        }
+        overall_summary[a] = (sum_stat/ sum_over_d);
+        summary_stat[a] =  (sum_stat/ sum_over_d);
+    }
+    if(DEBUG) {
+        cout << summary_stat.format(nice_row) << endl << "================END=============\n\n";
     }
 
-    cout << "\n========\n" ;
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, " ", " ");
-    cout << summary_stat.format(CommaInitFmt) << endl;
-//    for (int i = 0; i < 10; ++i) {
-//        cout << overall_summary[i] << " ";
-//    }
-    cout << endl;
-
     return summary_stat;
-//        for (int i = 0; i < 4; ++i) {//anc_1
-//        for (int j = 0; j <=i ; ++j) {//anc_2
-//            cout << i << "\t" << j << "\t" << sum << endl;
-//            for (int k = 0; k < 4; ++k) {
-//                index_vector[k];
-//
-//
-//            }
-//        }
-//    }
-//    cout << "Result: " << sum << endl;
 
-    /*
-    10 cat version
-      AA AC AG AT CC CG CT GG GT TT
-
-      descnt = A
-          A  C  G  T
-     *AA == !! !! !!
-      AC =! =! !! !!
-      AG =! !! =! !!
-      AT =! !! !! =!
-     *CC !! == !! !!
-      CG !! =! =! !!
-      CT !! =! !! =!
-     *GG !! !! == !!
-      GT !! !! =! =!
-     *TT !! !! !! ==
-
-
-*/
 }
 
 
@@ -415,10 +387,6 @@ double SequenceProb::probNotEqual(double emu) {
 void SequenceProb::PrintReads(ReadData data) {
     printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);
 
-}
-
-DiploidProbs SequenceProb::getAncGenotypes() {
-    return anc_genotypes;
 }
 
 

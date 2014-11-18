@@ -24,6 +24,8 @@ void testCalLikelihood(MutationProb muProb, SequenceProb sp[]);
 
 void testCalWeighting(MutationProb muProb,SequenceProb sp[]);
 
+
+
 int main(int argc, char** argv){
 
     namespace po = boost::program_options;
@@ -160,6 +162,15 @@ int main(int argc, char** argv){
         uint64_t ali_counter = 0;
         t = clock();
         BamAlignment ali;
+
+        std::cerr.setstate(std::ios::failbit) ;
+//        streambuf *old = cout.rdbuf(); // <-- save
+//        stringstream ss;
+//
+//        cout.rdbuf (ss.rdbuf());       // <-- redirect
+//        foobar();                      // <-- call
+//        cout.rdbuf (old);
+
         while( experiment.GetNextAlignment(ali)){
             pileup.AddAlignment(ali);
             ali_counter += 1;
@@ -170,6 +181,7 @@ int main(int argc, char** argv){
                         << " seconds)" << endl;
             }
         }
+        std::cerr.clear() ;
     }
     pileup.Flush();
     cout << "Base_count: " << base_counts.size() << endl;
@@ -236,6 +248,7 @@ void testCalWeighting(MutationProb muProb, SequenceProb sp[]) {
 //cout << "here\n";
     int num_descendant = 2;//FIXME change later
     for (int s = 0; s < 1; ++s) {
+        s=2;
         auto t = sp[s];
         for (int i = 0; i < 2; ++i) {
 

@@ -17,11 +17,13 @@
 typedef Eigen::Array<double, 10, 1> Array10D;
 typedef HaploidProbs Array4D;
 
+
+
 class SequenceProb{
 	DiploidProbs anc_genotypes;
 	DiploidProbs pop_genotypes;
 	std::vector<HaploidProbs> all_hap;
-    std::vector<HaploidProbs> all_norm_hap;
+    std::vector<HaploidProbs> all_normalised_hap;
 	ModelParams params;
 
 	MutationMatrix non_mutation;
@@ -64,7 +66,7 @@ public:
     Array10D CalculateAncestorToDescendant(Array4D prob_reads_given_descent);
     HaploidProbs GetDescendantToReads(int descent_index);
 
-    DiploidProbs getAncGenotypes();
+    DiploidProbs GetAncGenotypesToReads();
 
     static double probNotEqual(double emu);
     static double probOneEqual(double emu);
@@ -91,6 +93,9 @@ protected:
     ReadDataVector all_descendant;
 
     void PrintReads(ReadData data);
+
+    template<class T>
+    T NormaliseLogArray(T result);
 
 
 };

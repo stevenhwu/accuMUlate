@@ -31,7 +31,7 @@ set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIR} ${Bamtoo
 include_directories("${CMAKE_SOURCE_DIR}/third-party/bamtools/src")
 include_directories(${INCLUDE_DIR})
 
-ADD_SUBDIRECTORY(distributions)
+ADD_SUBDIRECTORY(src/distributions)
 
 SET(SOURCE_FILES model.cc parsers.cc SequenceProb.cc MutationProb.cc VariantVisitor.cc)
 
