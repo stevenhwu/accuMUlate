@@ -25,46 +25,10 @@ ENDIF(ZLIB_FOUND)
 
 
 set(LIBS ${LIBS} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${Bamtools_LIBRARIES})
-set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIR} ${Bamtools_INCLUDE_DIR}  ${EIGEN3_INCLUDE_DIR})
+set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src ${Boost_INCLUDE_DIR} ${Bamtools_INCLUDE_DIR}  ${EIGEN3_INCLUDE_DIR})
 
 
-include_directories("${CMAKE_SOURCE_DIR}/third-party/bamtools/src")
+include_directories("${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
 include_directories(${INCLUDE_DIR})
 
-ADD_SUBDIRECTORY(src/distributions)
-
-SET(SOURCE_FILES model.cc parsers.cc SequenceProb.cc MutationProb.cc VariantVisitor.cc)
-
-add_executable(accuMUlate main.cc ${SOURCE_FILES})
-target_link_libraries(accuMUlate ${LIBS} )
-
-add_executable(EMTest EMTest.cc ${SOURCE_FILES})
-target_link_libraries(EMTest ${LIBS} )
-
-#target_link_libraries(accuMUlate distributions)
-#target_link_libraries(accuMUlate bamtools bamtools-utils ${LIBS} distributions)
-
-
-#add_executable(pp utils/post_processor.cc parsers.cc model.cc)
-#target_link_libraries(pp ${Boost_LIBRARIES} ${Bamtools_LIBRARIES})
-#link_directories("${Bamtools_LIBRARY_DIR}/bamtools/")
-#target_link_libraries(pp ${Boost_LIBRARIES} bamtools bamtools-utils )
-
-
-#add_executable(freq_seq utils/freq_seq.cc parsers.cc)
-#target_link_libraries(pp bamtools bamtools-utils)
-
-
-IF(USER_DEBUG)
-	MESSAGE("===== inc ${INCLUDE_DIR}
-	${Boost_INCLUDE_DIR} 
-	${BamTools_INCLUDE_DIR}
-	")
-	
-	message("===== libs ${LIBS}
-	${Boost_LIBRARIES} 
-	${GSL_LIBRARIES} 
-	${Bamtools_LIBRARIES}
-	${Bamtools_LIBRARY_DIR}
-	")
-ENDIF (USER_DEBUG)	
+ADD_SUBDIRECTORY(src)
