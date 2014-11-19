@@ -94,9 +94,9 @@ MutationMatrix MutationAccumulation(const ModelParams &params, bool and_mut) {
 		beta -= d*d;
 	}
 	beta = 1.0/beta;
-//	printf("beta:%f %.10e\n", beta, params.mutation_rate );
+//	printf("beta0:%f %.10e\n", beta0, params.mutation_rate );
 	beta = exp(-beta*params.mutation_rate); //~ close to 1 for small mu
-//	printf("beta:%.10f\n", beta); //0.9999999852
+//	printf("beta0:%.10f\n", beta0); //0.9999999852
 	Eigen::Matrix4d m;
 	for(int i : {0,1,2,3}) {
 		for(int j : {0,1,2,3}) {

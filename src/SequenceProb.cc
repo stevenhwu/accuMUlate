@@ -6,8 +6,7 @@
  */
 #include <iostream>
 #include "SequenceProb.h"
-
-#include <string>
+//#include "models/JC69.h"
 
 
 
@@ -40,7 +39,7 @@
 
 Eigen::IOFormat nice_row(Eigen::StreamPrecision, Eigen::DontAlignCols, " ", " ");
 
-const bool DEBUG = false;
+const bool DEBUG = true;
 
 SequenceProb::SequenceProb(const ModelParams &model_params,
 		const ModelInput site_data, MutationProb muProb) {
@@ -298,7 +297,18 @@ double index_summary[4][10] ={
 
 
 */
-
+int index_16_to_10_single[16] = {
+    0,1,2,3,
+    1,4,5,6,
+    2,5,7,8,
+    3,6,8,9,
+};
+int index_10_to_16[10] = {//??
+        0,1,2, 3,
+          5,6, 7,
+            10,11,
+               15
+};
 
 string genotype_lookup[10]= {
         "AA", "AC", "AG", "AT",
@@ -314,7 +324,7 @@ string genotype_lookup[10]= {
 //
 //};
 
-Array10D SequenceProb::CalculateAncestorToDescendant(Array4D prob_reads_given_descent) {
+Array10D SequenceProb::CalculateAncestorToDescendant(Array4D prob_reads_given_descent, EvolutionModel *error_model) {
     cout << "==================In Calc AtoD====================\n";
 
     double likelihood = 0;
@@ -327,9 +337,11 @@ Array10D SequenceProb::CalculateAncestorToDescendant(Array4D prob_reads_given_de
         cout << "MU: " << mu <<" BASE FREQ: " << prob_reads_given_descent.format(nice_row) << endl;
     }
 
+    //JC69
+//    array<double, 3> conditional_prob_jc = (JC69) error_model->GetConditionalProbSpecial();
+//    double three_prob[3] = {0,0,0};
 
-    double emu = computeExpFourThirdMu(mu);//FIXME still JC, change to F81 soon
-    double three_prob[3] = {probThreeEqual(emu), probOneEqual(emu), probNotEqual(emu)};
+    MutationMatrix conditional_prob = error_model->GetConditionalProb();
     double sum_over_d = 0;
     double sum_stat = 0;
     double all_comb[10][4];
@@ -337,15 +349,17 @@ Array10D SequenceProb::CalculateAncestorToDescendant(Array4D prob_reads_given_de
     double overall_summary[10];
     Array10D summary_stat;
     
-    for (int a = 0; a < 10; ++a) {
+    for (int a = 0; a < 10; ++a) {//10 or 16??
         sum_over_d = 0;
         sum_stat = 0;
         if(DEBUG) {
             cout << "==Loop A: " << a << "\t" << genotype_lookup[a] << endl;
         }
-        for (int d = 0; d < 4; ++d) {
 
-            all_comb[a][d] = three_prob[index_vector[d][a]] * prob_reads_given_descent[d];
+        for (int d = 0; d < 4; ++d) {
+            int index16 = index_10_to_16[a];
+             // 16 to 10 to 16
+            all_comb[a][d] = conditional_prob(index16, d) * prob_reads_given_descent[d];
             sum_over_d += all_comb[a][d];
 
             double summary_given_a_d = all_comb[a][d] * index_summary[d][a];
@@ -366,23 +380,6 @@ Array10D SequenceProb::CalculateAncestorToDescendant(Array4D prob_reads_given_de
 }
 
 
-//FIXME, JC atm, no pi yet, add that and turn into F81
-double SequenceProb::computeExpFourThirdMu(double mu) {
-    return exp(-four_third*mu);
-}
-
-double SequenceProb::probThreeEqual(double emu) {
-    return quarter + three_quarter* emu;
-}
-
-double SequenceProb::probOneEqual(double emu) {
-    return quarter + quarter* emu;
-}
-
-
-double SequenceProb::probNotEqual(double emu) {
-    return quarter - quarter* emu;
-}
 
 void SequenceProb::PrintReads(ReadData data) {
     printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);

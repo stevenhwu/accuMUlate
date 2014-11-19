@@ -1,7 +1,16 @@
 
-ADD_SUBDIRECTORY(distributions)
+message("A: ${SOURCE_FILES}")
 
-SET(SOURCE_FILES model.cc parsers.cc SequenceProb.cc MutationProb.cc VariantVisitor.cc)
+SET(SOURCE_FILES  model.cc parsers.cc SequenceProb.cc MutationProb.cc VariantVisitor.cc)
+
+
+ADD_SUBDIRECTORY(distributions)
+ADD_SUBDIRECTORY(models)
+
+message("B: ${SOURCE_FILES}")
+
+
+message("C: ${SOURCE_FILES}")
 
 add_executable(accuMUlate main.cc ${SOURCE_FILES})
 target_link_libraries(accuMUlate ${LIBS} )

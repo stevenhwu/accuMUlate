@@ -1,8 +1,10 @@
+
 #include <iostream>
 #include <map>
 #include <vector>
 
 #include <boost/program_options.hpp>
+#include <models/JC69.h>
 
 #include "api/BamReader.h"
 #include "utils/bamtools_pileup_engine.h"
@@ -12,6 +14,7 @@
 #include "parsers.h"
 #include "SequenceProb.h"
 #include "VariantVisitor.h"
+#include "models/F81.h"
 
 using namespace std;
 using namespace BamTools;
@@ -22,7 +25,7 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params);
 
 void testCalLikelihood(MutationProb muProb, SequenceProb sp[]);
 
-void testCalWeighting(MutationProb muProb,SequenceProb sp[]);
+void testCalWeighting(MutationProb muProb, SequenceProb sp[], ModelParams model_params);
 
 
 
@@ -231,12 +234,12 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     cout << "Start\n\n";
 
 //    testCalLikelihood(muProb, sp);
-    testCalWeighting(muProb, sp);
+    testCalWeighting(muProb, sp, params);
 
     return 0;
 }
 
-void testCalWeighting(MutationProb muProb, SequenceProb sp[]) {
+void testCalWeighting(MutationProb muProb, SequenceProb sp[], ModelParams model_params) {
     const int cat = 2;
     double muArray[cat];
     muArray[0] = 1e-5;
@@ -247,10 +250,17 @@ void testCalWeighting(MutationProb muProb, SequenceProb sp[]) {
     double weight[2];
 //cout << "here\n";
     int num_descendant = 2;//FIXME change later
+
+//    JC69 model(muArray[0]);
+    F81  model(muArray[0], model_params.nuc_freq);
     for (int s = 0; s < 1; ++s) {
         s=2;
         auto t = sp[s];
         for (int i = 0; i < 2; ++i) {
+
+
+
+//            F81 model(muArray[i]);
 
 
             Array10D prob_AtoD = Array10D::Zero();
@@ -261,7 +271,7 @@ void testCalWeighting(MutationProb muProb, SequenceProb sp[]) {
                 t.UpdateMuProb(muProb);
 //                cout << "here1\n";
                 HaploidProbs prob_reads_given_descent = t.GetDescendantToReads(d); //Fixed value for now
-                prob_AtoD += t.CalculateAncestorToDescendant(prob_reads_given_descent);
+                prob_AtoD += t.CalculateAncestorToDescendant(prob_reads_given_descent, &model);
 
 //                prob_reads_given_descent
 //                cout << "here2\n";

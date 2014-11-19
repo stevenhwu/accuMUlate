@@ -12,7 +12,7 @@
 #include "model.h"
 #include "MutationProb.h"
 #include "distributions/DirichletMultinomialDistribution.h"
-
+#include "models/F81.h"
 
 typedef Eigen::Array<double, 10, 1> Array10D;
 typedef HaploidProbs Array4D;
@@ -63,7 +63,7 @@ public:
     void CountReadToGenotype();
 
 
-    Array10D CalculateAncestorToDescendant(Array4D prob_reads_given_descent);
+    Array10D CalculateAncestorToDescendant(Array4D prob_reads_given_descent, EvolutionModel *error_model);
     HaploidProbs GetDescendantToReads(int descent_index);
 
     DiploidProbs GetAncGenotypesToReads();
@@ -100,8 +100,4 @@ protected:
 
 };
 
-
-const double four_third= 4.0/3.0;
-const double quarter = 1.0/4.0;
-const double three_quarter = 3.0/4.0;
 #endif /* SEQUENCINGPROB_H_ */

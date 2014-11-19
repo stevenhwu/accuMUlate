@@ -53,7 +53,7 @@ MutationMatrix MutationProb::MutationAccumulation2(bool and_mut) {
 
 	using namespace Eigen;
 	double beta = CalculateBeta();
-//	printf("beta:%.10f\n", beta); //0.9999999852
+//	printf("beta0:%.10f\n", beta0); //0.9999999852
 	Eigen::Matrix4d m;
 	Eigen::Matrix4d m2 = Eigen::Matrix4d::Zero();
 
@@ -118,7 +118,7 @@ MutationMatrix MutationProb::MutationAccumulation2(bool and_mut) {
 MutationMatrix MutationProb::MutationAccumulation(const ModelParams &params, bool and_mut) {
 
 	double beta = CalculateBeta();
-//	printf("beta:%.10f\n", beta); //0.9999999852
+//	printf("beta0:%.10f\n", beta0); //0.9999999852
 	Eigen::Matrix4d m;
 	for (int i : { 0, 1, 2, 3 }) {
 		for (int j : { 0, 1, 2, 3 }) {
