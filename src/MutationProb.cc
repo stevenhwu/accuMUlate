@@ -5,20 +5,35 @@
  *      Author: Steven Wu
  */
 
-#include <MutationProb.h>
+#include "MutationProb.h"
 #include <cmath>
 #include <iostream>
+
+#include "SequenceProb.h"
 
 MutationProb::MutationProb(const ModelParams &model_params) {
 
 	params = model_params; //TODO check copy method/ref
 
 	beta0 = 1.0;
-	for (auto d : params.nuc_freq) {
+	for (auto d : model_params.nuc_freq) {
 		beta0 -= d * d;
 	}
 	beta0 = 1.0 / beta0;
-	UpdateMu();
+
+    for (int i = 0; i < 4; ++i) {
+        frequency_prior[i] = model_params.nuc_freq[i];
+//        beta0 += params.nuc_freq[i] * params.nuc_freq[i];
+        for (int j = i; j < 4; ++j) {
+            int index10 = index_converter_16_to_10[i][j];
+            ancestor_prior[index10] = model_params.nuc_freq[i] * model_params.nuc_freq[j];
+            if(i != j){
+                ancestor_prior[index10] *= 2; //Count both AC and CA
+            }
+        }
+    }
+
+    UpdateMu(model_params.mutation_rate);
 }
 
 MutationProb::~MutationProb() {
@@ -26,17 +41,18 @@ MutationProb::~MutationProb() {
 }
 
 
-void MutationProb::UpdateMu() {
-	UpdateMu(params.mutation_rate);
-}
+//void MutationProb::UpdateMu() {
+//
+//}
 
-void MutationProb::UpdateMu(double mu) {
-	params.mutation_rate = mu;
-
+void MutationProb::UpdateMu(double mu0) {
+	mutation_rate.mu = mu0;
+    mutation_rate.one_minus_mu = 1 - mutation_rate.mu;
+    CalculateBeta();
 	mutation = MutationAccumulation(params, false);
 	MutationMatrix mt = MutationAccumulation(params, true);
-
-	non_mutation = mutation - mt;
+//
+//	non_mutation = mutation - mt;
 
 //	std::cout << mutation << endl;
 //	std::cout << non_mutation << endl;
@@ -45,7 +61,7 @@ void MutationProb::UpdateMu(double mu) {
 //	std::cout << mutation << endl;
 //	std::cout << non_mutation << endl;
 
-//	MutationAccumulation2(false);//TODO: change to this version later
+	MutationAccumulation2(false);//TODO: change to this version later
 //	UpdateLikelihood();
 }
 
@@ -64,13 +80,13 @@ MutationMatrix MutationProb::MutationAccumulation2(bool and_mut) {
 
 	for (int i : { 0, 1, 2, 3 }) {
 		for (int j : { 0, 1, 2, 3 }) {
-			m(i, j) = params.nuc_freq[i] * (1.0 - beta);
+			m(i, j) = frequency_prior[i] * (1.0 - beta);
 		}
 		m(i, i) += beta;
 	}
 //	element wise operation
 	for (int i : { 0, 1, 2, 3 }) {
-		double c = params.nuc_freq[i] * (1.0 - beta);
+		double c = frequency_prior[i] * (1.0 - beta);
 //		c = (i+1) * 1.1;
 		m2.row(i) = Vector4d::Constant(c);
 	}
@@ -122,7 +138,7 @@ MutationMatrix MutationProb::MutationAccumulation(const ModelParams &params, boo
 	Eigen::Matrix4d m;
 	for (int i : { 0, 1, 2, 3 }) {
 		for (int j : { 0, 1, 2, 3 }) {
-			m(i, j) = params.nuc_freq[i] * (1.0 - beta);
+			m(i, j) = frequency_prior[i] * (1.0 - beta);
 		}
 		m(i, i) += beta;
 	}
@@ -158,10 +174,22 @@ MutationMatrix MutationProb::GetNonMutation() {
 
 double MutationProb::CalculateBeta(){
 
-	double beta = exp(-beta0 * params.mutation_rate);
+	beta = exp(-beta0 * mutation_rate.mu);
 	return beta;
 }
 
-double MutationProb::GetMu() {
-    return params.mutation_rate;
+MutationRate MutationProb::GetMutationRate() {
+    return mutation_rate;
+}
+
+double MutationProb::GetBeta() {
+    return beta;
+}
+
+Array4D MutationProb::GetFrequencyPrior() {
+    return frequency_prior;
+}
+
+Array10D MutationProb::GetAncestorPrior() {
+    return ancestor_prior;
 }

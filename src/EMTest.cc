@@ -203,9 +203,13 @@ int main(int argc, char** argv){
 
 int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     cout << "init" << endl;
+    size_t site_count = base_counts.size();
     MutationProb muProb = MutationProb(params);
     SequenceProb sp[3];
 
+//    for (int i = 0; i < site_count; ++i) {
+//        sp[i] = SequenceProb(params, base_counts[+i], muProb);
+//    }
     for (int i = 0; i < 3; ++i) {
         sp[i] = SequenceProb(params, base_counts[500+i], muProb);
     }
@@ -218,11 +222,13 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     ModelInput base_custom =  base_counts[598];
     for (int i = 0; i < 7; ++i) {
         for (int j = 0; j < 4; ++j) {
-            base_custom.all_reads[i].reads[j] = (uint16_t) i*2+j*3;
+            base_custom.all_reads[i].reads[j] = (uint16_t) i*j+i;
         }
     }
 
+
     sp[2] = SequenceProb(params, base_custom, muProb);
+
 //		double d = sp[0].GetLikelihood();
 		cout << "D:\t"  << endl;
 		for (auto t : sp) {
@@ -240,7 +246,9 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
 }
 
 void testCalWeighting(MutationProb muProb, SequenceProb sp[], ModelParams model_params) {
-    const int cat = 2;
+    const size_t cat = 2;
+    size_t site_count = 1000;//
+
     double muArray[cat];
     muArray[0] = 1e-5;
     muArray[1] = 1e-10;
@@ -253,25 +261,25 @@ void testCalWeighting(MutationProb muProb, SequenceProb sp[], ModelParams model_
 
 //    JC69 model(muArray[0]);
     F81  model(muArray[0], model_params.nuc_freq);
-    for (int s = 0; s < 1; ++s) {
-        s=2;
-        auto t = sp[s];
-        for (int i = 0; i < 2; ++i) {
+    for (int r = 0; r < 1; ++r) {
+        model.UpdateMu(muArray[r]);
+        MutationMatrix conditional_prob = model.GetConditionalProb();
 
+        muProb.UpdateMu(muArray[r]);
 
+        Array10D site_stat[site_count];
+        for (int s = 0; s < 1; ++s) {
+            s=2;
+            auto t = sp[s];
+            cout << "==============Start Looop:\t Site: " << s << " rate:" << r  << "\n";
+            t.UpdateMuProb(muProb);
 
-//            F81 model(muArray[i]);
-
-
-            Array10D prob_AtoD = Array10D::Zero();
-            for (int d = 0; d < num_descendant; ++d) {
-                cout << "==============Start Looop:\t" << s << " " << i << " "<< d << "\n";
 //            for (int b = 0; b < 4; ++b) {
-                muProb.UpdateMu(muArray[i]);
-                t.UpdateMuProb(muProb);
+                
 //                cout << "here1\n";
-                HaploidProbs prob_reads_given_descent = t.GetDescendantToReads(d); //Fixed value for now
-                prob_AtoD += t.CalculateAncestorToDescendant(prob_reads_given_descent, &model);
+
+//                prob_AtoD +=
+            t.CalculateAncestorToDescendant(conditional_prob);
 
 //                prob_reads_given_descent
 //                cout << "here2\n";
@@ -282,10 +290,10 @@ void testCalWeighting(MutationProb muProb, SequenceProb sp[], ModelParams model_
 //                "\t" << prob_reads_given_descent[3]<< endl;
 
 //                likelihood[i] = t.GetLikelihood();
-            }
+//            }
 
-            double summary_stat = t.CalculateExpectedValueForMu(prob_AtoD);
-            cout << "====================================summary_stat: " << summary_stat  << endl;
+
+//            cout << "====================================summary_stat: " << summary_stat  << endl;
         }
 //        double sum = likelihood[0] + likelihood[1];
 //
