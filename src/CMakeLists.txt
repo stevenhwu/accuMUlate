@@ -1,7 +1,7 @@
 
 message("A: ${SOURCE_FILES}")
 
-SET(SOURCE_FILES  model.cc parsers.cc SequenceProb.cc MutationProb.cc VariantVisitor.cc)
+SET(SOURCE_FILES  model.cc parsers.cc SequenceProb.cc MutationProb.cc VariantVisitor.cc Lookup.cc)
 
 
 ADD_SUBDIRECTORY(distributions)

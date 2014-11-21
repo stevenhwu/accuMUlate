@@ -9,7 +9,7 @@ endif()
 
 
 
-set(CMAKE_CXX_FLAGS  "-std=c++11")
+set(CMAKE_CXX_FLAGS  "-std=c++11 -g -Wvla")
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakeModule/")
 

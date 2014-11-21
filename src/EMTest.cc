@@ -23,9 +23,9 @@ using namespace BamTools;
 namespace po = boost::program_options;
 int RunBasicProbCalc(GenomeData base_counts, ModelParams params);
 
-void testCalLikelihood(MutationProb muProb, SequenceProb sp[]);
+void testCalLikelihood(MutationProb muProb, std::vector<SequenceProb> sp);
 
-void testCalWeighting(MutationProb muProb, SequenceProb sp[], ModelParams model_params);
+void testCalWeighting(MutationProb muProb, std::vector<SequenceProb> sp, ModelParams model_params);
 
 
 
@@ -205,13 +205,13 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     cout << "init" << endl;
     size_t site_count = base_counts.size();
     MutationProb muProb = MutationProb(params);
-    SequenceProb sp[3];
+    std::vector<SequenceProb> sp;
 
 //    for (int i = 0; i < site_count; ++i) {
 //        sp[i] = SequenceProb(params, base_counts[+i], muProb);
 //    }
     for (int i = 0; i < 3; ++i) {
-        sp[i] = SequenceProb(params, base_counts[500+i], muProb);
+        sp.push_back( SequenceProb(params, base_counts[500+i], muProb) );
     }
     sp[0] = SequenceProb(params, base_counts[598], muProb);
 //		sp[1] = SequenceProb(params, base_counts[4195], muProb);
@@ -220,10 +220,25 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
 //		sp[3] = SequenceProb(params, base_counts[6589], muProb);
 
     ModelInput base_custom =  base_counts[598];
+
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(1,10);
+
+    std::random_device rd;
+//    std::default_random_engine e1(rd());
+//    std::uniform_int_distribution<int> uniform_dist(1, 6);
+//    int mean = uniform_dist(e1);
+
+    // Generate a normal distribution around that mean
+    std::mt19937 e2(rd());
+    std::uniform_int_distribution<int> uniform_dist(1, 30);
+
+    int dice_roll = distribution(generator);
     for (int i = 0; i < 7; ++i) {
         for (int j = 0; j < 4; ++j) {
-            base_custom.all_reads[i].reads[j] = (uint16_t) i*j+i;
+            base_custom.all_reads[i].reads[j] = (uint16_t) uniform_dist(e2);
         }
+//        base_custom.all_reads[i].reads[0] = (uint16_t) i+0;
     }
 
 
@@ -245,26 +260,23 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     return 0;
 }
 
-void testCalWeighting(MutationProb muProb, SequenceProb sp[], ModelParams model_params) {
+void testCalWeighting(MutationProb muProb, std::vector<SequenceProb> sp, ModelParams model_params) {
     const size_t cat = 2;
     size_t site_count = 1000;//
 
     double muArray[cat];
-    muArray[0] = 1e-5;
+    muArray[0] = 1e-2;
     muArray[1] = 1e-10;
 
-//    likelihood[cat];
     double proportion[cat];
     double weight[2];
-//cout << "here\n";
     int num_descendant = 2;//FIXME change later
 
 //    JC69 model(muArray[0]);
     F81  model(muArray[0], model_params.nuc_freq);
+//    MutationMatrix conditional_prob = model.GetTransitionMatirxAToD();
     for (int r = 0; r < 1; ++r) {
         model.UpdateMu(muArray[r]);
-        MutationMatrix conditional_prob = model.GetConditionalProb();
-
         muProb.UpdateMu(muArray[r]);
 
         Array10D site_stat[site_count];
@@ -272,6 +284,8 @@ void testCalWeighting(MutationProb muProb, SequenceProb sp[], ModelParams model_
             s=2;
             auto t = sp[s];
             cout << "==============Start Looop:\t Site: " << s << " rate:" << r  << "\n";
+
+            t.UpdateTransitionMatrix(model);
             t.UpdateMuProb(muProb);
 
 //            for (int b = 0; b < 4; ++b) {
@@ -279,7 +293,7 @@ void testCalWeighting(MutationProb muProb, SequenceProb sp[], ModelParams model_
 //                cout << "here1\n";
 
 //                prob_AtoD +=
-            t.CalculateAncestorToDescendant(conditional_prob);
+            t.CalculateAncestorToDescendant();
 
 //                prob_reads_given_descent
 //                cout << "here2\n";

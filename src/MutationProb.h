@@ -18,7 +18,7 @@
 #endif
 
 #include "model.h"
-
+#include "Lookup.h"
 //#include "SequenceProb.h"
 
 

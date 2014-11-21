@@ -17,14 +17,17 @@ public:
 
     ~JC69();
 
-//    virtual double GetConditionalProb(int i);
-    virtual std::array<double, 3> GetConditionalProbSpecial();
+    std::array<double, 3> GetConditionalProbSpecial();
+
+
+protected:
+    virtual void UpdateTransitionMatrix();
 
 private:
     double exp_four_third_mu;
-    std::array<double, 3> conditional_prob;
+    std::array<double, 3> conditional_prob_special;
 
-    virtual void UpdateConditionalProb();
+    virtual void UpdateConditionalProbSpecial();
 
     void computeExpFourThirdMu();
     double probNotEqual();

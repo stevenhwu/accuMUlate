@@ -12,19 +12,18 @@ class F81 : public EvolutionModel{
 public:
     F81(double mu, vector<double> params);
     ~F81();
-    MutationMatrix GetConditionalProb();
 
 protected:
     double beta0;
     vector<double> freqs;
 
-    virtual void UpdateConditionalProb();
+    virtual void UpdateTransitionMatrix();
 
 
 
 private:
     double exp_beta;
-    MutationMatrix conditional_prob;
+
 };
 
 

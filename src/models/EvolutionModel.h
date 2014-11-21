@@ -5,7 +5,6 @@
 #define __EvolutionModel_H_
 
 
-
 class EvolutionModel {
 
 
@@ -16,12 +15,15 @@ public:
     virtual ~EvolutionModel();
 
     void UpdateMu(double mu);
-    virtual MutationMatrix GetConditionalProb() = 0;
+
+    MutationMatrix GetTranstionMatirxAToD();
 
 protected:
     double mu;
+    MutationMatrix transition_matrix_a_to_d;
 
-    virtual void UpdateConditionalProb() = 0;
+    virtual void UpdateTransitionMatrix() = 0;
+
 
 };
 
