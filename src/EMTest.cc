@@ -231,7 +231,7 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
 
     // Generate a normal distribution around that mean
     std::mt19937 e2(rd());
-    std::uniform_int_distribution<int> uniform_dist(1, 30);
+    std::uniform_int_distribution<int> uniform_dist(1, 10);
 
     int dice_roll = distribution(generator);
     for (int i = 0; i < 7; ++i) {
@@ -240,7 +240,11 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
         }
 //        base_custom.all_reads[i].reads[0] = (uint16_t) i+0;
     }
-
+    int i=0;
+//    base_custom.all_reads[i].reads[0] = (uint16_t) 1;
+//    base_custom.all_reads[i].reads[0] = (uint16_t) 0000;
+//    base_custom.all_reads[i].reads[0] = (uint16_t) 0000;
+//    base_custom.all_reads[i].reads[0] = (uint16_t) 0000;
 
     sp[2] = SequenceProb(params, base_custom, muProb);
 
@@ -265,7 +269,7 @@ void testCalWeighting(MutationProb muProb, std::vector<SequenceProb> sp, ModelPa
     size_t site_count = 1000;//
 
     double muArray[cat];
-    muArray[0] = 1e-2;
+    muArray[0] = 1e-5;
     muArray[1] = 1e-10;
 
     double proportion[cat];
@@ -273,28 +277,36 @@ void testCalWeighting(MutationProb muProb, std::vector<SequenceProb> sp, ModelPa
     int num_descendant = 2;//FIXME change later
 
 //    JC69 model(muArray[0]);
+
     F81  model(muArray[0], model_params.nuc_freq);
 //    MutationMatrix conditional_prob = model.GetTransitionMatirxAToD();
+
     for (int r = 0; r < 1; ++r) {
         model.UpdateMu(muArray[r]);
         muProb.UpdateMu(muArray[r]);
 
-        Array10D site_stat[site_count];
+//        Array10D site_stat[site_count];
         for (int s = 0; s < 1; ++s) {
+
             s=2;
             auto t = sp[s];
             cout << "==============Start Looop:\t Site: " << s << " rate:" << r  << "\n";
+            int em_count = 1;
+            for (int i = 0; i < em_count; ++i) {
 
-            t.UpdateTransitionMatrix(model);
-            t.UpdateMuProb(muProb);
 
-//            for (int b = 0; b < 4; ++b) {
-                
-//                cout << "here1\n";
+                double stat_same = 0;
+                double stat_diff = 0;
 
-//                prob_AtoD +=
-            t.CalculateAncestorToDescendant();
 
+                t.UpdateTransitionMatrix(model);
+                t.UpdateMuProb(muProb);
+                t.CalculateAncestorToDescendant(stat_same, stat_diff);
+                double newMu = stat_diff / (stat_diff + stat_same);
+                model.UpdateMu(newMu);
+                muProb.UpdateMu(newMu);
+                cout << "========================== NEM_MU:" << newMu << "\t" << stat_same << "\t" << stat_diff <<endl;
+            }
 //                prob_reads_given_descent
 //                cout << "here2\n";
 //                cout << prob_for_each_base << endl;
@@ -343,7 +355,7 @@ void testCalWeighting(MutationProb muProb, std::vector<SequenceProb> sp, ModelPa
 }
 
 void testCalLikelihood(MutationProb muProb, SequenceProb sp[]) {
-    int size = 5;
+    const int size = 5;
     double muArray[size];
     double likelihood[size];
     muArray[0] = 1;
@@ -421,7 +433,7 @@ void RunMaProb(ModelParams params, po::variables_map vm, BamReader experiment, P
 //                double likelihood = sp.GetLikelihood();
 //                cout << likelihood << (1 - likelihood) << endl;
 
-                int size = 20;
+                const int size = 20;
                 double muArray[size];
                 muArray[0] = 0.1;
                 for (int i = 1; i < size; ++i) {

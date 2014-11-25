@@ -1,16 +1,26 @@
 
 message("A: ${SOURCE_FILES}")
 
-SET(SOURCE_FILES  model.cc parsers.cc SequenceProb.cc MutationProb.cc VariantVisitor.cc Lookup.cc)
+SET(SOURCE_FILES ${SOURCE_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/SequenceProb.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/MutationProb.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/VariantVisitor.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/Lookup.cc
+    CACHE INTERNAL "Global"
+    )
 
+#list (APPEND SOURCE_LIST ${SOURCE_FILES})
+#file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
+
+message("BB: ${SOURCE_FILES} ${PROJECT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ")
 
 ADD_SUBDIRECTORY(distributions)
 ADD_SUBDIRECTORY(models)
 
-message("B: ${SOURCE_FILES}")
 
-
-message("C: ${SOURCE_FILES}")
+message("C: ${SOURCE_FILES} ")
 
 add_executable(accuMUlate main.cc ${SOURCE_FILES})
 target_link_libraries(accuMUlate ${LIBS} )

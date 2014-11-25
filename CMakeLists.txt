@@ -9,7 +9,9 @@ endif()
 
 
 
-set(CMAKE_CXX_FLAGS  "-std=c++11 -g -Wvla")
+set(CMAKE_CXX_FLAGS  "-std=c++11 -g -Wvla -Wall  -Wextra -Wno-unused-private-field -Wno-unused-variable")
+
+#set(CMAKE_CXX_FLAGS  "-std=c++11 -g -Wvla -Weverything -Wno-unused-private-field -Wno-unused-variable -Wno-documentation -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-deprecated -Wno-sign-conversion")
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakeModule/")
 
@@ -31,4 +33,26 @@ set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src ${Boost_INCLUDE_DIR} ${Ba
 include_directories("${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
 include_directories(${INCLUDE_DIR})
 
+
 ADD_SUBDIRECTORY(src)
+
+########### Find/add GTest #################
+#1
+ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/include/googletest-trunk/")
+#SET(GTEST_ROOT "${CMAKE_SOURCE_DIR}/include/googletest-trunk")
+
+#2
+SET(GTEST_ROOT "${CMAKE_SOURCE_DIR}/include/googletest-trunk")
+find_package( GTest  )
+IF(GTEST_FOUND)
+    message("Found GTEST at ${GTEST_INCLUDE_DIRS} ${gtest_SOURCE_DIR} ")
+ENDIF(GTEST_FOUND)
+
+#3
+ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/gtest")
+
+ADD_SUBDIRECTORY(test)
+
+
+
+

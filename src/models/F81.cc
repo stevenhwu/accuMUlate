@@ -5,16 +5,13 @@ F81::~F81() {
 }
 
 F81::F81(double mu, vector<double> freq) : EvolutionModel(mu) {
-    cout << "F81\n";
     this->freqs = freq;
     beta0 = 1.0;
 	for (auto d : freqs) {
 		beta0 -= d * d;
 	}
-    beta0 = 1/ beta0;
-    cout << "done beta\n";
+    beta0 =  1.0/beta0;
     UpdateTransitionMatrix();
-    cout << "done F81\n";
 }
 
 
@@ -44,8 +41,9 @@ void F81::UpdateTransitionMatrix() {
         }
     }
     
-    std::cout << "Calculate F81:\n" << mu <<  "\t" << beta0 << "\t" << exp_beta << "\n" <<
-             freqs[0] << freqs[1] << "\n" << m << "\n========================\n" << transition_matrix_a_to_d << endl;
+//    std::cout << "Calculate F81:\n" << mu <<  "\t" << beta0 << "\t" << exp_beta << "\n" <<
+//             freqs[0] << freqs[1] << "\n" << m << "\n========================\n" << transition_matrix_a_to_d <<
+//            "\n============================\n" << endl;
 
 }
 
@@ -61,7 +59,7 @@ void F81::UpdateTransitionMatrix() {
 MutationMatrix MutationProb::MutationAccumulation2(bool and_mut) {
 
 	using namespace Eigen;
-	double beta = CalculateBeta();
+	double exp_beta = CalculateBeta();
 //	printf("beta0:%.10f\n", beta0); //0.9999999852
 	Eigen::Matrix4d m;
 	Eigen::Matrix4d m2 = Eigen::Matrix4d::Zero();
@@ -73,17 +71,17 @@ MutationMatrix MutationProb::MutationAccumulation2(bool and_mut) {
 
 	for (int i : { 0, 1, 2, 3 }) {
 		for (int j : { 0, 1, 2, 3 }) {
-			m(i, j) = frequency_prior[i] * (1.0 - beta);
+			m(i, j) = frequency_prior[i] * (1.0 - exp_beta);
 		}
-		m(i, i) += beta;
+		m(i, i) += exp_beta;
 	}
 //	element wise operation
 	for (int i : { 0, 1, 2, 3 }) {
-		double c = frequency_prior[i] * (1.0 - beta);
+		double c = frequency_prior[i] * (1.0 - exp_beta);
 //		c = (i+1) * 1.1;
 		m2.row(i) = Vector4d::Constant(c);
 	}
-	m2.diagonal() += Vector4d::Constant(beta);
+	m2.diagonal() += Vector4d::Constant(exp_beta);
 //	std::cout << m << std::endl;
 //	std::cout << "\n" << m2 << std::endl;
 
@@ -126,14 +124,14 @@ MutationMatrix MutationProb::MutationAccumulation2(bool and_mut) {
 
 MutationMatrix MutationProb::MutationAccumulation(const ModelParams &params, bool and_mut) {
 
-	double beta = CalculateBeta();
+	double exp_beta = CalculateBeta();
 //	printf("beta0:%.10f\n", beta0); //0.9999999852
 	Eigen::Matrix4d m;
 	for (int i : { 0, 1, 2, 3 }) {
 		for (int j : { 0, 1, 2, 3 }) {
-			m(i, j) = frequency_prior[i] * (1.0 - beta);
+			m(i, j) = frequency_prior[i] * (1.0 - exp_beta);
 		}
-		m(i, i) += beta;
+		m(i, i) += exp_beta;
 	}
 //	std::cout << m << std::endl;
 

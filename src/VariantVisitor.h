@@ -33,16 +33,18 @@ public:
 public:
     void Visit(const PileupPosition& pileupData);
 private:
+    Fasta m_idx_ref;
     RefVector m_bam_ref;
     SamHeader m_header;
-    Fasta m_idx_ref;
-    GenomeData& m_all_the_data;
     SampleMap m_samples;
-    BamAlignment& m_ali;
+
 //        ModelParams m_params;
     int m_qual_cut;
-    int m_mapping_cut;
+    BamAlignment& m_ali;
+    GenomeData& m_all_the_data;
     double m_prob_cut;
+    int m_mapping_cut;
+
     char current_base;
     uint64_t chr_index;
 };

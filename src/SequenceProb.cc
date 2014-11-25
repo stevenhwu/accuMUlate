@@ -18,21 +18,21 @@
 //	DiploidProbs pop_genotypes = DiploidPopulation(params, site_data.reference);
 //
 //	auto data = site_data.all_reads.begin();
-//	DiploidProbs anc_genotypes = DiploidSequencing(params, site_data.reference,
+//	DiploidProbs ancestor_genotypes = DiploidSequencing(params, site_data.reference,
 //			*data);
-//	anc_genotypes *= pop_genotypes;
-//	DiploidProbs num_genotypes = anc_genotypes;
+//	ancestor_genotypes *= pop_genotypes;
+//	DiploidProbs num_genotypes = ancestor_genotypes;
 //	for (++data; data != site_data.all_reads.end(); ++data) {
 //		HaploidProbs p = HaploidSequencing(params, site_data.reference, *data);
 //
-//		anc_genotypes *= (m.matrix() * p.matrix()).array();
+//		ancestor_genotypes *= (m.matrix() * p.matrix()).array();
 //		num_genotypes *= (mn.matrix() * p.matrix()).array();
 //		exit(-1);
 //	}
 //
-//	//cerr << "\n" << anc_genotypes/anc_genotypes.sum() << endl;
+//	//cerr << "\n" << ancestor_genotypes/ancestor_genotypes.sum() << endl;
 //
-//	return 1.0 - num_genotypes.sum() / anc_genotypes.sum();
+//	return 1.0 - num_genotypes.sum() / ancestor_genotypes.sum();
 //}
 
 
@@ -46,32 +46,35 @@ const bool DEBUG = true;
 SequenceProb::SequenceProb(const ModelParams &model_params,
 		const ModelInput site_data, MutationProb muProb) {
 
-	params = model_params;
+//	params = model_params;
 
-	UpdateMuProb(muProb);
+    phi_haploid = model_params.phi_haploid;
+    phi_diploid = model_params.phi_diploid;
+    error_prob = model_params.error_prob;
+    theta = model_params.theta;
 
-	data = site_data;
-	pop_genotypes = DiploidPopulation(site_data.reference);
+    UpdateMuProb(muProb);
 
-    descendant_count = site_data.all_reads.size()-1;
+//	data = site_data;
 
-    ancestor = site_data.all_reads[0];
-	anc_genotypes = DiploidSequencing(ancestor);
-	anc_genotypes *= pop_genotypes;
-//	DiploidProbs num_genotypes = anc_genotypes;
+    int i=0;
+    DiploidProbs pop_genotypes = DiploidPopulation(site_data.reference);
+    ancestor_data = site_data.all_reads[i];
+	ancestor_genotypes = DiploidSequencing(ancestor_data);
+	ancestor_genotypes *= pop_genotypes;
 
-    for (int i = 0; i < descendant_count; ++i) {
-        ReadData data = site_data.all_reads[i+1];
-        all_descendant.push_back(data);
+//	DiploidProbs num_genotypes = ancestor_genotypes;
+
+    for (i=1; i < site_data.all_reads.size(); ++i) {
+        ReadData data = site_data.all_reads[i];
+        all_descendant_data.push_back(data);
 
         HaploidProbs p = HaploidSequencing(data);
-        all_hap.push_back(p);
+        all_descendant_genotypes.push_back(p);
 
-        HaploidProbs normalised = p;///p.sum();
-        all_normalised_hap.push_back(normalised);
     }
+    descendant_count = site_data.all_reads.size()-1;
 
-	UpdateLikelihood();
 
 }
 
@@ -86,7 +89,7 @@ void SequenceProb::CountReadToGenotype(){
     uint16_t ref_count[4];
 //    for (auto base : acgt) {
     for (int i = 0; i < 4; ++i) {
-        ref_count[0] = ancestor.reads[0];
+        ref_count[0] = ancestor_data.reads[0];
     }
 
 //    = it.reads[0];
@@ -94,7 +97,7 @@ void SequenceProb::CountReadToGenotype(){
 //            + it.reads[1]+ it.reads[2]+ it.reads[3];
     int match_count[4];
     int mismatch_count[4];
-    for (auto descendant : all_descendant) {
+    for (auto descendant : all_descendant_data) {
 
         for (int i = 0; i < 4; ++i) {
             int delta = fabs( ref_count[i] = descendant.reads[i]);
@@ -108,13 +111,13 @@ void SequenceProb::CountReadToGenotype(){
 
 void SequenceProb::UpdateMuProb(MutationProb muProb){
 
-	mutation = muProb.GetMutation();
-	non_mutation = muProb.GetNonMutation();
+//	mutation = muProb.GetMutation();
+//	non_mutation = muProb.GetNonMutation();
     mutation_rate = muProb.GetMutationRate();
 
     ancestor_prior = muProb.GetAncestorPrior();
     frequency_prior = muProb.GetFrequencyPrior();
-    beta = muProb.GetBeta();
+//    exp_beta = muProb.GetBeta();
 
 
     UpdateLikelihood();
@@ -126,7 +129,8 @@ DiploidProbs SequenceProb::DiploidPopulation(int ref_allele) {
 
 	double alphas[4];
 	for(int i : {0,1,2,3}){
-		alphas[i] = params.theta*params.nuc_freq[i];
+
+        alphas[i] = theta * frequency_prior[i];
 //		printf("A:%f\n",alphas[i]);
 	}
 //	printf("ref:%d\n", ref_allele);
@@ -152,55 +156,57 @@ DiploidProbs SequenceProb::DiploidPopulation(int ref_allele) {
 
 DiploidProbs SequenceProb::DiploidSequencing(ReadData data) {
 	DiploidProbs result;
-	double alphas_total = (1.0 - params.phi_diploid) / params.phi_diploid;
+    double alphas_total = (1.0 - phi_diploid) / phi_diploid;
 	for (int i : { 0, 1, 2, 3 }) {
-		for (int j = 0; j < i; ++j) {
+        for (int j = 0; j < i; ++j) {
 			double alphas[4];
 			for (int k : { 0, 1, 2, 3 }) {
 				if (k == i || k == j)
-					alphas[k] = (0.5 - params.error_prob / 3.0) * alphas_total;
+					alphas[k] = (0.5 - error_prob / 3.0) * alphas_total;
 				else
-					alphas[k] = (params.error_prob / 3.0) * alphas_total;
+					alphas[k] = (error_prob / 3.0) * alphas_total;
 			}
-			result[i * 4 + j] = DirichletMultinomialLogProbability(alphas,
-                    data);
+			result[i * 4 + j] = DirichletMultinomialLogProbability(alphas, data);
 			result[j * 4 + i] = result[i * 4 + j];
 		}
 		double alphas[4];
 		for (int k : { 0, 1, 2, 3 }) {
 			if (k == i)
-				alphas[k] = (1.0 - params.error_prob) * alphas_total;
+				alphas[k] = (1.0 - error_prob) * alphas_total;
 			else
-				alphas[k] = params.error_prob / 3.0 * alphas_total;
+				alphas[k] = error_prob / 3.0 * alphas_total;
 		}
 		result[i * 4 + i] = DirichletMultinomialLogProbability(alphas, data);
 	}
+
+
 	double scale = result.maxCoeff();
-	return (result - scale).exp();
+//	return (result - scale).exp();
 //    result -= scale;
 //    result = NormaliseLogArray(result);
-//    return result;
+    return result.exp();
 }
 
 HaploidProbs SequenceProb::HaploidSequencing(ReadData data) {
 	HaploidProbs result;
-	double alphas_total = (1.0 - params.phi_haploid) / params.phi_haploid;
+    
+    double alphas_total = (1.0 - phi_haploid) / phi_haploid;
 	for (int i : { 0, 1, 2, 3 }) {
 		double alphas[4];
 		for (int k : { 0, 1, 2, 3 }) {
 			if (k == i)
-				alphas[k] = (1.0 - params.error_prob) * alphas_total;
+				alphas[k] = (1.0 - error_prob) * alphas_total;
 			else
-				alphas[k] = params.error_prob / 3.0 * alphas_total;
+				alphas[k] = error_prob / 3.0 * alphas_total;
 		}
 		result[i] = DirichletMultinomialLogProbability(alphas, data);
 	}
 
 	double scale = result.maxCoeff();
-	return (result - scale).exp();
+//	return (result - scale).exp();
 //    result -= scale;
 //    result = NormaliseLogArray(result);
-//    return result;
+    return result.exp();
 }
 
 template <class T> //FIXME: make sure it only take Eigen::Array class
@@ -217,19 +223,19 @@ T SequenceProb::NormaliseLogArray(T result) {
 void SequenceProb::UpdateLikelihood() {
 
 //	auto data = site_data.all_reads.begin();
-//	DiploidProbs anc_genotypes = DiploidSequencing(params, site_data.reference, *data);
-//	anc_genotypes *= pop_genotypes;
-	DiploidProbs anc_genotypes2 = anc_genotypes;
-	DiploidProbs num_genotypes = anc_genotypes;
-	for (auto t : all_hap) {
+//	DiploidProbs ancestor_genotypes = DiploidSequencing(params, site_data.reference, *data);
+//	ancestor_genotypes *= pop_genotypes;
+	DiploidProbs anc_genotypes2 = ancestor_genotypes;
+	DiploidProbs num_genotypes = ancestor_genotypes;
+	for (auto t : all_descendant_genotypes) {
 
-		anc_genotypes2 *= (mutation.matrix() * t.matrix()).array();
-		num_genotypes *= (non_mutation.matrix() * t.matrix()).array();
+//		anc_genotypes2 *= (mutation.matrix() * t.matrix()).array();
+//		num_genotypes *= (non_mutation.matrix() * t.matrix()).array();
 
 	}
 
 	likelihood = 1- num_genotypes.sum() / anc_genotypes2.sum();
-	//cerr << "\n" << anc_genotypes/anc_genotypes.sum() << endl;
+	//cerr << "\n" << ancestor_genotypes/ancestor_genotypes.sum() << endl;
 
 	likelihood = anc_genotypes2.sum();
 
@@ -244,17 +250,19 @@ double SequenceProb::GetLikelihood() {
 }
 
 //ModelInput GetData();
-ModelInput SequenceProb::GetData(){
-	return data;
+//ModelInput SequenceProb::GetData(){
+//	return data;
+//}
+
+HaploidProbs SequenceProb::GetDescendantGenotypes(int descent_index) {
+    if(descent_index >= descendant_count || descent_index < 0){
+        //TODO: throw error
+    }
+    return all_descendant_genotypes[descent_index];
 }
 
-HaploidProbs SequenceProb::GetDescendantToReads(int descent_index) {
-
-    return all_normalised_hap[descent_index];
-}
-
-DiploidProbs SequenceProb::GetAncGenotypesToReads() {
-    return anc_genotypes;
+DiploidProbs SequenceProb::GetAncestorGenotypes() {
+    return ancestor_genotypes;
 }
 
 
@@ -266,13 +274,17 @@ DiploidProbs SequenceProb::GetAncGenotypesToReads() {
 //
 //};
 double total_sum = 0;
-void SequenceProb::CalculateAncestorToDescendant() {
+void SequenceProb::CalculateAncestorToDescendant(double &stat_same, double &stat_diff) {
+if(DEBUG){
     cout << "==================In Calc AtoD====================\n";
     for (int i = 0; i < descendant_count; ++i) {
 
-        PrintReads(data.all_reads[i]);
+        PrintReads(all_descendant_data[i]);
     }
-
+    for (auto f : ancestor_prior) {
+        cout << f << "\t";
+    }
+    cout << endl;
 //    mu = 0.9;
 //    prob_reads_given_descent[0] = 0.2;
 //    prob_reads_given_descent[1] = 0.2;
@@ -280,11 +292,12 @@ void SequenceProb::CalculateAncestorToDescendant() {
 //    prob_reads_given_descent[3] = 0.2;
 
 //    for (int r = 0; r < 2; ++r) {
-cout << anc_genotypes << endl;
 
-    double prob_reads;
-    double sum_all_stats_same;
-    double sum_all_stats_diff;
+    cout << ancestor_genotypes << endl;
+}
+    double prob_reads = 0;
+    double sum_all_stats_same = 0;
+    double sum_all_stats_diff = 0;
     double summary_stat_same_ancestor[ANCESTOR_COUNT];
     double summary_stat_diff_ancestor[ANCESTOR_COUNT];
     double sum_prob_ancestor[ANCESTOR_COUNT];
@@ -294,18 +307,17 @@ cout << anc_genotypes << endl;
             int index16 = LookupTable::index_converter_10_to_16[a];
             if (DEBUG) {
                 cout << "==Loop A: " << a << "\t" << index16 << "\t" << LookupTable::genotype_lookup_10[a] << "\t" <<
-                        anc_genotypes(index16) << endl;
+                        ancestor_genotypes[index16] << endl;
             }
 //summary_stat_same_ancestor[a]=0;
             CalculateAllDescendantGivenAncestor(a, summary_stat_same_ancestor, summary_stat_diff_ancestor, sum_prob_ancestor);
 
-anc_genotypes(index16) = 1.0/16.0 ;//-> sum up to 1 FIXME!!
-            double prob_reads_given_a = anc_genotypes(index16) * ancestor_prior[index10] *  sum_prob_ancestor[a];// TODO: check ? P(R_Y | X) and P(R_X | X)
-//            prob_reads_given_a = log(anc_genotypes(index16)) + log( ancestor_prior[index10]) + sum_prob_ancestor[a];// TODO: check ? P(R_Y | X) and P(R_X | X)
+            double prob_reads_given_a = ancestor_genotypes[index16] * ancestor_prior[index10] *  sum_prob_ancestor[a];
+//            prob_reads_given_a = log(ancestor_genotypes(index16)) + log( ancestor_prior[index10]) + sum_prob_ancestor[a];
+            prob_reads += prob_reads_given_a;
 
             summary_stat_same_ancestor[a] *= prob_reads_given_a;
             summary_stat_diff_ancestor[a] *= prob_reads_given_a;
-            prob_reads += prob_reads_given_a;
 
             sum_all_stats_same += summary_stat_same_ancestor[a];
             sum_all_stats_diff += summary_stat_diff_ancestor[a];
@@ -315,8 +327,8 @@ anc_genotypes(index16) = 1.0/16.0 ;//-> sum up to 1 FIXME!!
             //        summary_stat_ancestor[a] =
             if (DEBUG) {
 
-                cout << "==summary: Same:\t" << sum_all_stats_same << "\tDiff:" << sum_all_stats_diff <<
-                "====\t" << sum_prob_ancestor[a] << "\t" << anc_genotypes[index16] << "\t" << ancestor_prior[index10] << "\t" << prob_reads_given_a << endl << endl;
+                cout << "==summary: Same: " << sum_all_stats_same << "\tDiff:" << sum_all_stats_diff <<
+                " ==\t" << sum_prob_ancestor[a] << "\t" << ancestor_genotypes[index16] << "\t" << ancestor_prior[index10] << "\t" << prob_reads_given_a << endl << endl;
 
             }
 
@@ -328,9 +340,11 @@ anc_genotypes(index16) = 1.0/16.0 ;//-> sum up to 1 FIXME!!
 //    cout << ancestor_prior<< end;
 cout << "summaryALL\tSame:" << sum_all_stats_same << "\tDiff:" << sum_all_stats_diff << "\t" << (sum_all_stats_diff + sum_all_stats_same) << endl << endl;
 cout << "total_sum: "<<total_sum<<endl;
-    exit(99);
-    summary_stat_same_ancestor;
-    summary_stat_diff_ancestor;// sum(stat*prb/denom)
+    stat_same = sum_all_stats_same;
+    stat_diff = sum_all_stats_diff;
+//    exit(99);
+//    summary_stat_same_ancestor;
+//    summary_stat_diff_ancestor;// sum(stat*prb/denom)
 }
 
 
@@ -346,9 +360,11 @@ void SequenceProb::CalculateAllDescendantGivenAncestor(int a, double summary_sta
     double summary_stat_diff = 0;
     double sum_over_probs = 0;
 sum_prob_ancestor[a] = 1;
-
+    summary_stat_diff_ancestor[a] = 0;
+    summary_stat_same_ancestor[a] = 0;
+    descendant_count = 1; // FIXME
     for (int d = 0; d < descendant_count; ++d) {
-        HaploidProbs prob_reads_given_descent = GetDescendantToReads(d); //Fixed value for now
+        HaploidProbs prob_reads_given_descent = GetDescendantGenotypes(d); //Fixed value for now
 
 //        CalculateDescendantGivenAncestor(a, prob_reads_given_descent, sum_prob_d[d], summary_stat_same_d[d], summary_stat_diff_d[d]);
 
@@ -357,8 +373,8 @@ sum_prob_ancestor[a] = 1;
         summary_stat_diff_ancestor[a] += summary_stat_diff;//_d[d];
         summary_stat_same_ancestor[a] += summary_stat_same;//_d[d];
 
+//        sum_prob_ancestor[a] += log(sum_over_probs);
         sum_prob_ancestor[a] *= sum_over_probs;
-
         if (DEBUG) {
             cout << "====D: " << d << "\t Sum:" <<
                     sum_over_probs << "\t" << sum_prob_ancestor[a] << "\t" <<
@@ -367,6 +383,7 @@ sum_prob_ancestor[a] = 1;
         }
 
     }
+//    sum_prob_ancestor[a] = exp(sum_prob_ancestor[a]);
 
 }
 
@@ -378,8 +395,9 @@ void SequenceProb::CalculateDescendantGivenAncestor(int a, HaploidProbs prob_rea
     summary_stat_same = 0;
     summary_stat_diff = 0;
 
-//prob_reads_given_descent = {0.1,0.2,0.3,0.4};
-
+//prob_reads_given_descent = {0.4,0.1,0.1,0.4};
+//    prob_reads_given_descent = {0.03,0.03,0.04,0.9};
+//    prob_reads_given_descent = {0.3,0.2,0.2,0.3};
     for (int b = 0; b < BASE_COUNT; ++b) {
 //prob_reads_given_descent[b] = 0.25;
         double prob = transition_matrix_a_to_d(index16, b) * prob_reads_given_descent[b];
@@ -387,6 +405,13 @@ void SequenceProb::CalculateDescendantGivenAncestor(int a, HaploidProbs prob_rea
 
         summary_stat_same += prob_reads_given_descent[b] * mutation_rate.one_minus_mu * LookupTable::summary_stat_same_lookup_table[a][b];
         summary_stat_diff += prob_reads_given_descent[b] * mutation_rate.mu * frequency_prior[b];
+//
+//        summary_stat_same += prob * mutation_rate.one_minus_mu * LookupTable::summary_stat_same_lookup_table[a][b];
+//        summary_stat_diff += prob * mutation_rate.mu * frequency_prior[b];
+
+//        summary_stat_same += prob_reads_given_descent[b]; //* mutation_rate.one_minus_mu * LookupTable::summary_stat_same_lookup_table[a][b];
+//        summary_stat_diff += prob_reads_given_descent[b]; //* mutation_rate.mu * frequency_prior[b];
+
 //        total_sum += summary_stat_diff + summary_stat_same;
         total_sum += mutation_rate.one_minus_mu * LookupTable::summary_stat_same_lookup_table[a][b] + mutation_rate.mu * frequency_prior[b];
         if (DEBUG) {
@@ -394,7 +419,7 @@ void SequenceProb::CalculateDescendantGivenAncestor(int a, HaploidProbs prob_rea
             double t1 = prob_reads_given_descent[b] * mutation_rate.one_minus_mu * LookupTable::summary_stat_same_lookup_table[a][b];
             double t2 = prob_reads_given_descent[b] * mutation_rate.mu * frequency_prior[b];
 
-//            cout << "======Loop base: " << b << "\t" << "\t" << prob <<"\t"<< prob_reads_given_descent[b] << "\t T1:" << t1 << "\t T2:" << t2 <<"\t SAME:"<<summary_stat_same << "\t" << summary_stat_diff << endl;//t1 << "\t" << t2 <<endl;
+            cout << "======Loop base: " << b << "\t" << "\t" << prob <<"\t"<< prob_reads_given_descent[b] << "\t T1:" << t1 << "\t T2:" << t2 <<"\t SAME:"<<summary_stat_same << "\t" << summary_stat_diff << endl;//t1 << "\t" << t2 <<endl;
           }
     }
     summary_stat_same /= prob_reads_d_given_a;
@@ -410,18 +435,18 @@ void SequenceProb::PrintReads(ReadData data) {
 
 double SequenceProb::CalculateExpectedValueForMu(Array10D summary_stat_AtoD) {
 
-//    anc_genotypes;
+//    ancestor_genotypes;
     double sum = 0;
     double nume_sum = 0;
     for (int i = 0; i < 4; ++i) {
         for(int j=i;j< 4;++j) {
             int index10 = LookupTable::index_converter_16_to_10[i][j];
             int index16 = i*4+j;
-            double denominator = anc_genotypes(index16)* frequency_prior[index10];
+            double denominator = ancestor_genotypes[index16]* frequency_prior[index10];
             sum += denominator;
 
-//            nume_sum += denominator * summary_stat_AtoD(index10); // TODO: add P(X) freq_1 X freq_2
-//            cout << i<<":"<<j<< " " << index10 << ":\t" << anc_genotypes(index16) << "\t" << summary_stat_AtoD(index10) << endl;
+//            nume_sum += denominator * summary_stat_AtoD(index10); //
+//            cout << i<<":"<<j<< " " << index10 << ":\t" << ancestor_genotypes(index16) << "\t" << summary_stat_AtoD(index10) << endl;
         }
     }
 
@@ -432,7 +457,7 @@ double SequenceProb::CalculateExpectedValueForMu(Array10D summary_stat_AtoD) {
 }
 
 double SequenceProb::Maximisation(double summery_stat) {
-
+    double beta = 0;
     double max_hat = -beta * log(1- summery_stat / beta);
     return max_hat;
 

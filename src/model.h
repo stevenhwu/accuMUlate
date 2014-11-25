@@ -1,8 +1,12 @@
 #ifndef model_H
 #define model_H
 
-
+#pragma clang diagnostic push
+// in reality, you will likely need to disable *more* than Wmultichar
+#pragma clang diagnostic ignored "-Wall"
 #include "Eigen/Dense"
+#pragma clang diagnostic pop
+
 
 using namespace std;
 

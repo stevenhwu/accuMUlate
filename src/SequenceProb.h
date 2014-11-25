@@ -30,28 +30,24 @@
 
 class SequenceProb {
 
+    ReadData ancestor_data;
+    ReadDataVector all_descendant_data;
 
-    DiploidProbs anc_genotypes;
-    DiploidProbs pop_genotypes;
-    std::vector<HaploidProbs> all_hap;
-    std::vector<HaploidProbs> all_normalised_hap;
-    ModelParams params;
-
-    MutationMatrix non_mutation;
-    MutationMatrix mutation;
+    DiploidProbs ancestor_genotypes;
+    std::vector<HaploidProbs> all_descendant_genotypes;
 
     MutationMatrix transition_matrix_a_to_d;
-    double likelihood;
-    double beta;
     MutationRate mutation_rate;
-
-    ModelInput data;
 
     Array4D frequency_prior;
     Array10D ancestor_prior;
 
-
-
+//    std::vector<HaploidProbs> all_normalised_hap;
+//    DiploidProbs pop_genotypes;
+    double likelihood;
+//    MutationMatrix non_mutation;
+//    MutationMatrix mutation;
+//    double exp_beta;
 //    c char ACGT[] {'A', 'C', 'G', 'T'};
 public:
     SequenceProb() {
@@ -75,18 +71,18 @@ public:
     void CountReadToGenotype();
 
 
-    void CalculateAncestorToDescendant();
+    void CalculateAncestorToDescendant(double &stat_same, double &stat_diff);
 
-    HaploidProbs GetDescendantToReads(int descent_index);
+    HaploidProbs GetDescendantGenotypes(int descent_index);
 
-    DiploidProbs GetAncGenotypesToReads();
+    DiploidProbs GetAncestorGenotypes();
 
 
     double CalculateExpectedValueForMu(Array10D summary_stat_AtoD);
 
     double Maximisation(double summery_stat);
 
-    void UpdateTransitionMatrix(EvolutionModel f81);
+    void UpdateTransitionMatrix(EvolutionModel evo_model);
 
 protected:
     DiploidProbs DiploidPopulation(int ref_allele);
@@ -98,12 +94,6 @@ protected:
 //	MutationMatrix MutationAccumulation(const ModelParams &params, bool and_mut);
 //	MutationMatrix MutationAccumulation2(bool and_mut);
 
-
-
-
-    ReadData ancestor;
-//    vector<ReadData> all_descendant;
-    ReadDataVector all_descendant;
 
     void PrintReads(ReadData data);
 
@@ -119,6 +109,10 @@ private:
     void CalculateAllDescendantGivenAncestor(int a, double summary_stat_same_ancestor[], double summary_stat_diff_ancestor[], double sum_prob_d[]);
 
 
+    double phi_haploid;
+    double phi_diploid;
+    double error_prob;
+    double theta;
 };
 
 #endif /* SEQUENCINGPROB_H_ */

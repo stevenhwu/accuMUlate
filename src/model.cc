@@ -190,7 +190,7 @@ double TetMAProbability(const ModelParams &params, const ModelInput site_data) {
 		num_genotypes *= (mn.matrix()*p.matrix()).array();
 	}
 	
-    //cerr << "\n" << anc_genotypes/anc_genotypes.sum() << endl;
+    //cerr << "\n" << ancestor_genotypes/ancestor_genotypes.sum() << endl;
 	
 	return 1.0 - num_genotypes.sum()/anc_genotypes.sum();
 }

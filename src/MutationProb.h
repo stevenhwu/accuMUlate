@@ -33,12 +33,12 @@ struct MutationRate{
 
 class MutationProb {
 
-	MutationMatrix non_mutation;
-	MutationMatrix mutation;
-    ModelParams params;
-
+//	MutationMatrix non_mutation;
+//	MutationMatrix mutation;
+//    ModelParams params;
+    double mu0;
 	double beta0;
-    double beta; //beta = -beta*mu
+    double exp_beta; //exp_beta = exp(-beta*mu)
 
 public:
 	MutationProb(const ModelParams &model_params);
@@ -46,14 +46,17 @@ public:
 
 //	void UpdateMu();
 	void UpdateMu(double mu);
-	MutationMatrix GetMutation();
-	MutationMatrix GetNonMutation();
+//	MutationMatrix GetMutation();
+//	MutationMatrix GetNonMutation();
 
     MutationRate GetMutationRate();
     double GetBeta();
 
     Array4D GetFrequencyPrior();
     Array10D GetAncestorPrior();
+
+    double GetMu0();
+    double GetBeta0();
 
 protected:
 
@@ -68,5 +71,7 @@ private:
     Array4D frequency_prior;
     Array10D ancestor_prior;
     MutationRate mutation_rate;
+
+
 };
 #endif /* MUTATIONPROB_H_ */
