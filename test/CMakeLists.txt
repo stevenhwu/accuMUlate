@@ -16,6 +16,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 SET(TEST_SOURCE_FILES ${TEST_SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/MutationProbTest.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/SequenceProbTest.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/SiteProbTest.cc
     )
 
 add_executable( UnitTests ${TEST_SOURCE_FILES} ${SOURCE_FILES})

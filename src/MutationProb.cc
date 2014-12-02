@@ -9,19 +9,15 @@
 #include <cmath>
 #include <iostream>
 
-#include "SequenceProb.h"
-
 MutationProb::MutationProb(const ModelParams &model_params) {
 
-	beta0 = 1.0;
+
     for (int i = 0; i < 4; ++i) {
         frequency_prior[i] = (i+1)/10.0;
         frequency_prior[i] = model_params.nuc_freq[i];
     }
-    for (int i = 0; i < 4; ++i) {
 
-        beta0 -= (frequency_prior[i] * frequency_prior[i]);
-//        beta0 += params.nuc_freq[i] * params.nuc_freq[i];
+    for (int i = 0; i < 4; ++i) {
         for (int j = i; j < 4; ++j) {
             int index10 = LookupTable::index_converter_16_to_10[i][j];
             ancestor_prior[index10] = frequency_prior[i] * frequency_prior[j];
@@ -30,8 +26,8 @@ MutationProb::MutationProb(const ModelParams &model_params) {
             }
         }
     }
-    beta0 = 1.0 / beta0;
 
+    beta0 = CalculateBeta0(frequency_prior);
     UpdateMu(model_params.mutation_rate);
 }
 
@@ -41,35 +37,30 @@ MutationProb::~MutationProb() {
 
 void MutationProb::UpdateMu(double mu0) {
     this->mu0 = mu0;
-    CalculateBeta();
+    CalculateExpBeta();
 
-	mutation_rate.mu = 1-exp_beta;
-    mutation_rate.one_minus_mu = 1-mutation_rate.mu;
+	mutation_rate.prob = 1-exp_beta;
+    mutation_rate.one_minus_p = 1-mutation_rate.prob;
 
-
+    cout << "MuP:\t" << this->mu0 << "\t" << mutation_rate.prob << endl;
 }
 
-double MutationProb::CalculateBeta(){
 
-    exp_beta = exp(-beta0 * mu0);
+
+double MutationProb::CalculateExpBeta(){
+    exp_beta = CalculateExpBeta(mu0, beta0);
     return exp_beta;
 }
 
-//MutationMatrix MutationProb::GetMutation() {
-//
-//	return mutation;
-//}
-//
-//MutationMatrix MutationProb::GetNonMutation() {
-//	return non_mutation;
-//}
-
+double MutationProb::ConvertExpBetaToMu(double exp_beta) {
+    return ConvertExpBetaToMu(exp_beta, beta0);
+}
 
 MutationRate MutationProb::GetMutationRate() {
     return mutation_rate;
 }
 
-double MutationProb::GetBeta() {
+double MutationProb::GetExpBeta() {
     return exp_beta;
 }
 
@@ -87,4 +78,29 @@ double MutationProb::GetMu0() {
 
 double MutationProb::GetBeta0() {
     return beta0;
+}
+
+
+//////////////////////////////////////////////////
+//// Static methods
+//////////////////////////////////////////////////
+double MutationProb::CalculateExpBeta(double mu, double beta0){
+    double exp_beta = exp(-beta0 * mu);
+    return exp_beta;
+}
+
+
+double MutationProb::ConvertExpBetaToMu(double exp_beta, double beta0) {
+    return log(1-exp_beta)/(-beta0);
+}
+
+double MutationProb::CalculateBeta0(Array4D freq) {
+
+    double beta0 = 1;
+    for (size_t i = 0; i < freq.size(); ++i) {
+        beta0 -= (freq[i] * freq[i]);
+    }
+    beta0 = 1.0 / beta0;
+    return beta0;
+
 }

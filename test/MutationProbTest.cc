@@ -57,7 +57,7 @@ TEST_F(MutationProbTest, EqualFreqsInit) {
 
     ASSERT_EQ(0.1, muProb.GetMu0());
     ASSERT_DOUBLE_EQ(1.333333333333333, muProb.GetBeta0());
-    double beta = muProb.GetBeta();
+    double beta = muProb.GetExpBeta();
 
     ASSERT_EQ(0.87517331904294748401, beta);
     ASSERT_EQ(0.87517331904294748, beta); // ***474 fail, needs 474(8)
@@ -66,8 +66,8 @@ TEST_F(MutationProbTest, EqualFreqsInit) {
 
     MutationRate rate = muProb.GetMutationRate(); // exp(-1/ (1- 0.25^2*4) * 0.1)
     double expected_beta = 0.87517331904294748401;
-    ASSERT_DOUBLE_EQ(expected_beta, rate.one_minus_mu);
-    ASSERT_DOUBLE_EQ(1-expected_beta, rate.mu);
+    ASSERT_DOUBLE_EQ(expected_beta, rate.one_minus_p);
+    ASSERT_DOUBLE_EQ(1-expected_beta, rate.prob);
     
 }
 
@@ -101,14 +101,14 @@ TEST_F(MutationProbTest, NotEqualFreqsUpdateMu) {
     ASSERT_EQ(0.001, muProb.GetMu0());
     ASSERT_DOUBLE_EQ(1.4285714285714286031, muProb.GetBeta0());
 
-    double beta = muProb.GetBeta();
+    double beta = muProb.GetExpBeta();
     double expected_beta = 0.99857244849385662366; //exp(-1/ (1- sum((1:4/10)^2)) * 0.001)
 
     ASSERT_DOUBLE_EQ(expected_beta, beta);
 
     MutationRate rate = muProb.GetMutationRate();
-    ASSERT_DOUBLE_EQ(expected_beta, rate.one_minus_mu);
-    ASSERT_DOUBLE_EQ(1-expected_beta, rate.mu);
+    ASSERT_DOUBLE_EQ(expected_beta, rate.one_minus_p);
+    ASSERT_DOUBLE_EQ(1-expected_beta, rate.prob);
 
 }
 

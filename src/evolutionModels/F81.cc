@@ -4,20 +4,26 @@
 F81::~F81() {
 }
 
-F81::F81(double mu, vector<double> freq) : EvolutionModel(mu) {
+F81::F81(double mu, Array4D freq) : EvolutionModel(mu) {
     this->freqs = freq;
-    beta0 = 1.0;
-	for (auto d : freqs) {
-		beta0 -= d * d;
-	}
-    beta0 =  1.0/beta0;
+	beta0 = MutationProb::CalculateBeta0(freqs);
     UpdateTransitionMatrix();
+}
+
+F81::F81(double mu, vector<double> freq_v) : EvolutionModel(mu) {
+	for (size_t i = 0; i < freqs.size(); ++i) {
+		freqs[i] = freq_v[i];
+	}
+
+	beta0 = MutationProb::CalculateBeta0(freqs);
+	UpdateTransitionMatrix();
 }
 
 
 void F81::UpdateTransitionMatrix() {
 
-    exp_beta = exp(-beta0 * mu);
+    exp_beta = MutationProb::CalculateExpBeta(mu, beta0);
+cout << "F81:\t" << mu << "\t" << exp_beta << endl;
 
     Eigen::Matrix4d m;
     for (int i : { 0, 1, 2, 3 }) {
@@ -59,7 +65,7 @@ void F81::UpdateTransitionMatrix() {
 MutationMatrix MutationProb::MutationAccumulation2(bool and_mut) {
 
 	using namespace Eigen;
-	double exp_beta = CalculateBeta();
+	double exp_beta = CalculateExpBeta();
 //	printf("beta0:%.10f\n", beta0); //0.9999999852
 	Eigen::Matrix4d m;
 	Eigen::Matrix4d m2 = Eigen::Matrix4d::Zero();
@@ -124,7 +130,7 @@ MutationMatrix MutationProb::MutationAccumulation2(bool and_mut) {
 
 MutationMatrix MutationProb::MutationAccumulation(const ModelParams &params, bool and_mut) {
 
-	double exp_beta = CalculateBeta();
+	double exp_beta = CalculateExpBeta();
 //	printf("beta0:%.10f\n", beta0); //0.9999999852
 	Eigen::Matrix4d m;
 	for (int i : { 0, 1, 2, 3 }) {
