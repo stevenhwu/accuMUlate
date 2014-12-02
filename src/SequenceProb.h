@@ -49,7 +49,7 @@ public:
     HaploidProbs GetDescendantGenotypes(int descent_index);
     std::vector<HaploidProbs> GetDescendantGenotypes();
 
-
+    void PrintReads(ReadData data);
 //    double GetLikelihood();
 
 protected:
@@ -59,7 +59,7 @@ protected:
 
     DiploidProbs DiploidSequencing(ReadData data);
 
-    void PrintReads(ReadData data);
+
 
     template<class T>
     T ScaleLogArray(T result);

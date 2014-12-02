@@ -364,7 +364,7 @@ TEST_F(SiteProbTest, TestCalculateAncestorToDescendant) {
 
     double overall_stat_same;
     double overall_stat_diff;
-    site.CalculateAncestorToDescendant(overall_stat_same, overall_stat_diff);
+    site.CalculateAncestorToDescendant(<#initializer#>, overall_stat_same, overall_stat_diff);
 //    ASSERT_EQ(expected_prob, sum_prob_ancestor);
     ASSERT_EQ(expected_same, overall_stat_same);
     ASSERT_EQ(expected_diff, overall_stat_diff);
@@ -436,7 +436,7 @@ TEST_F(SiteProbTest, TestCalculateAncestorToDescendant3) {
 
     double overall_stat_same;
     double overall_stat_diff;
-    site.CalculateAncestorToDescendant(overall_stat_same, overall_stat_diff);
+    site.CalculateAncestorToDescendant(<#initializer#>, overall_stat_same, overall_stat_diff);
 //    ASSERT_EQ(expected_prob, sum_prob_ancestor);
     ASSERT_EQ(expected_same, overall_stat_same);
     ASSERT_EQ(expected_diff, overall_stat_diff);

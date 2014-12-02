@@ -36,7 +36,7 @@ public:
     void UpdateTransitionMatrix(EvolutionModel evo_model);
 
 
-    void CalculateAncestorToDescendant(double &stat_same, double &stat_diff);
+    void CalculateAncestorToDescendant(double &sum_prob, double &stat_same, double &stat_diff);
 
     void CalculateAllDescendantGivenAncestor(int a, double &sum_prob_d, double &summary_stat_same_ancestor, double &summary_stat_diff_ancestor);
 
