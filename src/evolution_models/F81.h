@@ -8,16 +8,19 @@
 #include "EvolutionModel.h"
 
 class F81 : public EvolutionModel{
-//    double mu;
+
 
 public:
-    F81(double mu, Array4D freqs);
-    F81(double mu, vector<double> freqs); //Legacy
+//    F81(double mu, Array4D freqs);
+//    F81(double mu, vector<double> freqs); //Legacy
+    F81(MutationProb prob);
+
+    F81(double mu);
+
     ~F81();
 
 protected:
-    double beta0;
-    Array4D freqs;
+
 
     virtual void UpdateTransitionMatrix();
 
@@ -25,7 +28,8 @@ protected:
 
 private:
     double exp_beta;
-
+    double beta0;
+    Array4D freqs;
 };
 
 

@@ -23,7 +23,7 @@
 #include "model.h"
 #include "MutationProb.h"
 #include "distributions/DirichletMultinomialDistribution.h"
-#include "evolutionModels/EvolutionModel.h"
+#include "evolution_models/EvolutionModel.h"
 #include "Lookup.h"
 
 

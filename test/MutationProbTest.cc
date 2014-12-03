@@ -14,7 +14,6 @@ protected:
     double mu_4 = 0.0001;
 
     virtual void SetUp() {
-        foo = 0;
         params_equal = {
                 0,//vm["theta"].as<double>(),
                 freq_equal,//vm["nfreqs"].as<vector< double> >(),
@@ -29,9 +28,6 @@ protected:
 };
 
 
-TEST_F(MutationProbTest, FooStartsAtZero) {
-    EXPECT_EQ(0, foo);
-}
 
 
 TEST_F(MutationProbTest, EqualFreqsInit) {

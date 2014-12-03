@@ -37,8 +37,11 @@ namespace LookupTable {
 
 */
     extern const int index_converter_16_to_10_single[16];
-    extern const int index_converter_16_to_10[4][4];
+    extern const int index_converter_4_4_to_10[4][4];
+
+    extern const int index_converter_4_4_to_16[4][4];
     extern const int index_converter_10_to_16[10];
+
     extern const std::string genotype_lookup_10[10];
 
 

@@ -6,12 +6,21 @@ message("A: ${SOURCE_FILES}")
 SET(SOURCE_FILES ${SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/SequenceProb.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/VariantVisitor.cc
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/Lookup.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/MutationProb.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/SiteProb.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/SequenceProb.cc
+
+    CACHE INTERNAL "Global"
+    )
+
+SET(SOURCE_FILES_accuMUlate ${SOURCE_FILES_accuMUlate}
+    ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantVisitor.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/Lookup.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/SiteProb.cc
-    CACHE INTERNAL "Global"
     )
 
 #list (APPEND SOURCE_LIST ${SOURCE_FILES})
@@ -20,12 +29,12 @@ SET(SOURCE_FILES ${SOURCE_FILES}
 message("BB: ${SOURCE_FILES} ${PROJECT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ")
 
 ADD_SUBDIRECTORY(distributions)
-ADD_SUBDIRECTORY(evolutionModels)
+ADD_SUBDIRECTORY(evolution_models)
 
 
 message("C: ${SOURCE_FILES} ")
 
-add_executable(accuMUlate main.cc ${SOURCE_FILES})
+add_executable(accuMUlate main.cc ${SOURCE_FILES_accuMUlate})
 target_link_libraries(accuMUlate ${LIBS} )
 
 add_executable(EMTest EMTest.cc ${SOURCE_FILES})

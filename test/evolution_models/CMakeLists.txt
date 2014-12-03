@@ -1,0 +1,7 @@
+# Add test cpp file
+SET(TEST_SOURCE_FILES ${TEST_SOURCE_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/F81.cc
+    #${CMAKE_CURRENT_SOURCE_DIR}/SequenceProbTest.cc
+    #${CMAKE_CURRENT_SOURCE_DIR}/SiteProbTest.cc
+    PARENT_SCOPE
+)

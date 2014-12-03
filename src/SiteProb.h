@@ -14,10 +14,16 @@
 #include "MutationProb.h"
 #include "SiteProb.h"
 #include "SequenceProb.h"
-//#include "distributions/DirichletMultinomialDistribution.h"
-#include "evolutionModels/EvolutionModel.h"
+#include "distributions/DirichletMultinomialDistribution.h"
+#include "evolution_models/EvolutionModel.h"
 #include "Lookup.h"
 
+struct ProbTwoStats{
+
+    double prob;
+    double stat_same;
+    double stat_diff;
+};
 
 class SiteProb {
 
@@ -29,6 +35,8 @@ public:
 //    SiteProb(const ModelParams &params, const ModelInput site_data, MutationProb muProb);
 //    SiteProb(const ModelInput site_data, const MutationProb muProb, const EvolutionModel evoModel);
 
+    SiteProb(SequenceProb &traits, EvolutionModel evo_model);
+
     ~SiteProb();
 
     void UpdateMuProb(MutationProb muProb);
@@ -36,12 +44,14 @@ public:
     void UpdateTransitionMatrix(EvolutionModel evo_model);
 
 
-    void CalculateAncestorToDescendant(double &sum_prob, double &stat_same, double &stat_diff);
+    void CalculateAncestorToDescendant(double &prob_reads, double &all_stats_same, double &all_stats_diff);
 
     void CalculateAllDescendantGivenAncestor(int a, double &sum_prob_d, double &summary_stat_same_ancestor, double &summary_stat_diff_ancestor);
 
     void CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs prob_reads_given_descent, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff);
 
+
+    void UpdateModel(EvolutionModel evo_model);
 
 protected:
 

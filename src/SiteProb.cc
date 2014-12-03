@@ -5,7 +5,6 @@
  *      Author: Steven Wu
  */
 #include <iostream>
-//#include <tkDecls.h>
 #include "SiteProb.h"
 
 
@@ -37,6 +36,8 @@
 
 const int DEBUG = 0;
 
+
+
 SiteProb::SiteProb(SequenceProb sequence_prob,
 		 MutationProb mutation_prob, EvolutionModel evo_model) {
 
@@ -54,10 +55,27 @@ SiteProb::SiteProb(SequenceProb sequence_prob,
 }
 
 
+SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel evo_model) {
+    MutationProb mutation_prob = evo_model.GetMutationProb();
+    ancestor_prior = mutation_prob.GetAncestorPrior();
+    frequency_prior = mutation_prob.GetFrequencyPrior();
+
+    UpdateModel(evo_model);
+
+    ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
+    all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
+    descendant_count = all_descendant_genotypes.size();
+}
+
 
 SiteProb::~SiteProb() {
 }
 
+
+void SiteProb::UpdateModel(EvolutionModel evo_model) {
+    transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
+    mutation_rate = evo_model.GetMutationRate();
+}
 
 void SiteProb::UpdateMuProb(MutationProb mutation_prob){
 
@@ -71,31 +89,32 @@ void SiteProb::UpdateTransitionMatrix(EvolutionModel evo_model) {
 
 
 double total_sum2 = 0;
-void SiteProb::CalculateAncestorToDescendant(double &sum_prob, double &stat_same, double &stat_diff) {
+void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_stats_same, double &all_stats_diff) {
 
-    double prob_reads = 0;
-    double sum_all_stats_same = 0;
-    double sum_all_stats_diff = 0;
-    double summary_stat_same_ancestor[ANCESTOR_COUNT];
-    double summary_stat_diff_ancestor[ANCESTOR_COUNT];
-    double prod_prob_ancestor[ANCESTOR_COUNT];
+    prob_reads = 0;
+    all_stats_same = 0;
+    all_stats_diff = 0;
+
+
+    double summary_stat_same_ancestor = 0;
+    double summary_stat_diff_ancestor = 0;
+    double prod_prob_ancestor = 1;
 
     for (int a = 0; a < ANCESTOR_COUNT; ++a) {
         int index10 = a;
         int index16 = LookupTable::index_converter_10_to_16[a];
 
-//summary_stat_same_ancestor[a]=0;
-        CalculateAllDescendantGivenAncestor(a, prod_prob_ancestor[a], summary_stat_same_ancestor[a], summary_stat_diff_ancestor[a]);
+        CalculateAllDescendantGivenAncestor(a, prod_prob_ancestor, summary_stat_same_ancestor, summary_stat_diff_ancestor);
 
-        double prob_reads_given_a = ancestor_genotypes[index16] * ancestor_prior[index10] *  prod_prob_ancestor[a];
+        double prob_reads_given_a = ancestor_genotypes[index16] * ancestor_prior[index10] *  prod_prob_ancestor;
 //            prob_reads_given_a = log(ancestor_genotypes(index16)) + log( ancestor_prior[index10]) + prod_prob_ancestor[a];
         prob_reads += prob_reads_given_a;
 
 //        summary_stat_same_ancestor[a] *= prob_reads_given_a;
 //        summary_stat_diff_ancestor[a] *= prob_reads_given_a;
 
-        sum_all_stats_same += summary_stat_same_ancestor[a]*prob_reads_given_a;
-        sum_all_stats_diff += summary_stat_diff_ancestor[a]*prob_reads_given_a;
+        all_stats_same += summary_stat_same_ancestor*prob_reads_given_a;
+        all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
         //            sum_all_stats += prob_reads_given_a * summary_stat_ancestor[a];
 
         //        prod_prob_ancestor[a] = sum(sum_prob_d);
@@ -103,27 +122,22 @@ void SiteProb::CalculateAncestorToDescendant(double &sum_prob, double &stat_same
         if (DEBUG>1) {
             cout << "==A: " << a << " " << index16 << " " << LookupTable::genotype_lookup_10[a] << " " <<
                     ancestor_genotypes[index16] << "\t";
-            cout << "Same: " << sum_all_stats_same << "\tDiff:" << sum_all_stats_diff <<
-            "\t" << summary_stat_same_ancestor[a] << "\t" <<summary_stat_diff_ancestor[a] <<
-            "\tProb:" << prod_prob_ancestor[a]  << "\t" << prob_reads_given_a << endl ;
-
+            cout << "Same: " << all_stats_same << "\tDiff:" << all_stats_diff <<
+            "\t" << summary_stat_same_ancestor << "\t" <<summary_stat_diff_ancestor <<
+            "\tProb:" << prod_prob_ancestor  << "\t" << prob_reads_given_a << endl ;
         }
-
 
     }
 
-    sum_all_stats_same /= prob_reads;
-    sum_all_stats_diff /= prob_reads;
+    all_stats_same /= prob_reads;
+    all_stats_diff /= prob_reads;
 
-//    cout << ancestor_prior<< end;
     if(DEBUG>0){
-        cout << "summaryALL\tSame:" << sum_all_stats_same << "\tDiff:" << sum_all_stats_diff << "\t" << (sum_all_stats_diff + sum_all_stats_same) << endl << endl;
+        cout << "summaryALL\tSame:" << all_stats_same << "\tDiff:" << all_stats_diff << "\t" << (all_stats_diff + all_stats_same) << endl << endl;
         cout << "total_sum2: "<< total_sum2 << "\tProb: " << prob_reads <<endl;
 
     }
-    stat_same = sum_all_stats_same;
-    stat_diff = sum_all_stats_diff;
-    sum_prob = prob_reads;
+
 }
 
 
@@ -210,7 +224,4 @@ void SiteProb::PrintReads(ReadData data) {
     printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);
 
 }
-
-
-
 

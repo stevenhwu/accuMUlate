@@ -39,6 +39,7 @@ public:
 
 
 public:
+    MutationProb(double mu);
 	MutationProb(const ModelParams &model_params);
 	~MutationProb();
 
@@ -64,6 +65,7 @@ private:
     double exp_beta; //exp_beta = exp(-beta0*mu0)
 
     double CalculateExpBeta();
+    void CalculateAncestorPrior();
 
 };
 #endif /* MUTATIONPROB_H_ */

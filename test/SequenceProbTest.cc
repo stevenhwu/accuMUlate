@@ -1,10 +1,10 @@
-#include <evolutionModels/F81.h>
+#include <evolution_models/F81.h>
 #include "gtest/gtest.h"
 #include "SequenceProb.h"
 
 class SequenceProbTest : public ::testing::Test {
 public:
-    const double ERROR_THRESHOLD = 1e-10;
+    const double ERROR_THRESHOLD = 1e-15;
 protected:
     int foo;
     ModelParams params_equal;
@@ -17,7 +17,6 @@ protected:
     double mu_4 = 0.0001;
 
     virtual void SetUp() {
-        foo = 0;
         params_equal = {
                 0.01,//vm["theta"].as<double>(),
                 freq_equal,//vm["nfreqs"].as<vector< double> >(),
@@ -30,10 +29,6 @@ protected:
         params_not_equal = {0.01, freq_not_equal, mu_4, 0.01, 0.01, 0.01};
     }
 };
-
-TEST_F(SequenceProbTest, FooStartsAtZero) {
-    EXPECT_EQ(0, foo);
-}
 
 
 TEST_F(SequenceProbTest, EqualFreqsGenotypes) {

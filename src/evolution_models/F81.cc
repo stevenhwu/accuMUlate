@@ -4,32 +4,48 @@
 F81::~F81() {
 }
 
-F81::F81(double mu, Array4D freq) : EvolutionModel(mu) {
-    this->freqs = freq;
-	beta0 = MutationProb::CalculateBeta0(freqs);
-    UpdateTransitionMatrix();
-}
-
-F81::F81(double mu, vector<double> freq_v) : EvolutionModel(mu) {
-	for (size_t i = 0; i < freqs.size(); ++i) {
-		freqs[i] = freq_v[i];
-	}
-
-	beta0 = MutationProb::CalculateBeta0(freqs);
+F81::F81(double mu) : EvolutionModel(MutationProb(mu)) {
+//	cout << "C_F81_mu\n";
+	freqs = mu_prob.GetFrequencyPrior();
 	UpdateTransitionMatrix();
 }
+
+F81::F81(MutationProb mutation_prob) : EvolutionModel(mutation_prob) {
+//	cout << "C_F81\n";
+	freqs = mu_prob.GetFrequencyPrior();
+	UpdateTransitionMatrix();
+}
+
+//
+//F81::F81(double mu, Array4D freq) : EvolutionModel(mu) {
+//	cout << "C_F81_array\n";
+//    this->freqs = freq;
+//	beta0 = MutationProb::CalculateBeta0(freqs);
+//    UpdateTransitionMatrix();
+//}
+//
+//F81::F81(double mu, vector<double> freq_v) : EvolutionModel(mu) {
+//	cout << "C_F81_vector\n";
+//	for (size_t i = 0; i < freqs.size(); ++i) {
+//		freqs[i] = freq_v[i];
+//	}
+//
+//	beta0 = MutationProb::CalculateBeta0(freqs);
+//	UpdateTransitionMatrix();
+//}
 
 
 void F81::UpdateTransitionMatrix() {
 
-    exp_beta = MutationProb::CalculateExpBeta(mu, beta0);
-cout << "F81:\t" << mu << "\t" << exp_beta << endl;
+    exp_beta = mu_prob.GetExpBeta();
+//cout << "F81:\t" << mu << "\t" << exp_beta << endl;
 
     Eigen::Matrix4d m;
     for (int i : { 0, 1, 2, 3 }) {
         double prob = freqs[i] * (1.0 - exp_beta);
         for (int j : { 0, 1, 2, 3 }) {
             m(j, i) = prob;
+			//MatrixXd::Constant(3,3,1.2)) replace with
         }
         m(i, i) += exp_beta;
     }
@@ -38,9 +54,8 @@ cout << "F81:\t" << mu << "\t" << exp_beta << endl;
     transition_matrix_a_to_d = MutationMatrix::Zero();
     for (int i : { 0, 1, 2, 3 }) {
         for (int j : { 0, 1, 2, 3 }) {
-            int index16 = i * 4 + j;
+            int index16 = LookupTable::index_converter_4_4_to_16[i][j];
             for (int k : { 0, 1, 2, 3 }) {
-//                conditional_prob(i * 4 + j, k) = 0.0;
                 transition_matrix_a_to_d(index16, k) += 0.5 * m(i, k);
                 transition_matrix_a_to_d(index16, k) += 0.5 * m(j, k);
             }

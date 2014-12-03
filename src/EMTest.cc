@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <boost/program_options.hpp>
+#include <time.h>
 
 
 #include "api/BamReader.h"
@@ -14,8 +15,8 @@
 #include "parsers.h"
 #include "SequenceProb.h"
 #include "VariantVisitor.h"
-#include "evolutionModels/JC69.h"
-#include "evolutionModels/F81.h"
+#include "evolution_models/JC69.h"
+#include "evolution_models/F81.h"
 #include "SiteProb.h"
 
 using namespace std;
@@ -27,7 +28,7 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params);
 
 void testCalLikelihood(MutationProb muProb, std::vector<SequenceProb> sp);
 
-void testCalWeighting(MutationProb muProb, std::vector<SequenceProb> sp, ModelParams model_params);
+void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp);
 
 
 
@@ -214,7 +215,7 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
 //    }
 //    F81  model(muArray[0], model_params.nuc_freq);
     site_count = 100;
-    for (int i = 0; i < site_count; ++i) {
+    for (size_t i = 0; i < site_count; ++i) {
         sp.push_back(SequenceProb(base_counts[500 + i], params));
     }
 //    sp[0] = SequenceProb(base_counts[598], params);
@@ -235,8 +236,8 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
 
     // Generate a normal distribution around that mean
     std::mt19937 e2(rd());
-    std::uniform_int_distribution<int> uniform_dist(5, 10);
-    for (int s = 0; s < site_count; ++s) {
+    std::uniform_int_distribution<int> uniform_dist(10, 20);
+    for (size_t s = 0; s < site_count; ++s) {
         ModelInput base_custom = base_counts[s];
         base_custom.reference = 0;
         for (int i = 0; i < 7; ++i) {
@@ -246,100 +247,108 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
             }
             base_custom.all_reads[i].reads[0] = (uint16_t) 100 + uniform_dist(e2);
         }
-
-        sp[s] = SequenceProb(base_custom, params);
-    }
-
-    for (int s = 75; s < site_count; ++s) {
-        ModelInput base_custom = base_counts[s];
-        base_custom.reference = 0;
-        for (int i = 0; i < 7; ++i) {
-            base_custom.all_reads[i].key=0;
-            for (int j = 0; j < 4; ++j) {
-                base_custom.all_reads[i].reads[2] = (uint16_t) 100 + uniform_dist(e2);
-            }
-        }
-
         int i=0;
-        base_custom.all_reads[i].key=0;
-        for (int j = 0; j < 4; ++j) {
-            base_custom.all_reads[i].reads[j] = (uint16_t) uniform_dist(e2);
+        if(s > 70){ //diff
+            base_custom.all_reads[i].reads[0] = (uint16_t) uniform_dist(e2);
+            base_custom.all_reads[i].reads[2] = (uint16_t) 100 + uniform_dist(e2);
         }
-        base_custom.all_reads[i].reads[0] = (uint16_t) 100 + uniform_dist(e2);
-
         sp[s] = SequenceProb(base_custom, params);
     }
+
+//    for (int s = 75; s < site_count; ++s) {
+//        ModelInput base_custom = base_counts[s];
+//        base_custom.reference = 0;
+//        for (int i = 0; i < 7; ++i) {
+//            base_custom.all_reads[i].key=0;
+//            for (int j = 0; j < 4; ++j) {
+//                base_custom.all_reads[i].reads[j] = (uint16_t) uniform_dist(e2);
+//            }
+//            base_custom.all_reads[i].reads[2] = (uint16_t) 100+uniform_dist(e2);
+//        }
+//
+//
+//
+//        sp[s] = SequenceProb(base_custom, params);
+//    }
 
 
     cout << "Start\n\n";
 
-//    testCalLikelihood(muProb, sp);
-    testCalWeighting(muProb, sp, params);
+    testCalWeighting(muProb, sp);
 
     return 0;
 }
 
-void testCalWeighting(MutationProb muProb, std::vector<SequenceProb> sp, ModelParams model_params) {
+void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) {
     const size_t cat = 2;
-    size_t site_count = 1000;//
+
 
     double muArray[cat];
     muArray[0] = 1e-10;
-    muArray[1] = 1e-1;
+    muArray[1] = 1;
 
-    double muNewArray[cat];
-    muNewArray[0] = muArray[0];
-    muNewArray[1] = muArray[1];
+//    double muNewArray[cat];
+//    muNewArray[0] = muArray[0];
+//    muNewArray[1] = muArray[1];
 
 
-    double proportion[cat] {0.8,0.2};
+    double proportion[cat] {0.5,0.5};
     double all_stats_same[cat];
     double all_stats_diff[cat];
 
 //    double weight[2];
-//    int num_descendant = 2;//FIXME change later
+
 
 //    JC69 model(muArray[0]);
 //    MutationProb muProbs[cat] = {
 //            MutationProb(model_params),
 //            MutationProb(model_params)};
+    //F81 model2(muArray[0], model_params.nuc_freq);
 
-    F81 model(muArray[0], model_params.nuc_freq);
+    F81 model2(0.1);
+    JC69 m69(0.1);
+
+    JC69 m692(mutation_prob);
+
+    F81 model(mutation_prob);
+//    exit(-10);
+//    F81 model(mutation_prob);
+//    JC69 m69(mutation_prob);
 //    MutationMatrix conditional_prob = model.GetTransitionMatirxAToD();
     const int c_site_count = 100;
-    site_count = c_site_count;
+    size_t site_count = c_site_count;
     std::vector<SiteProb> site_prob;
     for (size_t s = 0; s < site_count; ++s) {
-        SiteProb site  (sp[s],muProb, model );
+//        SiteProb site  (sp[s],mutation_prob, model );
+        SiteProb site  (sp[s], model );
         site_prob.push_back(site);
+
     }
     size_t em_count = 50;
     size_t rate_count = 2; //2;
     double all_prob[cat][c_site_count];
     cout << "Start EM:" << endl;
+
     for (size_t i = 0; i < em_count; ++i) {
 
         for (size_t r = 0; r < rate_count; ++r) {
             model.UpdateMu(muArray[r]);
-//            muProbs[r].UpdateMu(muArray[r]);
-            muProb.UpdateMu(muArray[r]);
+//            mutation_prob.UpdateMu(muArray[r]);
+
             all_stats_same[r] = 0;
             all_stats_diff[r] = 0;
 //            all_prob[r][s] = 0;
 //          Array10D site_stat[site_count];
             for (size_t s = 0; s < site_count; ++s) {
-//                s = 2;
 
-                auto t = site_prob[s];
-                t.UpdateTransitionMatrix(model);
-                t.UpdateMuProb(muProb);
-
-//                cout << "==============Start Looop:\t Site: " << s << " rate:" << r << "\n";
-
+                auto site = site_prob[s];
+//                t.UpdateTransitionMatrix(model);
+//                t.UpdateMuProb(mutation_prob);
+                site.UpdateModel(model);
                 double stat_same = 0;
                 double stat_diff = 0;
                 double sum_prob = 0;
-                t.CalculateAncestorToDescendant(sum_prob, stat_same, stat_diff);
+                site.CalculateAncestorToDescendant(sum_prob, stat_same, stat_diff);
                 all_stats_same[r] += proportion[r] * stat_same;
                 all_stats_diff[r] += proportion[r] * stat_diff;
                 all_prob[r][s] = sum_prob;
@@ -347,83 +356,39 @@ void testCalWeighting(MutationProb muProb, std::vector<SequenceProb> sp, ModelPa
             }
         }
 
-        double all_weight[c_site_count];
         double sum = 0;
-//        for (size_t s = 0; s < site_count; ++s) {
-//            double sum0 = 0;
-//            for (size_t r = 0; r < rate_count; ++r) {
-//                sum0 += all_prob[r][s];
-//            }
-//            all_weight[s] = all_prob[0][s]/ sum0;
-//            all_weight[s] = all_prob[0][s]/ (all_prob[0][s]+all_prob[1][s]);
-//            sum += all_weight[s];
-//        }
-//        sum= 0;
         for (size_t s = 0; s < c_site_count; ++s) {
-            all_weight[s] = all_prob[0][s]/ (all_prob[0][s]+all_prob[1][s]);
-            sum += all_weight[s];
+            double sum0 = all_prob[0][s]/ (all_prob[0][s]+all_prob[1][s]);
+            sum += sum0;
         }
         proportion[0] = sum/site_count;
         proportion[1] = 1-proportion[0];
 
         for (size_t r = 0; r < rate_count; ++r) {
+            double sum_stat = all_stats_diff[r] + all_stats_same[r];
+            double new_exp_beta = all_stats_diff[r] / sum_stat;
+            double new_mu = mutation_prob.ConvertExpBetaToMu(new_exp_beta);
 
-            double new_exp_beta = all_stats_diff[r] / (all_stats_diff[r] + all_stats_same[r]);
-            double new_mu = muProb.ConvertExpBetaToMu(new_exp_beta);
-
-            double new_one_minus_exp_beta = all_stats_same[r] / (all_stats_diff[r] + all_stats_same[r]);
-            double new_one_minus_mu = muProb.ConvertExpBetaToMu(-(new_one_minus_exp_beta-1));
+            double new_one_minus_exp_beta = all_stats_same[r] / sum_stat;
+            double new_one_minus_mu = mutation_prob.ConvertExpBetaToMu(-(new_one_minus_exp_beta-1));
 //            cout.setprecision(10);
 
 //            proportion[r] = all_prob[r]/(all_prob[0]+all_prob[1]);
-            printf("======= NEM_MU_r: %zu \tMu: %.10f %.10f =expBeta=  %.10f %.10f \t =prop= %.10f %.10f "
-                            "\t =all_prob=  %.10f \t =stat= %.10f %.10f \n" ,r,
+            printf("======= NEM_MU_r: %zu \tMu: %.5e %.5f =expBeta=  %.5f %.5f \t =prop= %.5f %.5f "
+                            "\t =all_prob=  %.5f \t =stat= %.5f %.5f \n" ,r,
                     new_mu ,new_one_minus_mu,
                     new_exp_beta, new_one_minus_exp_beta,
                     proportion[0], proportion[1],  sum,
                     all_stats_same[0], all_stats_same[1]);
 
             muArray[r] = new_mu;
-//        model.UpdateMu(newMu);
-//        muProb.UpdateMu(newMu);
+
         }
         
-//        proportion[0] = all_stats_same[0] / (all_stats_same[0] + all_stats_same[1]);
-//        proportion[1] = all_stats_same[1] / (all_stats_same[0] + all_stats_same[1]);
+
     }
     
 
-//        double sum = likelihood[0] + likelihood[1];
-//
-//        proportion[0] = likelihood[0]/sum;
-//        proportion[1] = likelihood[1]/sum;
-//
-//        cout << proportion[0] << "\t" << proportion[1] << endl;
-
-//        ModelInput m = t.GetData();
-////			m.all_reads
-//
-//        ModelInput mA, mB;
-//        ReadData vA, vB;
-//        //Might have to redo this part, with double[4] TODO:
-//        mA.all_reads = std::vector<ReadData>(7);
-        /*for (int b = 0; b < m.all_reads.size(); ++b) {
-            ReadData v = m.all_reads[b];
-
-            cout << v.reads[0] << "\t" << v.reads[1] << "\t"<< v.reads[2] << "\t"<< v.reads[3] << "\t" <<endl;
-            for (int bb = 0; bb < 3; ++bb) {
-                vA.reads[bb] = v.reads[bb] * proportion[0];
-                vB.reads[bb] = v.reads[bb] * proportion[1];
-            }
-            cout << vA.reads[0] << "\t" << vA.reads[1] << "\t"<< vA.reads[2] << "\t"<< vA.reads[3] << "\t" <<endl;
-            cout << "AA" << endl;
-            mA.all_reads[b] = vA;
-            cout << "BB" << endl;
-            mB.all_reads.push_back( vB );
-            cout << "??" << endl;
-        }*/
-
-//    cout << muArray[0] << "\t" << muArray[2] << endl;
 }
 
 

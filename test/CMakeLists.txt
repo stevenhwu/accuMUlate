@@ -19,6 +19,8 @@ SET(TEST_SOURCE_FILES ${TEST_SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/SiteProbTest.cc
     )
 
+ADD_SUBDIRECTORY("evolution_models")
+
 add_executable( UnitTests ${TEST_SOURCE_FILES} ${SOURCE_FILES})
 
 

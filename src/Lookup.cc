@@ -60,14 +60,19 @@ namespace LookupTable {
                 2, 5, 7, 8,
                 3, 6, 8, 9,
         };
-        const int index_converter_16_to_10[4][4] = {
+        const int index_converter_4_4_to_10[4][4] = {
                 {0, 1, 2, 3},
                 {1, 4, 5, 6},
                 {2, 5, 7, 8},
                 {3, 6, 8, 9}
-
         };
-        const int index_converter_10_to_16[10] = {//??
+        const int index_converter_4_4_to_16[4][4] = {
+                {0, 4, 8,  12},
+                {1, 5, 9,  13},
+                {2, 6, 10, 14},
+                {3, 7, 11, 15}
+        };
+        const int index_converter_10_to_16[10] = {
                 0, 1, 2, 3,
                 5, 6, 7,
                 10, 11,
