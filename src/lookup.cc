@@ -1,4 +1,11 @@
-#include "Lookup.h"
+/*
+ * em_model.h
+ *
+ *  Created on: 12/4/14
+ *      Author: Steven Wu
+ */
+
+#include "lookup.h"
 
 namespace LookupTable {
 //struct LookupTable {
@@ -35,25 +42,6 @@ namespace LookupTable {
                 {0, 0, 0, 1.0},    //	TT
         };
 
-/*
-10 cat version
-  AA AC AG AT CC CG CT GG GT TT
-
-  descnt = A
-      A  C  G  T
- *AA == !! !! !!
-  AC =! =! !! !!
-  AG =! !! =! !!
-  AT =! !! !! =!
- *CC !! == !! !!
-  CG !! =! =! !!
-  CT !! =! !! =!
- *GG !! !! == !!
-  GT !! !! =! =!
- *TT !! !! !! ==
-
-
-*/
         const int index_converter_16_to_10_single[16] = {
                 0, 1, 2, 3,
                 1, 4, 5, 6,

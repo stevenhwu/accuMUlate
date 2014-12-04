@@ -1,6 +1,6 @@
 #include <evolution_models/F81.h>
 #include "gtest/gtest.h"
-#include "SequenceProb.h"
+#include "sequence_prob.h"
 
 class SequenceProbTest : public ::testing::Test {
 public:

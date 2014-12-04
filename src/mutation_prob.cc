@@ -1,11 +1,11 @@
 /*
- * MutationProb.cpp
+ * mutation_prob.cpp
  *
  *  Created on: Nov 8, 2014
  *      Author: Steven Wu
  */
 
-#include "MutationProb.h"
+#include "mutation_prob.h"
 #include <cmath>
 #include <iostream>
 

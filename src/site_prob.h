@@ -1,22 +1,22 @@
 /*
- * SiteProb.h
+ * site_prob.h
  *
  *  Created on: Dec 1, 2014
  *      Author: Steven Wu
  */
-
-#ifndef SiteProb_H_
-#define SiteProb_H_
+#pragma once
+#ifndef SITE_PROB_H_
+#define SITE_PROB_H_
 
 #include <vector>
 #include <iostream>
 #include "model.h"
-#include "MutationProb.h"
-#include "SiteProb.h"
-#include "SequenceProb.h"
+#include "mutation_prob.h"
+#include "site_prob.h"
+#include "sequence_prob.h"
 #include "distributions/DirichletMultinomialDistribution.h"
 #include "evolution_models/EvolutionModel.h"
-#include "Lookup.h"
+#include "lookup.h"
 
 struct ProbTwoStats{
 
@@ -73,4 +73,4 @@ private:
 
 };
 
-#endif /* SiteProb_H_ */
+#endif /* SITE_PROB_H_ */

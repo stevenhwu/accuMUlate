@@ -4,7 +4,7 @@
 
 
 #include <model.h>
-#include <MutationProb.h>
+#include "mutation_prob.h"
 #include "EvolutionModel.h"
 
 class F81 : public EvolutionModel{

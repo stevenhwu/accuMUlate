@@ -1,12 +1,12 @@
 /*
- * SequenceProb.h
+ * sequence_prob.h
  *
  *  Created on: Nov 7, 2014
  *      Author: Steven Wu
  */
-
-#ifndef SEQUENCEPROB_H_
-#define SEQUENCEPROB_H_
+#pragma once
+#ifndef SEQUENCE_PROB_H_
+#define SEQUENCE_PROB_H_
 
 #ifdef __GNUC__
 #define DEPRECATED(func) func __attribute__ ((deprecated))
@@ -21,10 +21,10 @@
 #include <vector>
 #include <iostream>
 #include "model.h"
-#include "MutationProb.h"
+#include "mutation_prob.h"
 #include "distributions/DirichletMultinomialDistribution.h"
 #include "evolution_models/EvolutionModel.h"
-#include "Lookup.h"
+#include "lookup.h"
 
 
 extern const int ANCESTOR_COUNT;
@@ -86,4 +86,4 @@ private:
 
 };
 
-#endif /* SEQUENCEPROB_H_ */
+#endif /* SEQUENCE_PROB_H_ */

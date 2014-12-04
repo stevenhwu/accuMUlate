@@ -1,8 +1,8 @@
-#include <SiteProb.h>
+#include "site_prob.h"
 #include <evolution_models/F81.h>
 
 #include "gtest/gtest.h"
-#include "SequenceProb.h"
+#include "sequence_prob.h"
 
 class SiteProbTest : public ::testing::Test {
 public:

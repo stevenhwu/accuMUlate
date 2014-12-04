@@ -1,11 +1,11 @@
 /*
- * SequencingProb.cc
+ * sequence_prob.cc
  *
  *  Created on: Nov 7, 2014
  *      Author: Steven Wu
  */
 #include <iostream>
-#include "SequenceProb.h"
+#include "sequence_prob.h"
 
 
 

@@ -13,11 +13,12 @@
 
 #include "model.h"
 #include "parsers.h"
-#include "SequenceProb.h"
+#include "sequence_prob.h"
 #include "VariantVisitor.h"
 #include "evolution_models/JC69.h"
 #include "evolution_models/F81.h"
-#include "SiteProb.h"
+#include "site_prob.h"
+#include "em_algorithm.h"
 
 using namespace std;
 using namespace BamTools;
@@ -274,6 +275,31 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
 
     cout << "Start\n\n";
 
+
+    EMData2 ed2 = EMData2();
+    EMData *ed =  &ed2;
+    EMData &ed0 =  ed2;
+
+    EMSummaryStat es;
+    es.stat1 = 100;
+
+    EMSummaryStat2 es2;
+    es2.stat1 = 200;
+    es2.stat2 = 210;
+
+
+    ed->UpdateLikelihood(0, es);
+    ed2.UpdateLikelihood(0, es);
+    ed0.UpdateLikelihood(0, es);
+
+    ed->UpdateLikelihood(0, es2);
+    ed2.UpdateLikelihood(0, es2);
+    ed0.UpdateLikelihood(0, es2);
+
+    es2.print();
+
+
+    exit(-1);
     testCalWeighting(muProb, sp);
 
     return 0;
@@ -327,7 +353,7 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
     size_t em_count = 50;
     size_t rate_count = 2; //2;
     double all_prob[cat][c_site_count];
-    cout << "Start EM:" << endl;
+    cout << "Start em_algorithm:" << endl;
 
     for (size_t i = 0; i < em_count; ++i) {
 

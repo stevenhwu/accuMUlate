@@ -1,11 +1,11 @@
 /*
- * SiteProb.cc
+ * site_prob.cc.cc
  *
  *  Created on: Dec 1, 2014
  *      Author: Steven Wu
  */
 #include <iostream>
-#include "SiteProb.h"
+#include "site_prob.h"
 
 
 //

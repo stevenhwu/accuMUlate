@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "MutationProb.h"
+#include "mutation_prob.h"
 
 class MutationProbTest : public ::testing::Test {
 protected:

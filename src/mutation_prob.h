@@ -1,12 +1,12 @@
 /*
- * MutationProb.h
+ * mutation_prob.h
  *
  *  Created on: Nov 8, 2014
  *      Author: Steven Wu
  */
-
-#ifndef MUTATIONPROB_H_
-#define MUTATIONPROB_H_
+#pragma once
+#ifndef MUTATION_PROB_H_
+#define MUTATION_PROB_H_
 
 #ifdef __GNUC__
 #define DEPRECATED(func) func __attribute__ ((deprecated))
@@ -18,7 +18,7 @@
 #endif
 
 #include "model.h"
-#include "Lookup.h"
+#include "lookup.h"
 
 
 
@@ -40,7 +40,7 @@ public:
 
 public:
     MutationProb(double mu);
-	MutationProb(const ModelParams &model_params);
+    MutationProb(const ModelParams &model_params);
 	~MutationProb();
 
     void UpdateMu(double mu);
@@ -68,4 +68,4 @@ private:
     void CalculateAncestorPrior();
 
 };
-#endif /* MUTATIONPROB_H_ */
+#endif /* MUTATION_PROB_H_ */
