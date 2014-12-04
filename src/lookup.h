@@ -1,3 +1,11 @@
+/*
+ * lookup.h
+ *
+ *  Created on: 11/25/14
+ *      Author: Steven Wu
+ */
+
+
 #pragma once
 #ifndef LOOKUP_H_
 #define LOOKUP_H_

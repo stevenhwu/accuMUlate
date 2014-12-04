@@ -7,6 +7,7 @@
 #include <time.h>
 
 
+
 #include "api/BamReader.h"
 #include "utils/bamtools_pileup_engine.h"
 #include "utils/bamtools_fasta.h"
@@ -18,7 +19,8 @@
 #include "evolution_models/JC69.h"
 #include "evolution_models/F81.h"
 #include "site_prob.h"
-#include "em_algorithm.h"
+#include "algorithm/em_algorithm.h"
+#include "algorithm/em_data_mutation.h"
 
 using namespace std;
 using namespace BamTools;
@@ -276,16 +278,16 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     cout << "Start\n\n";
 
 
-    EMData2 ed2 = EMData2();
-    EMData *ed =  &ed2;
-    EMData &ed0 =  ed2;
+    EmDataMutation ed2 = EmDataMutation();
+    EmData *ed =  &ed2;
+    EmData &ed0 =  ed2;
 
-    EMSummaryStat es;
-    es.stat1 = 100;
+    EmSummaryStat es;
+    es.stat = 100;
 
-    EMSummaryStat2 es2;
-    es2.stat1 = 200;
-    es2.stat2 = 210;
+    EmSummaryStatMutation es2;
+    es2.stat = 200;
+    es2.stat_diff = 210;
 
 
     ed->UpdateLikelihood(0, es);
@@ -299,7 +301,6 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     es2.print();
 
 
-    exit(-1);
     testCalWeighting(muProb, sp);
 
     return 0;
@@ -355,6 +356,11 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
     double all_prob[cat][c_site_count];
     cout << "Start em_algorithm:" << endl;
 
+
+    EM em (2, site_prob, model);
+    em.Run();
+
+    exit(35);
     for (size_t i = 0; i < em_count; ++i) {
 
         for (size_t r = 0; r < rate_count; ++r) {

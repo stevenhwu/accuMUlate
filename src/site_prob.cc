@@ -75,6 +75,8 @@ SiteProb::~SiteProb() {
 void SiteProb::UpdateModel(EvolutionModel evo_model) {
     transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
     mutation_rate = evo_model.GetMutationRate();
+//    cout << "new mutation rate: " << mutation_rate.prob << endl;
+
 }
 
 void SiteProb::UpdateMuProb(MutationProb mutation_prob){

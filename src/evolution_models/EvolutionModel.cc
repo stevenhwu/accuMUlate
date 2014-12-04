@@ -19,6 +19,7 @@ EvolutionModel::~EvolutionModel() {}
 void EvolutionModel::UpdateMu(double mu0) {
     mu_prob.UpdateMu(mu0);
     this->mu = mu0;
+//    cout << "new mu:" << mu << endl;
     UpdateTransitionMatrix();
 
 }

@@ -29,6 +29,9 @@ class SiteProb {
 
 
 public:
+    SiteProb() {
+    }
+
     SiteProb(SequenceProb sequence_prob, MutationProb const mutation_prob, EvolutionModel const evo_model);
 
 //    SiteProb(ModelInput const site_data, ModelParams const model_params, MutationProb const mutation_prob, EvolutionModel const evo_model);
