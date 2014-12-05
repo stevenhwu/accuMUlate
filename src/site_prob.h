@@ -24,7 +24,7 @@ struct ProbTwoStats{
     double stat_same;
     double stat_diff;
 };
-
+static int counter = 0;
 class SiteProb {
 
 
@@ -32,6 +32,7 @@ public:
     SiteProb() {
     }
 
+    int thisCount = 0;
     SiteProb(SequenceProb sequence_prob, MutationProb const mutation_prob, EvolutionModel const evo_model);
 
 //    SiteProb(ModelInput const site_data, ModelParams const model_params, MutationProb const mutation_prob, EvolutionModel const evo_model);

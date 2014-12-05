@@ -10,7 +10,7 @@
 #ifndef EM_SUMMARY_STAT_H_
 #define EM_SUMMARY_STAT_H_
 
-
+#include <vector>
 class EmSummaryStat {
 
 
@@ -31,7 +31,12 @@ public:
         stat = 0;
     };
 
+    virtual void SetStats(std::vector<double> stats){
+        std::cout << "SetStat in EMSumStat: " << stat << std::endl;
+        stat = stats[0];
+    }
 //protprivate:
+    const int stat_count = 1;
     double stat = 0;
 
 

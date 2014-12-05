@@ -278,27 +278,27 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     cout << "Start\n\n";
 
 
-    EmDataMutation ed2 = EmDataMutation();
-    EmData *ed =  &ed2;
-    EmData &ed0 =  ed2;
-
-    EmSummaryStat es;
-    es.stat = 100;
-
-    EmSummaryStatMutation es2;
-    es2.stat = 200;
-    es2.stat_diff = 210;
-
-
-    ed->UpdateLikelihood(0, es);
-    ed2.UpdateLikelihood(0, es);
-    ed0.UpdateLikelihood(0, es);
-
-    ed->UpdateLikelihood(0, es2);
-    ed2.UpdateLikelihood(0, es2);
-    ed0.UpdateLikelihood(0, es2);
-
-    es2.print();
+//    EmDataMutation ed2 = EmDataMutation();
+//    EmData *ed =  &ed2;
+//    EmData &ed0 =  ed2;
+//
+//    EmSummaryStat es;
+//    es.stat = 100;
+//
+//    EmSummaryStatMutation es2;
+//    es2.stat = 200;
+//    es2.stat_diff = 210;
+//
+//
+//    ed->UpdateSummaryStat(0, es);
+//    ed2.UpdateSummaryStat(0, es);
+//    ed0.UpdateSummaryStat(0, es);
+//
+//    ed->UpdateSummaryStat(0, es2);
+//    ed2.UpdateSummaryStat(0, es2);
+//    ed0.UpdateSummaryStat(0, es2);
+//
+//    es2.print();
 
 
     testCalWeighting(muProb, sp);
@@ -342,23 +342,78 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 //    F81 model(mutation_prob);
 //    JC69 m69(mutation_prob);
 //    MutationMatrix conditional_prob = model.GetTransitionMatirxAToD();
-    const int c_site_count = 100;
+    const int c_site_count = 2;
     size_t site_count = c_site_count;
     std::vector<SiteProb> site_prob;
+    std::vector<EmData*> em_site_prob;
+
+    std::vector<std::unique_ptr<EmData>> em_site_data;
+//    stuff.reserve(site_count);
+//    for( int i = 0; i < 10; ++i )
+
+
     for (size_t s = 0; s < site_count; ++s) {
 //        SiteProb site  (sp[s],mutation_prob, model );
         SiteProb site  (sp[s], model );
         site_prob.push_back(site);
 
+//        std::unique_ptr<EmData> e ( new EmDataMutation(sp[s], model) );
+//        unique_ptr<EmData> e = std::unique_ptr<EmData>  ( );
+        em_site_data.emplace_back(  new EmDataMutation(sp[s], model)  );
+//        EmDataMutation em_site = EmDataMutation(sp[s], model);
+////        EmData *p = &em_site;
+//        em_site_prob.push_back(em_site);
+
     }
+    /*
+    //Doesn't work, need new
+    EmDataMutation em_site = EmDataMutation(sp[0], model);
+    em_site_prob[0] =(&em_site);
+    em_site = EmDataMutation(sp[1], model);
+    em_site_prob[1] = (&em_site);
+*/
     size_t em_count = 50;
     size_t rate_count = 2; //2;
     double all_prob[cat][c_site_count];
-    cout << "Start em_algorithm:" << endl;
 
 
-    EM em (2, site_prob, model);
-    em.Run();
+    cout << "\n========================\nStart em_algorithm:" << endl;
+    double a,b,c;
+    cout << site_prob.size() << "\t" << em_site_prob.size() << endl;
+
+    site_prob[0].CalculateAncestorToDescendant(a,b,c);
+    site_prob[1].CalculateAncestorToDescendant(a,b,c);
+    cout <<"\n\n";
+    unique_ptr<EmData> &e = em_site_data[0];
+//    EmData *ed= e.get();
+    EmDataMutation *eeem = static_cast<EmDataMutation*>(e.get());
+    eeem->site.CalculateAncestorToDescendant(a,b,c);
+
+
+    unique_ptr<EmData> &e2 = em_site_data[1];
+
+    EmDataMutation *eeem2 = static_cast<EmDataMutation*>(e2.get());
+    eeem2->site.CalculateAncestorToDescendant(a,b,c);
+
+
+
+//    exit(100);
+
+
+    EmModelMutation em_model (model);
+//    EM em (2, site_prob, model);
+//    em.RunOld();
+
+//    EmModel *em_base_model = &em_model;
+//    EM em (2, site_prob, model, em_model);
+//    EM em2 (2, site_prob, model, *em_base_model);
+
+    EmModel *em_base_model = &em_model;
+//    EM em (2, site_prob, model, em_site_prob, em_model);
+    EM em2 (2, site_prob, model, em_site_data, *em_base_model);
+
+//    em.Run();
+    em2.Run();
 
     exit(35);
     for (size_t i = 0; i < em_count; ++i) {
@@ -475,7 +530,7 @@ void RunMaProb(ModelParams params, po::variables_map vm, BamReader experiment, P
                 cout << count << endl;
                 MutationProb muProb = MutationProb(params);
                 SequenceProb sp(base, params);
-//                sp.UpdateLikelihood();
+//                sp.UpdateSummaryStat();
 //                double likelihood = sp.GetLikelihood();
 //                cout << likelihood << (1 - likelihood) << endl;
 

@@ -56,6 +56,10 @@ SiteProb::SiteProb(SequenceProb sequence_prob,
 
 
 SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel evo_model) {
+
+    counter++;
+    thisCount = counter;
+
     MutationProb mutation_prob = evo_model.GetMutationProb();
     ancestor_prior = mutation_prob.GetAncestorPrior();
     frequency_prior = mutation_prob.GetFrequencyPrior();
@@ -65,6 +69,10 @@ SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel evo_model) {
     ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
     all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
     descendant_count = all_descendant_genotypes.size();
+
+    double a,b,c;
+
+//    CalculateAncestorToDescendant(a,b,c);
 }
 
 
@@ -75,7 +83,8 @@ SiteProb::~SiteProb() {
 void SiteProb::UpdateModel(EvolutionModel evo_model) {
     transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
     mutation_rate = evo_model.GetMutationRate();
-//    cout << "new mutation rate: " << mutation_rate.prob << endl;
+    cout << "new mutation rate: " << mutation_rate.prob  << "\t" << mutation_rate.one_minus_p <<
+            "\t" << thisCount << endl;
 
 }
 
@@ -102,7 +111,11 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
     double summary_stat_diff_ancestor = 0;
     double prod_prob_ancestor = 1;
 
-    for (int a = 0; a < ANCESTOR_COUNT; ++a) {
+    cout << "Count: " << thisCount << endl;
+    for (int d = 0; d < descendant_count; ++d) {
+        cout << "d:\t" << all_descendant_genotypes[d].format(nice_row) << endl;
+    }
+        for (int a = 0; a < ANCESTOR_COUNT; ++a) {
         int index10 = a;
         int index16 = LookupTable::index_converter_10_to_16[a];
 
@@ -121,7 +134,7 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
 
         //        prod_prob_ancestor[a] = sum(sum_prob_d);
         //        summary_stat_ancestor[a] =
-        if (DEBUG>1) {
+        if (DEBUG>0) {
             cout << "==A: " << a << " " << index16 << " " << LookupTable::genotype_lookup_10[a] << " " <<
                     ancestor_genotypes[index16] << "\t";
             cout << "Same: " << all_stats_same << "\tDiff:" << all_stats_diff <<
@@ -134,7 +147,7 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
     all_stats_same /= prob_reads;
     all_stats_diff /= prob_reads;
 
-    if(DEBUG>0){
+    if(DEBUG==0){
         cout << "summaryALL\tSame:" << all_stats_same << "\tDiff:" << all_stats_diff << "\t" << (all_stats_diff + all_stats_same) << endl << endl;
         cout << "total_sum2: "<< total_sum2 << "\tProb: " << prob_reads <<endl;
 
@@ -166,7 +179,7 @@ void SiteProb::CalculateAllDescendantGivenAncestor(int a, double &product_prob_g
 
 //        sum_prob_ancestor[a] += log(sum_over_probs);
         product_prob_given_ancestor *= sum_over_probs;
-        if (DEBUG>2) {
+        if (DEBUG>0) {
             cout << "====D: " << d << "\t Sum:" <<
                     sum_over_probs << "\t" << product_prob_given_ancestor << "\t" <<
                     "\tSame:" << summary_stat_same << "\tDiff:" << summary_stat_diff << "\t" <<

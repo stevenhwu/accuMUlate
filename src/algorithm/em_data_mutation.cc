@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "em_data_mutation.h"
+#include "em_model_mutation.h"
 
 
 EmDataMutation::EmDataMutation(SequenceProb &sequence_prob, EvolutionModel &evo_model){
@@ -12,16 +13,37 @@ EmDataMutation::EmDataMutation(SequenceProb &sequence_prob, EvolutionModel &evo_
 EmDataMutation::~EmDataMutation() {}
 
 
+void EmDataMutation::UpdateSummaryStat(double prob, EmSummaryStat &summaryStat) {
 
 
-
-void EmDataMutation::UpdateLikelihood(double prob, EmSummaryStat &summaryStat) {
-
-
-    std::cout << "call EMDATA2" << std::endl;
     summaryStat.print();
+    prob = 0;
+    double stat_same = 0;
+    double stat_diff = 0;
+    //relpace with
+//    EmSummaryStatMutation local;
+
+
+    site.CalculateAncestorToDescendant(prob, stat_same, stat_diff);
+    std::cout << "call EMDATA2: " << stat_same << "\t" << stat_diff << "\t" << prob <<std::endl;
+    summaryStat.SetStats(vector<double> {stat_same, stat_diff});
+
+
+//    site->UpdateSummaryStat(sum_prob, local);
+//    site.CalculateAncestorToDescendant(sum_prob, stat_same, stat_diff);
 }
 
 
+void EmDataMutation::UpdateEmModel(EmModel *em_model) {
 
+    cout << "In EmDataMutation, UpdateModel: " << endl;
+//    EmModelMutation *em = dynamic_cast<EmModelMutation*> (em_model);
+    EmModelMutation *em_model_mutation = static_cast<EmModelMutation*> (em_model);
+    EvolutionModel *evo_model = em_model_mutation->GetEvoModel();
+    site.UpdateModel(*evo_model);
 
+}
+
+void EmDataMutation::Test(double num) {
+    cout << "In EmDataMutation, testing function: " << num << endl;
+}

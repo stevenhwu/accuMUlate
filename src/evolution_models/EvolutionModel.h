@@ -1,4 +1,5 @@
 #include <model.h>
+#include <mutation_prob.h>
 
 #pragma once
 #ifndef __EvolutionModel_H_

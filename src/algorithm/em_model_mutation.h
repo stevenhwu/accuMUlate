@@ -11,19 +11,27 @@
 #define EM_MODEL_MUTATION_H_
 
 
+#include "evolution_models/EvolutionModel.h"
 #include "em_model.h"
 #include "em_model_mutation.h"
 
 class EmModelMutation : public EmModel {
 
 public:
-    EmModelMutation() {
-    }
+    EmModelMutation(EvolutionModel &evo_model0);
 
     virtual ~EmModelMutation() {
     }
 
     virtual void UpdateParameter(double param);
+
+    void GetUpdatedInfo();
+
+    EvolutionModel *GetEvoModel() ;
+
+protected:
+    EvolutionModel *evo_model;
+
 
 
 

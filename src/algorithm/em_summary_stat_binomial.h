@@ -12,7 +12,7 @@
 
 
 #include "em_summary_stat.h"
-
+#include <vector>
 class EmSummaryStatBinomial : public EmSummaryStat {
 
 public:
@@ -28,6 +28,9 @@ public:
 
     void UpdateSumWithProportion(double &d, EmSummaryStatBinomial mutation);
 
+    virtual void SetStats(std::vector<double> stats);
+//protprivate:
+    const int stat_count = 2;
 
     virtual ~EmSummaryStatBinomial() {
     }
@@ -35,6 +38,7 @@ public:
 //private:
     double stat_diff = 0;
 
+    void biTest(double a);
 };
 
 

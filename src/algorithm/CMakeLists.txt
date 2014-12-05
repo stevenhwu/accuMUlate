@@ -2,7 +2,7 @@
 
 SET(SOURCE_FILES ${SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/em_algorithm.cc
-    #${CMAKE_CURRENT_SOURCE_DIR}/em_data.cc
+    #${CMAKE_CURRENT_SOURCE_DIR}/em_data_old.cc
     #${CMAKE_CURRENT_SOURCE_DIR}/em
     ${CMAKE_CURRENT_SOURCE_DIR}/em_data_mutation.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/em_model_mutation.cc
