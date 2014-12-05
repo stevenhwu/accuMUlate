@@ -332,10 +332,10 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 //            MutationProb(model_params)};
     //F81 model2(muArray[0], model_params.nuc_freq);
 
-    F81 model2(0.1);
-    JC69 m69(0.1);
-
-    JC69 m692(mutation_prob);
+//    F81 model2(0.1);
+//    JC69 m69(0.1);
+//
+//    JC69 m692(mutation_prob);
 
     F81 model(mutation_prob);
 //    exit(-10);
@@ -399,8 +399,9 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 
 //    exit(100);
 
+    F81 model2(mutation_prob);
+    EmModelMutation em_model (model2);
 
-    EmModelMutation em_model (model);
 //    EM em (2, site_prob, model);
 //    em.RunOld();
 
@@ -408,9 +409,9 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 //    EM em (2, site_prob, model, em_model);
 //    EM em2 (2, site_prob, model, *em_base_model);
 
-    EmModel *em_base_model = &em_model;
+//    EmModel *em_base_model = &em_model;
 //    EM em (2, site_prob, model, em_site_prob, em_model);
-    EM em2 (2, site_prob, model, em_site_data, *em_base_model);
+    EM em2 (2, site_prob, model, em_site_data, em_model);
 
 //    em.Run();
     em2.Run();

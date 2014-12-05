@@ -37,7 +37,7 @@ public:
 
 //    EM(int num_category0, vector<SiteProb> em_data0, EvolutionModel &em_model0, EmModelMutation &m);
 
-    EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<EmData*> &d, EmModel &m);
+//    EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<EmData*> &d, EmModel &m);
 
     EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<unique_ptr<EmData>> &d_ptr, EmModel &m);
 
@@ -64,7 +64,7 @@ private:
     vector<SiteProb> em_data_old;
     EvolutionModel *em_model_old;
 
-    vector<EmData*> em_data;
+//    vector<EmData*> em_data;
     vector<unique_ptr<EmData>> *em_data_ptr;
     EmModel *em_model;
 
@@ -83,11 +83,12 @@ private:
     void InitialiseProportion();
 
     Eigen::ArrayXXd all_probs;
+    Eigen::ArrayXXd all_probs_test;
 
 
     void CalculateProportion();
 
-    vector<EmSummaryStatMutation> all_em_stats;
+    vector<unique_ptr<EmSummaryStat>> all_em_stats;
 
 
 };

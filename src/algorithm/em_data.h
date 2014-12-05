@@ -22,7 +22,7 @@ public:
     virtual ~EmData() {
     };
 
-    virtual void UpdateSummaryStat(double prob, EmSummaryStat &summaryStat) = 0;
+    virtual void UpdateSummaryStat(double &prob, EmSummaryStat &summaryStat) = 0;
 //    virtual void UpdateEmModel(EmModel &em_model) = 0;
     virtual void UpdateEmModel(EmModel *em_model) = 0;
 

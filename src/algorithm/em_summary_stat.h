@@ -15,29 +15,27 @@ class EmSummaryStat {
 
 
 public:
-    EmSummaryStat(double stat) : stat(stat) {
-    }
 
-    EmSummaryStat() {
-    }
-
+    EmSummaryStat();
     virtual ~EmSummaryStat() {
     }
 
-    virtual void print() {
-        std::cout << "EMSumStat: " << stat << std::endl;
-    }
-    virtual void Reset(){
-        stat = 0;
-    };
 
-    virtual void SetStats(std::vector<double> stats){
-        std::cout << "SetStat in EMSumStat: " << stat << std::endl;
-        stat = stats[0];
-    }
-//protprivate:
-    const int stat_count = 1;
-    double stat = 0;
+    double GetStat(int index);
+
+    void SetStat(int index, double stat0);
+
+
+    virtual void print();
+    virtual void Reset();
+
+    virtual void UpdateSumWithProportion(double &d, EmSummaryStat &mutation);
+
+    virtual void SetStats(std::vector<double> stats);
+
+protected:
+    int stat_count = 1;
+    std::vector<double> stat;
 
 
 };

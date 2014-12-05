@@ -13,7 +13,7 @@ EmDataMutation::EmDataMutation(SequenceProb &sequence_prob, EvolutionModel &evo_
 EmDataMutation::~EmDataMutation() {}
 
 
-void EmDataMutation::UpdateSummaryStat(double prob, EmSummaryStat &summaryStat) {
+void EmDataMutation::UpdateSummaryStat(double &prob, EmSummaryStat &summaryStat) {
 
 
     summaryStat.print();
@@ -25,10 +25,10 @@ void EmDataMutation::UpdateSummaryStat(double prob, EmSummaryStat &summaryStat) 
 
 
     site.CalculateAncestorToDescendant(prob, stat_same, stat_diff);
-    std::cout << "call EMDATA2: " << stat_same << "\t" << stat_diff << "\t" << prob <<std::endl;
+
     summaryStat.SetStats(vector<double> {stat_same, stat_diff});
 
-
+//    std::cout << "call EMDATA2: " << stat_same << "\t" << stat_diff << "\t" << prob <<std::endl;
 //    site->UpdateSummaryStat(sum_prob, local);
 //    site.CalculateAncestorToDescendant(sum_prob, stat_same, stat_diff);
 }
@@ -36,11 +36,12 @@ void EmDataMutation::UpdateSummaryStat(double prob, EmSummaryStat &summaryStat) 
 
 void EmDataMutation::UpdateEmModel(EmModel *em_model) {
 
-    cout << "In EmDataMutation, UpdateModel: " << endl;
+//    cout << "In EmDataMutation, UpdateModel: " << endl;
 //    EmModelMutation *em = dynamic_cast<EmModelMutation*> (em_model);
     EmModelMutation *em_model_mutation = static_cast<EmModelMutation*> (em_model);
     EvolutionModel *evo_model = em_model_mutation->GetEvoModel();
     site.UpdateModel(*evo_model);
+    //FIXME: redo static_cast with visitor??? ?typeid?
 
 }
 

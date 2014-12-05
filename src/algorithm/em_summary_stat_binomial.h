@@ -20,23 +20,9 @@ public:
 
     EmSummaryStatBinomial();
 
-    void SetStats(double stat_same0, double stat_diff0);
-
-    virtual void print();
-
-    void Reset();
-
-    void UpdateSumWithProportion(double &d, EmSummaryStatBinomial mutation);
-
-    virtual void SetStats(std::vector<double> stats);
-//protprivate:
-    const int stat_count = 2;
-
     virtual ~EmSummaryStatBinomial() {
     }
 
-//private:
-    double stat_diff = 0;
 
     void biTest(double a);
 };

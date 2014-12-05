@@ -35,10 +35,10 @@ EM::EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0,
         cout << "Not yet implemented for more than 2 categories" << endl;
         exit(222);
     }
-    em_data_ptr->size();
+
     site_count = em_data_ptr->size();
     rate_count = num_category;
-    em_count = 3;
+    em_count = 100;
 
 //    auto site2 = em_data[0];
 //    EmData *site3 = em_data[0];
@@ -46,38 +46,38 @@ EM::EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0,
 //    site2->Test(4);
 //    site3->Test(5);
 
-
+    all_probs_test = Eigen::ArrayXXd::Zero(num_category, site_count);
     Init();
     cout << "===========\nDone Constructor smart pointer\n";
 }
 
 
-
-EM::EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<EmData *> &d, EmModel &m)
-        : num_category(num_category0), em_data_old(em_data0), em_model_old(&em_model0), em_data(d), em_model(&m) {
-
-//    cout << "\n============\nEM  half way Constructor\n";
-
-//    em_model->UpdateParameter(2);
-    if (num_category != 2) {
-        cout << "Not yet implemented for more than 2 categories" << endl;
-        exit(222);
-    }
-
-    site_count = em_data.size();
-    rate_count = num_category;
-    em_count = 3;
-
-//    auto site2 = em_data[0];
-//    EmData *site3 = em_data[0];
 //
-//    site2->Test(4);
-//    site3->Test(5);
-
-
-    Init();
-    cout << "===========\nDone Constructor raw pointer\n";
-}
+//EM::EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<EmData *> &d, EmModel &m)
+//        : num_category(num_category0), em_data_old(em_data0), em_model_old(&em_model0), em_data(d), em_model(&m) {
+//
+////    cout << "\n============\nEM  half way Constructor\n";
+//
+////    em_model->UpdateParameter(2);
+//    if (num_category != 2) {
+//        cout << "Not yet implemented for more than 2 categories" << endl;
+//        exit(222);
+//    }
+//
+//    site_count = em_data.size();
+//    rate_count = num_category;
+//    em_count = 3;
+//
+////    auto site2 = em_data[0];
+////    EmData *site3 = em_data[0];
+////
+////    site2->Test(4);
+////    site3->Test(5);
+//
+//
+//    Init();
+//    cout << "===========\nDone Constructor raw pointer\n";
+//}
 
 
 //EM::EM(int num_category0, vector<EmData> em_data0, EmModel &em_model0) : num_category(num_category0), em_data(em_data0), em_model(&em_model0){
@@ -105,112 +105,75 @@ void EM::Init() {
     InitialiseParameters();
     InitialiseProportion();
     all_probs = Eigen::ArrayXXd::Zero(num_category, site_count);
-
-
-    all_em_stats = vector<EmSummaryStatMutation>(rate_count);
-
     all_stats_same = vector<double>(num_category, 0);
     all_stats_diff = vector<double>(num_category, 0);
 
+//    all_em_stats = vector<EmSummaryStatMutation>(rate_count);
+    for (int i = 0; i < rate_count; ++i) {
+        all_em_stats.emplace_back(new EmSummaryStatMutation());
+    }
 
 }
 
 
 void EM::ExpectationStep() {
 
-    for (size_t r = 0; r < rate_count; ++r) {
-        em_model_old->UpdateMu(parameters[r]);
-//            mutation_prob.UpdateMu(parameters[r]);
+    EmSummaryStat em_stat_local = EmSummaryStatMutation();
 
-        all_em_stats[r].Reset();
+    for (size_t r = 0; r < rate_count; ++r) {
+        em_model->UpdateParameter(parameters[r]);
+
+        all_em_stats[r]->Reset();
 
         for (size_t s = 0; s < site_count; ++s) {
+            cout << "em_count: "  << " rate_count: " << r << " site: " << s << endl;
             double sum_prob = 0;
 
-            auto site = em_data_old[s];
+            (*em_data_ptr)[s]->UpdateEmModel(em_model);
 
-            site.UpdateModel(*em_model_old);
+            (*em_data_ptr)[s]->UpdateSummaryStat(sum_prob, em_stat_local);
 
-            double stat_same = 0;
-            double stat_diff = 0;
-            //relpace with
-            EmSummaryStatMutation local;
-
-
-            site.CalculateAncestorToDescendant(sum_prob, stat_same, stat_diff);
-
-
-            local.SetStats(stat_same, stat_diff);
-            all_em_stats[r].UpdateSumWithProportion(proportion[r], local);
-
+            all_em_stats[r]->UpdateSumWithProportion(proportion[r], em_stat_local);
 
             all_probs(r, s) = sum_prob;
 
         }
-
     }
-
-
 }
 
 void EM::Run() {
 
     MutationProb mutation_prob = em_model_old->GetMutationProb();//FIXME: What to do here?? maybe in EmSummayrStat??
 
+    EmSummaryStatMutation em_stat_local;
 
     for (size_t i = 0; i < em_count; ++i) {
         cout << "EM ite: " << i << endl;
+        ExpectationStep();
 
         for (size_t r = 0; r < rate_count; ++r) {
-            em_model->UpdateParameter(parameters[r]);
-//            mutation_prob.UpdateMu(parameters[r]);
+
+            em_model_old->UpdateMu(parameters[r]);
 
             all_stats_same[r] = 0;
             all_stats_diff[r] = 0;
-            //replace with
-//            auto em_stat = all_em_stats[r];
-            all_em_stats[r].Reset();
 
-//            em_stat.print();
-//            all_probs[r][s] = 0;
-//          Array10D site_stat[site_count];
+//            all_em_stats[r]->Reset();
+//            em_model->UpdateParameter(parameters[r]+0.05);
+
             for (size_t s = 0; s < site_count; ++s) {
                 cout << "em_count: " << i << " rate_count: " << r << " site: " << s << endl;
                 double sum_prob = 0;
-
                 auto site_old = em_data_old[s];
-//                auto site = em_data[s];
-//                auto site_ptr = em_data_ptr[s];
-                (*em_data_ptr)[s]->UpdateEmModel(em_model);
-
                 site_old.UpdateModel(*em_model_old);
-//                site->UpdateEmModel(em_model);
-
                 double stat_same = 0;
                 double stat_diff = 0;
-                //relpace with
-                EmSummaryStatMutation local;
-
-
                 site_old.CalculateAncestorToDescendant(sum_prob, stat_same, stat_diff);
-                cout << "old sum stat: " << stat_same << "\t" << stat_diff << "\t" << sum_prob << endl;
-//                site->UpdateSummaryStat(sum_prob, local);
-                (*em_data_ptr)[s]->UpdateSummaryStat(sum_prob, local);
-
                 all_stats_same[r] += proportion[r] * stat_same;
                 all_stats_diff[r] += proportion[r] * stat_diff;
-                //replace with
-//                local.SetStats(stat_same, stat_diff);
-                all_em_stats[r].UpdateSumWithProportion(proportion[r], local);
 
 
-                if(all_em_stats[r].stat != all_stats_same[r] || all_em_stats[r].stat_diff!=all_stats_diff[r]) {
-                    cout << "DIFF!!! inner " << all_em_stats[r].stat << "\t" << all_stats_same[r] << "\t" << all_em_stats[r].stat_diff << "\t" << all_stats_diff[r] << endl;
-                    exit(99);
-                }
-
-
-                all_probs(r, s) = sum_prob;
+                all_probs_test(r, s) = sum_prob;
 
             }
 //            if(all_em_stats[r].stat != all_stats_same[r] || all_em_stats[r].stat_diff!=all_stats_diff[r]){
@@ -218,11 +181,27 @@ void EM::Run() {
 //            }
         }
 
+
+        for (int r = 0; r < rate_count; ++r) {
+            if (all_em_stats[r]->GetStat(0) != all_stats_same[r] || all_em_stats[r]->GetStat(1) != all_stats_diff[r]) {
+                cout << "DIFF!!! inner " << all_em_stats[r]->GetStat(0) << "\t" << all_stats_same[r] << "\t" << all_em_stats[r]->GetStat(1) << "\t" << all_stats_diff[r] << endl;
+                exit(99);
+            }
+        }
+        Eigen::ArrayXXd complex1 = (all_probs - all_probs_test);
+        double sumaa = complex1.sum();
+        if (sumaa != 0) {
+            cout << all_probs ;
+            cout << "=============================\n";
+            cout << all_probs_test;
+            cout << sumaa << endl;
+        exit(199);
+    }
         MaximizationStep();
 
 
         for (size_t r = 0; r < rate_count; ++r) {
-            auto em_stat = all_em_stats[r];
+//            auto em_stat = all_em_stats[r]; //TODO: work with this
 //            if(em_stat.stat != all_stats_same[r] || em_stat.stat_diff!=all_stats_diff[r]){
 //                cout << "DIFF!!! max" << em_stat.stat << "\t" <<all_stats_same[r] << "\t" << em_stat.stat_diff << "\t" << all_stats_diff[r] <<
 //                        endl;
@@ -278,7 +257,7 @@ void EM::RunOld() {
             all_stats_diff[r] = 0;
             //replace with
 //            auto em_stat = all_em_stats[r];
-            all_em_stats[r].Reset();
+            all_em_stats[r]->Reset();
 
 //            em_stat.print();
 //            all_probs[r][s] = 0;
@@ -302,8 +281,8 @@ void EM::RunOld() {
                 all_stats_same[r] += proportion[r] * stat_same;
                 all_stats_diff[r] += proportion[r] * stat_diff;
                 //replace with
-                local.SetStats(stat_same, stat_diff);
-                all_em_stats[r].UpdateSumWithProportion(proportion[r], local);
+                local.SetStats(vector<double>{ stat_same, stat_diff});
+                all_em_stats[r]->UpdateSumWithProportion(proportion[r], local);
 
 
 //                if(all_em_stats[r].stat != all_stats_same[r] || all_em_stats[r].stat_diff!=all_stats_diff[r]){
@@ -323,7 +302,7 @@ void EM::RunOld() {
 
 
         for (size_t r = 0; r < rate_count; ++r) {
-            auto em_stat = all_em_stats[r];
+//            auto em_stat = all_em_stats[r];
 //            if(em_stat.stat != all_stats_same[r] || em_stat.stat_diff!=all_stats_diff[r]){
 //                cout << "DIFF!!! max" << em_stat.stat << "\t" <<all_stats_same[r] << "\t" << em_stat.stat_diff << "\t" << all_stats_diff[r] <<
 //                        endl;
@@ -356,8 +335,8 @@ void EM::RunOld() {
 
 
 void EM::InitialiseParameters() {
-    double lower_bound = 1e-100;
-    double upper_bound = 1;
+    double lower_bound = 1e-12;
+    double upper_bound = 1e-1;
     parameters = vector<double>(num_category);
     if (num_category == 2) {
         parameters = {upper_bound, lower_bound};

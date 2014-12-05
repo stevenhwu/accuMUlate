@@ -83,8 +83,8 @@ SiteProb::~SiteProb() {
 void SiteProb::UpdateModel(EvolutionModel evo_model) {
     transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
     mutation_rate = evo_model.GetMutationRate();
-    cout << "new mutation rate: " << mutation_rate.prob  << "\t" << mutation_rate.one_minus_p <<
-            "\t" << thisCount << endl;
+//    cout << "new mutation rate: " << mutation_rate.prob  << "\t" << mutation_rate.one_minus_p <<
+//            "\t" << thisCount << endl;
 
 }
 
@@ -111,10 +111,6 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
     double summary_stat_diff_ancestor = 0;
     double prod_prob_ancestor = 1;
 
-    cout << "Count: " << thisCount << endl;
-    for (int d = 0; d < descendant_count; ++d) {
-        cout << "d:\t" << all_descendant_genotypes[d].format(nice_row) << endl;
-    }
         for (int a = 0; a < ANCESTOR_COUNT; ++a) {
         int index10 = a;
         int index16 = LookupTable::index_converter_10_to_16[a];
@@ -134,7 +130,7 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
 
         //        prod_prob_ancestor[a] = sum(sum_prob_d);
         //        summary_stat_ancestor[a] =
-        if (DEBUG>0) {
+        if (DEBUG>1) {
             cout << "==A: " << a << " " << index16 << " " << LookupTable::genotype_lookup_10[a] << " " <<
                     ancestor_genotypes[index16] << "\t";
             cout << "Same: " << all_stats_same << "\tDiff:" << all_stats_diff <<
@@ -147,7 +143,7 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
     all_stats_same /= prob_reads;
     all_stats_diff /= prob_reads;
 
-    if(DEBUG==0){
+    if(DEBUG>0){
         cout << "summaryALL\tSame:" << all_stats_same << "\tDiff:" << all_stats_diff << "\t" << (all_stats_diff + all_stats_same) << endl << endl;
         cout << "total_sum2: "<< total_sum2 << "\tProb: " << prob_reads <<endl;
 
