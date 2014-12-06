@@ -159,7 +159,7 @@ void SiteProb::CalculateAllDescendantGivenAncestor(int a, double &product_prob_g
     product_prob_given_ancestor = 1;
     summary_stat_diff_ancestor = 0;
     summary_stat_same_ancestor = 0;
-//    descendant_count = 1; // FIXME
+//    descendant_count = 1; // FIXME:
     for (int d = 0; d < descendant_count; ++d) {
         double summary_stat_same = 0;
         double summary_stat_diff = 0;

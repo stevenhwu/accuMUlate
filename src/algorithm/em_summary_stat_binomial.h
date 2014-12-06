@@ -13,10 +13,17 @@
 
 #include "em_summary_stat.h"
 #include <vector>
+
 class EmSummaryStatBinomial : public EmSummaryStat {
 
-public:
+    static const int EM_SUMMARY_STAT_BINOMIAL_STATS_COUNT = 2;
 
+public:
+    /*
+    stat[0] = stat_same;
+    stat[1] = stat_diff;
+
+     */
 
     EmSummaryStatBinomial();
 
@@ -25,6 +32,10 @@ public:
 
 
     void biTest(double a);
+
+
+    virtual double MaximiseStats() override;
+
 };
 
 

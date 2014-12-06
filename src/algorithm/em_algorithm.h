@@ -11,6 +11,7 @@
 
 
 #include <bits/unique_ptr.h>
+#include <stddef.h>
 #include "site_prob.h"
 
 #include "em_model_mutation.h"
@@ -64,6 +65,7 @@ private:
     vector<SiteProb> em_data_old;
     EvolutionModel *em_model_old;
 
+    vector<double> parameters_old;
 //    vector<EmData*> em_data;
     vector<unique_ptr<EmData>> *em_data_ptr;
     EmModel *em_model;
@@ -91,6 +93,10 @@ private:
     vector<unique_ptr<EmSummaryStat>> all_em_stats;
 
 
+    void oldEStep();
+
+//    int parameters_old;
+    void oldMStep(MutationProb &mutation_prob);
 };
 
 

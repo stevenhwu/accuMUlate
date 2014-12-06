@@ -41,7 +41,7 @@ void EmDataMutation::UpdateEmModel(EmModel *em_model) {
     EmModelMutation *em_model_mutation = static_cast<EmModelMutation*> (em_model);
     EvolutionModel *evo_model = em_model_mutation->GetEvoModel();
     site.UpdateModel(*evo_model);
-    //FIXME: redo static_cast with visitor??? ?typeid?
+    //TODO: redo static_cast with visitor??? ?typeid?
 
 }
 

@@ -3,6 +3,7 @@
 #include "em_model_mutation.h"
 
 #include <memory>
+#include <stddef.h>
 //EM::EM(int num_category0, vector<SiteProb> em_data0, EvolutionModel &em_model0) : num_category(num_category0), em_data_old(em_data0), em_model_old(&em_model0){
 //
 //    cout << "EM Constructor\n";
@@ -45,10 +46,16 @@ EM::EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0,
 //
 //    site2->Test(4);
 //    site3->Test(5);
-
+    double lower_bound = 1e-12;
+    double upper_bound = 1e-1;
     all_probs_test = Eigen::ArrayXXd::Zero(num_category, site_count);
+    parameters_old = vector<double>(num_category);
+    if (num_category == 2) {
+        parameters_old = {upper_bound, lower_bound};
+    }
     Init();
     cout << "===========\nDone Constructor smart pointer\n";
+
 }
 
 
@@ -151,7 +158,70 @@ void EM::Run() {
         cout << "EM ite: " << i << endl;
         ExpectationStep();
 
+        oldEStep();
+//        for (int r = 0; r < rate_count; ++r) {
+//            if (all_em_stats[r]->GetStat(0) != all_stats_same[r] || all_em_stats[r]->GetStat(1) != all_stats_diff[r]) {
+//                cout << "DIFF!!! inner " << all_em_stats[r]->GetStat(0) << "\t" << all_stats_same[r] << "\t" << all_em_stats[r]->GetStat(1) << "\t" << all_stats_diff[r] << endl;
+//                exit(99);
+//            }
+//        }
+//        Eigen::ArrayXXd complex1 = (all_probs - all_probs_test);
+//        double sumaa = complex1.sum();
+//        if (sumaa != 0) {
+//            cout << all_probs;
+//            cout << "=============================\n";
+//            cout << all_probs_test;
+//            cout << sumaa << endl;
+//            exit(199);
+//        }
+
+        MaximizationStep();
+
+
         for (size_t r = 0; r < rate_count; ++r) {
+//            parameters[r] = new_mu;
+            parameters[r] = mutation_prob.ConvertExpBetaToMu(parameters[r]);
+
+        }
+        oldMStep(mutation_prob);
+        if(parameters[0] != parameters_old[0] || parameters[1] != parameters_old[1]){
+            cout << "DIFF param: " << parameters[0] << "\t" <<  parameters_old[0]<< "\t" <<  parameters[1] << "\t" <<  parameters_old[1] << endl;
+            exit(144);
+        }
+
+    }
+
+}
+
+void EM::oldMStep(MutationProb &mutation_prob) {
+    for (size_t r = 0; r < rate_count; ++r) {
+
+//            all_em_stats[r]->MaximiseStats();
+            double sum_stat = all_stats_diff[r] + all_stats_same[r];
+            double new_exp_beta = all_stats_diff[r] / sum_stat;
+            double new_mu = mutation_prob.ConvertExpBetaToMu(new_exp_beta);
+
+            double new_one_minus_exp_beta = all_stats_same[r] / sum_stat;
+            double new_one_minus_mu = mutation_prob.ConvertExpBetaToMu(-(new_one_minus_exp_beta - 1));
+//            cout.setprecision(10);
+
+//            proportion[r] = all_probs[r]/(all_probs[0]+all_probs[1]);
+
+
+            printf("======= NEM_MU_r: %zu \tMu: %.5e %.5f =expBeta=  %.5f %.5f \t =prop= %.5f %.5f "
+                            "\t =stat= %.5f %.5f \n", r,
+                    new_mu, new_one_minus_mu,
+                    new_exp_beta, new_one_minus_exp_beta,
+                    proportion[0], proportion[1],
+                    all_stats_same[0], all_stats_same[1]);
+
+            parameters_old[r] = new_mu;
+
+        }
+}
+
+void EM::oldEStep() {
+    for (size_t r = 0; r < rate_count; ++r) {
 
             em_model_old->UpdateMu(parameters[r]);
 
@@ -162,7 +232,7 @@ void EM::Run() {
 //            em_model->UpdateParameter(parameters[r]+0.05);
 
             for (size_t s = 0; s < site_count; ++s) {
-                cout << "em_count: " << i << " rate_count: " << r << " site: " << s << endl;
+                cout << "em_E: "  << " rate_count: " << r << " site: " << s << endl;
                 double sum_prob = 0;
                 auto site_old = em_data_old[s];
                 site_old.UpdateModel(*em_model_old);
@@ -180,55 +250,6 @@ void EM::Run() {
 //                cout << "DIFF!!! outer " << endl;
 //            }
         }
-
-
-        for (int r = 0; r < rate_count; ++r) {
-            if (all_em_stats[r]->GetStat(0) != all_stats_same[r] || all_em_stats[r]->GetStat(1) != all_stats_diff[r]) {
-                cout << "DIFF!!! inner " << all_em_stats[r]->GetStat(0) << "\t" << all_stats_same[r] << "\t" << all_em_stats[r]->GetStat(1) << "\t" << all_stats_diff[r] << endl;
-                exit(99);
-            }
-        }
-        Eigen::ArrayXXd complex1 = (all_probs - all_probs_test);
-        double sumaa = complex1.sum();
-        if (sumaa != 0) {
-            cout << all_probs ;
-            cout << "=============================\n";
-            cout << all_probs_test;
-            cout << sumaa << endl;
-        exit(199);
-    }
-        MaximizationStep();
-
-
-        for (size_t r = 0; r < rate_count; ++r) {
-//            auto em_stat = all_em_stats[r]; //TODO: work with this
-//            if(em_stat.stat != all_stats_same[r] || em_stat.stat_diff!=all_stats_diff[r]){
-//                cout << "DIFF!!! max" << em_stat.stat << "\t" <<all_stats_same[r] << "\t" << em_stat.stat_diff << "\t" << all_stats_diff[r] <<
-//                        endl;
-//            }
-            double sum_stat = all_stats_diff[r] + all_stats_same[r];
-            double new_exp_beta = all_stats_diff[r] / sum_stat;
-            double new_mu = mutation_prob.ConvertExpBetaToMu(new_exp_beta);
-
-            double new_one_minus_exp_beta = all_stats_same[r] / sum_stat;
-            double new_one_minus_mu = mutation_prob.ConvertExpBetaToMu(-(new_one_minus_exp_beta - 1));
-//            cout.setprecision(10);
-
-//            proportion[r] = all_probs[r]/(all_probs[0]+all_probs[1]);
-            printf("======= NEM_MU_r: %zu \tMu: %.5e %.5f =expBeta=  %.5f %.5f \t =prop= %.5f %.5f "
-                            "\t =stat= %.5f %.5f \n", r,
-                    new_mu, new_one_minus_mu,
-                    new_exp_beta, new_one_minus_exp_beta,
-                    proportion[0], proportion[1],
-                    all_stats_same[0], all_stats_same[1]);
-
-            parameters[r] = new_mu;
-
-        }
-
-
-    }
-
 }
 
 
@@ -300,7 +321,11 @@ void EM::RunOld() {
 
         MaximizationStep();
 
+        for (size_t r = 0; r < rate_count; ++r) {
+//            parameters[r] = new_mu;
+            parameters[r] = mutation_prob.ConvertExpBetaToMu(parameters[r]);
 
+        }
         for (size_t r = 0; r < rate_count; ++r) {
 //            auto em_stat = all_em_stats[r];
 //            if(em_stat.stat != all_stats_same[r] || em_stat.stat_diff!=all_stats_diff[r]){
@@ -324,7 +349,7 @@ void EM::RunOld() {
                     proportion[0], proportion[1],
                     all_stats_same[0], all_stats_same[1]);
 
-            parameters[r] = new_mu;
+            parameters_old[r] = new_mu;
 
         }
 
@@ -372,6 +397,26 @@ void EM::CalculateProportion() {
 void EM::MaximizationStep() {
     CalculateProportion();
 
+
+    for (size_t r = 0; r < rate_count; ++r) {
+
+        double new_parameter = all_em_stats[r]->MaximiseStats();
+//        double new_mu = mutation_prob.ConvertExpBetaToMu(new_exp_beta);
+
+//        double new_one_minus_mu = mutation_prob.ConvertExpBetaToMu(-(new_one_minus_exp_beta - 1));
+
+
+        parameters[r] = new_parameter;
+
+    }
+
+
+//    printf("======= NEM_MU_r: %zu \tMu: %.5e %.5f =expBeta=  %.5f %.5f \t =prop= %.5f %.5f "
+//                    "\t =stat= %.5f %.5f \n", r,
+//            new_mu, new_one_minus_mu,
+//            new_exp_beta, new_one_minus_exp_beta,
+//            proportion[0], proportion[1],
+//            all_stats_same[0], all_stats_same[1]
 
 }
 

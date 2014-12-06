@@ -13,28 +13,29 @@
 #include <vector>
 class EmSummaryStat {
 
-
+    static const int EM_SUMMARY_STAT_STATS_COUNT = 1;
 public:
-
     EmSummaryStat();
+    EmSummaryStat(int const stat_count0);
     virtual ~EmSummaryStat() {
     }
 
 
     double GetStat(int index);
-
-    void SetStat(int index, double stat0);
-
+    //CHECK: These don't have to be virtual right??
+    virtual void SetStat(int index, double stat0);
+    virtual void SetStats(std::vector<double> stats);
 
     virtual void print();
     virtual void Reset();
-
     virtual void UpdateSumWithProportion(double &d, EmSummaryStat &mutation);
 
-    virtual void SetStats(std::vector<double> stats);
+
+
+    virtual double MaximiseStats();
 
 protected:
-    int stat_count = 1;
+    int const stat_count;//int const stat_count;
     std::vector<double> stat;
 
 
