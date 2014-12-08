@@ -11,6 +11,7 @@
 #define EM_SUMMARY_STAT_H_
 
 #include <vector>
+#include <memory>
 class EmSummaryStat {
 
     static const int EM_SUMMARY_STAT_STATS_COUNT = 1;
@@ -28,7 +29,7 @@ public:
 
     virtual void print();
     virtual void Reset();
-    virtual void UpdateSumWithProportion(double &d, EmSummaryStat &mutation);
+    virtual void UpdateSumWithProportion(double &d, std::unique_ptr<EmSummaryStat> &em_stat_local);
 
 
 

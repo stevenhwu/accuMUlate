@@ -25,7 +25,7 @@ public:
     EmDataMutation(SequenceProb &sequence_prob, EvolutionModel &evo_model);
     virtual  ~EmDataMutation();
 
-    virtual void UpdateSummaryStat(double &prob, EmSummaryStat &summaryStat);
+    virtual void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat);
 
 //    virtual void UpdateEmModel(EmModel &em_model);
 
@@ -33,8 +33,6 @@ public:
 
 
     SiteProb site;
-
-    virtual void Test(double num);
 
     void UpdateEmModel(EmModel *em_model);
 };

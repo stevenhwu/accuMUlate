@@ -11,6 +11,8 @@
 #define EM_SUMMARY_STAT_MUTATION_H_
 
 #include "em_summary_stat_binomial.h"
+#include "em_summary_stat.h"
+
 class EmSummaryStatMutation : public EmSummaryStatBinomial{
 
 public:
@@ -21,6 +23,7 @@ public:
     }
 
 
+    virtual double MaximiseStats() override;
 };
 
 

@@ -25,6 +25,8 @@ public:
 
     MutationProb GetMutationProb();
 
+    virtual void UpdateExpBeta(double d) = 0;
+
 protected:
     double mu;
     MutationProb mu_prob;

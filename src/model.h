@@ -8,7 +8,7 @@
 #pragma clang diagnostic pop
 
 
-using namespace std;
+using namespace std;//TODO: maybe remove this later to avoid confusion
 
 union ReadData{
     uint16_t reads[4];

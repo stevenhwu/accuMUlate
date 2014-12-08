@@ -30,6 +30,8 @@ private:
     double exp_beta;
     double beta0;
     Array4D freqs;
+
+    void UpdateExpBeta(double exp_beta);
 };
 
 

@@ -1,104 +1,85 @@
 /*
  * em_algorithm.h
  *
- *  Created on: 12/3/14
+ *  Created on: 12/7/14
  *      Author: Steven Wu
  */
 
+
 #pragma once
+
+#include <memory>
+#include <vector>
+#include <stddef.h>
+#include <Eigen/Dense>
+#include "em_model.h"
+#include "em_data.h"
+
 #ifndef EM_ALGORITHM_H_
 #define EM_ALGORITHM_H_
 
 
-#include <bits/unique_ptr.h>
-#include <stddef.h>
-#include "site_prob.h"
-
-#include "em_model_mutation.h"
-#include "em_data_mutation.h"
-#include "em_summary_stat_mutation.h"
-
-
-class EM {
-
-public:
-
-//    EM(vector<EmData> em_data, EmModel &em_model);
-
-//    EM(int num_category, vector<SiteProb> em_data0, EvolutionModel &em_model0, EmModel &m);
-
-
-//    EM(vector<EmDataMutation> site_data, EmModelMutation &evo_model);
-
-//    EM(int num_category0, vector<EmData> em_data0, EmModel &em_model0);
-
-//    EM(int num_category0, vector<SiteProb> em_data0, EmModel &em_model0);
-
-//    EM(int num_category0, vector<SiteProb> em_data0);
-
-//    EM(int num_category0, vector<SiteProb> em_data0, EvolutionModel &em_model0, EmModelMutation &m);
-
-//    EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<EmData*> &d, EmModel &m);
-
-    EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<unique_ptr<EmData>> &d_ptr, EmModel &m);
-
-    virtual ~EM();
-
-    void Run();
-    void RunOld();
-protected:
-    void ExpectationStep ();
-
-    void MaximizationStep();
-
-
-private:
-    //TODO These will be gone soon
-    vector<double> all_stats_same;
-    vector<double> all_stats_diff;
-
-
-private:
-
-    int num_category;
-
-    vector<SiteProb> em_data_old;
-    EvolutionModel *em_model_old;
-
-    vector<double> parameters_old;
-//    vector<EmData*> em_data;
-    vector<unique_ptr<EmData>> *em_data_ptr;
-    EmModel *em_model;
-
-    vector<double> parameters;
-    vector<double> proportion;
-
-
-    size_t rate_count;
-    size_t site_count;
-    size_t em_count;
-
-    void InitialiseParameters();
-
-    void Init();
-
-    void InitialiseProportion();
-
-    Eigen::ArrayXXd all_probs;
-    Eigen::ArrayXXd all_probs_test;
+class EmAlgorithm {
 
 
     void CalculateProportion();
 
-    vector<unique_ptr<EmSummaryStat>> all_em_stats;
+public:
+
+    EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0);
+
+//    EmAlgorithm() ;
+
+//    EmAlgorithm(int category_count);
+
+    virtual ~EmAlgorithm() {
+    }
+
+    virtual std::vector<double> GetParameters();
 
 
-    void oldEStep();
+    virtual void Run() = 0;
 
-//    int parameters_old;
-    void oldMStep(MutationProb &mutation_prob);
+protected:
+
+
+    size_t num_category;
+    size_t site_count;
+    size_t em_count;
+
+    std::vector<std::unique_ptr<EmData>> *em_data_ptr;
+    std::vector<std::unique_ptr<EmModel>> *em_model_ptr;
+    EmModel *em_model;
+
+    std::vector<std::unique_ptr<EmSummaryStat>> all_em_stats;
+    std::unique_ptr<EmSummaryStat> em_stat_local;
+
+    std::vector<double> parameters;
+    std::vector<double> proportion;
+    Eigen::ArrayXXd all_probs;
+
+
+
+
+    void Init();
+
+
+    void ExpectationStep ();
+
+    void MaximizationStep();
+
+    virtual void InitialiseProportion();
+
+
+
+    virtual void InitialiseParameters() = 0;
+
+    virtual void InitialiseSummaryStat() = 0;
+
+    void ExpectationStep2();
+
+    EmAlgorithm(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &model_ptr);
 };
 
 
 #endif //EM_ALGORITHM_H_
-

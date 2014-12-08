@@ -31,11 +31,8 @@ public:
     }
 
 
-    void biTest(double a);
 
-
-    virtual double MaximiseStats() override;
-
+    virtual double MaximiseStats();
 };
 
 

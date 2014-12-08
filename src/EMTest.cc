@@ -5,7 +5,9 @@
 
 #include <boost/program_options.hpp>
 #include <time.h>
-
+#include <algorithm/em_model_binomial.h>
+#include <algorithm/em_data_binomial.h>
+#include <algorithm/em_algorithm_binomial.h>
 
 
 #include "api/BamReader.h"
@@ -19,7 +21,7 @@
 #include "evolution_models/JC69.h"
 #include "evolution_models/F81.h"
 #include "site_prob.h"
-#include "algorithm/em_algorithm.h"
+#include "algorithm/em_algorithm_mutation.h"
 #include "algorithm/em_data_mutation.h"
 
 using namespace std;
@@ -342,7 +344,7 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 //    F81 model(mutation_prob);
 //    JC69 m69(mutation_prob);
 //    MutationMatrix conditional_prob = model.GetTransitionMatirxAToD();
-    const int c_site_count = 2;
+    const int c_site_count = 100;
     size_t site_count = c_site_count;
     std::vector<SiteProb> site_prob;
     std::vector<EmData*> em_site_prob;
@@ -398,9 +400,13 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 
 
 //    exit(100);
+    std::vector<std::unique_ptr<EmModel>> em_model;
+    F81 evo_model0(mutation_prob);
+    F81 evo_model1(mutation_prob);
+    EmModelMutation em_model0 (evo_model0);
 
-    F81 model2(mutation_prob);
-    EmModelMutation em_model (model2);
+    em_model.emplace_back(new EmModelMutation(evo_model0));
+    em_model.emplace_back(new EmModelMutation(evo_model1));
 
 //    EM em (2, site_prob, model);
 //    em.RunOld();
@@ -411,10 +417,47 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 
 //    EmModel *em_base_model = &em_model;
 //    EM em (2, site_prob, model, em_site_prob, em_model);
-    EM em2 (2, site_prob, model, em_site_data, em_model);
+//    EmModelMutation em_model2 = em_model;
+
+    em_model[0]->GetParameterInfo();
+    em_model[1]->GetParameterInfo();
+
+    em_model[0]->UpdateParameter(0.5);
+
+    em_model[0]->GetParameterInfo();
+    em_model[1]->GetParameterInfo();
+
+    em_model[1]->UpdateParameter(0.1);
+
+    em_model[0]->GetParameterInfo();
+    em_model[1]->GetParameterInfo();
+
+
+    EmAlgorithmMutation em_alg (2, site_prob, model, em_site_data, em_model0);
+//    EmAlgorithmMutation em_alg2 (em_site_data, em_model);
+
+    em_alg.Run();
+//    em2.Run();
+
+exit(4);
+    std::vector<std::unique_ptr<EmData>> em_data_binomial;
+    for (size_t s = 0; s < 5; ++s) {
+        em_data_binomial.emplace_back(  new EmDataBinomial(10, s+1)  );
+    }
+    em_data_binomial.emplace_back(  new EmDataBinomial(10, 9)  );
+    em_data_binomial.emplace_back(  new EmDataBinomial(10, 9)  );
+    em_data_binomial.emplace_back(  new EmDataBinomial(10, 10)  );
+    EmModelBinomial em_model_binomial (10, 0.5);
+    EmAlgorithmBinomial em_bin (2, em_data_binomial, em_model_binomial);
 
 //    em.Run();
-    em2.Run();
+    em_bin.Run();
+
+    vector<double> p1 = em_bin.GetParameters();
+    for (auto item : p1) {
+        printf("%f\t", item);
+    }
+    printf("\n");
 
     exit(35);
     for (size_t i = 0; i < em_count; ++i) {

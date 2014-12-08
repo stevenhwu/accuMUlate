@@ -13,10 +13,10 @@ EmDataMutation::EmDataMutation(SequenceProb &sequence_prob, EvolutionModel &evo_
 EmDataMutation::~EmDataMutation() {}
 
 
-void EmDataMutation::UpdateSummaryStat(double &prob, EmSummaryStat &summaryStat) {
+void EmDataMutation::UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat) {
 
 
-    summaryStat.print();
+    summaryStat->print();
     prob = 0;
     double stat_same = 0;
     double stat_diff = 0;
@@ -26,7 +26,7 @@ void EmDataMutation::UpdateSummaryStat(double &prob, EmSummaryStat &summaryStat)
 
     site.CalculateAncestorToDescendant(prob, stat_same, stat_diff);
 
-    summaryStat.SetStats(vector<double> {stat_same, stat_diff});
+    summaryStat->SetStats(vector<double> {stat_same, stat_diff});
 
 //    std::cout << "call EMDATA2: " << stat_same << "\t" << stat_diff << "\t" << prob <<std::endl;
 //    site->UpdateSummaryStat(sum_prob, local);
@@ -43,8 +43,4 @@ void EmDataMutation::UpdateEmModel(EmModel *em_model) {
     site.UpdateModel(*evo_model);
     //TODO: redo static_cast with visitor??? ?typeid?
 
-}
-
-void EmDataMutation::Test(double num) {
-    cout << "In EmDataMutation, testing function: " << num << endl;
 }

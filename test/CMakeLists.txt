@@ -20,6 +20,7 @@ SET(TEST_SOURCE_FILES ${TEST_SOURCE_FILES}
     )
 
 ADD_SUBDIRECTORY("evolution_models")
+ADD_SUBDIRECTORY("algorithm")
 
 add_executable( UnitTests ${TEST_SOURCE_FILES} ${SOURCE_FILES})
 
