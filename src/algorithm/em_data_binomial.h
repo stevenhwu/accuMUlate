@@ -28,6 +28,11 @@ public:
     std::vector<int> data;
 
     int count;
+
+    virtual void UpdateEmModel(std::unique_ptr<EmModelBinomial> &em_model);
+
+    virtual void UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model);
+
     void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat);
 
     void UpdateEmModel(EmModel *em_model);

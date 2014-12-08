@@ -44,3 +44,46 @@ void EmDataMutation::UpdateEmModel(EmModel *em_model) {
     //TODO: redo static_cast with visitor??? ?typeid?
 
 }
+
+void EmDataMutation::UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model) {
+
+//    default_delete<EmModel> &deleter = em_model.get_deleter();
+//    std::unique_ptr<EmDataMutation> em_model_mutation = static_unique_ptr_cast<EmModelMutation, EmModel, default_delete<EmModel> >(em_model);
+    EvolutionModel *evo_model = em_model->GetEvoModel();
+    site.UpdateModel(*evo_model);
+}
+
+
+
+/*
+FIXME: This is getting stupid, fix it later
+template<typename Derived, typename Base, typename Del>
+std::unique_ptr<Derived, Del>
+static_unique_ptr_cast( std::unique_ptr<Base, Del>&& p )
+{
+    auto d = static_cast<Derived *>(p.release());
+    return std::unique_ptr<Derived, Del>(d, std::move(p.get_deleter()));
+}
+
+template<typename Derived, typename Base, typename Del>
+std::unique_ptr<Derived, Del>
+dynamic_unique_ptr_cast( std::unique_ptr<Base, Del>&& p )
+{
+    if(Derived *result = dynamic_cast<Derived *>(p.get())) {
+        p.release();
+        return std::unique_ptr<Derived, Del>(result, std::move(p.get_deleter()));
+    }
+    return std::unique_ptr<Derived, Del>(nullptr, p.get_deleter());
+}
+
+
+void EmDataMutation::UpdateEmModel(std::unique_ptr<EmModel> &em_model) {
+
+    default_delete<EmModel> &deleter = em_model.get_deleter();
+    std::unique_ptr<EmDataMutation> em_model_mutation = static_unique_ptr_cast<EmModelMutation, EmModel, default_delete<EmModel> >(em_model);
+
+}
+*/
+void EmDataMutation::UpdateEmModel(std::unique_ptr<EmModelBinomial> &em_model) {
+
+}

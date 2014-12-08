@@ -11,6 +11,9 @@
 #include "sequence_prob.h"
 #include "site_prob.h"
 #include "em_model.h"
+#include "em_model_mutation.h"
+#include "em_model_binomial.h"
+
 
 #ifndef EM_DATA_MUTATION_H
 #define EM_DATA_MUTATION_H_
@@ -19,8 +22,12 @@
 
 
 class EmDataMutation : public EmData {
+protected:
+//    SiteProb site;
 
 public:
+    SiteProb site;
+
     EmDataMutation() {};
     EmDataMutation(SequenceProb &sequence_prob, EvolutionModel &evo_model);
     virtual  ~EmDataMutation();
@@ -32,9 +39,14 @@ public:
 
 
 
-    SiteProb site;
+
+    virtual void UpdateEmModel(std::unique_ptr<EmModelBinomial> &em_model);
 
     void UpdateEmModel(EmModel *em_model);
+
+    virtual void UpdateEmModel(unique_ptr<EmModelMutation> &em_model);
+
+
 };
 
 

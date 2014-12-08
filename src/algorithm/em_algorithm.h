@@ -79,6 +79,8 @@ protected:
     void ExpectationStep2();
 
     EmAlgorithm(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &model_ptr);
+
+    void ExpectationStep_Old();
 };
 
 

@@ -14,7 +14,8 @@
 #include <bits/unique_ptr.h>
 #include "em_summary_stat.h"
 #include "em_model.h"
-
+#include "em_model_mutation.h"
+#include "em_model_binomial.h"
 
 class EmData {
 
@@ -26,6 +27,9 @@ public:
     virtual void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat) = 0;
 //    virtual void UpdateEmModel(EmModel &em_model) = 0;
     virtual void UpdateEmModel(EmModel *em_model) = 0;
+
+    virtual void UpdateEmModel(std::unique_ptr<EmModelBinomial> & em_model) = 0;
+    virtual void UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model) = 0;
 };
 
 

@@ -25,9 +25,7 @@ EmAlgorithmMutation::EmAlgorithmMutation(
         : EmAlgorithm(d_ptr, m)
 //          EmAlgorithm::em_data_ptr(&d_ptr), em_model(&m) {
 {
-//    cout << "\n============\nEM  half way Constructor\n";
 
-//    em_model->UpdateParameter(2);
     if (num_category != 2) {
         cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< endl;
         exit(222);
@@ -37,20 +35,8 @@ EmAlgorithmMutation::EmAlgorithmMutation(
     Init();
 
 
-    MutationProb mutation_prob = em_model_old->GetMutationProb();//FIXME: What to do here?? maybe in EmSummayrStat??
 
-    double lower_bound = mutation_prob.ConvertExpBetaToMu(1e-12);
-    double upper_bound = mutation_prob.ConvertExpBetaToMu(1e-1);
-    all_probs_old = Eigen::ArrayXXd::Zero(num_category, site_count);
-    parameters_old = vector<double>(num_category);
-    if (num_category == 2) {
-        parameters_old = {upper_bound, lower_bound};
-    }
-    all_stats_same = vector<double>(num_category, 0);
-    all_stats_diff = vector<double>(num_category, 0);
-
-
-    cout << "=========== Done Constructor smart pointer\n";
+    cout << "=========== Done Constructor smart pointer x 2\n";
 
 }
 
@@ -140,6 +126,18 @@ EmAlgorithmMutation::~EmAlgorithmMutation() {
 
 }
 
+void EmAlgorithmMutation::Run2() {
+em_stat_local->print();
+    for (size_t i = 0; i < em_count; ++i) {
+        cout << "EM ite: " << i << endl;
+        ExpectationStep2();
+
+        MaximizationStep();
+
+
+    }
+
+}
 
 void EmAlgorithmMutation::Run() {
 em_stat_local->print();
@@ -188,7 +186,7 @@ void EmAlgorithmMutation::InitialiseSummaryStat() {
     em_stat_local = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutation());
     em_stat_local->print();
 
-    for (int i = 0; i < num_category; ++i) {
+    for (size_t i = 0; i < num_category; ++i) {
         all_em_stats.emplace_back(new EmSummaryStatMutation());
     }
 

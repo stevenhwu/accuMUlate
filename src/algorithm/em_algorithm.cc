@@ -44,6 +44,7 @@ void EmAlgorithm::ExpectationStep() {
 
     for (size_t r = 0; r < num_category; ++r) {
         all_em_stats[r]->Reset();
+        em_model_ptr->at(r)->UpdateParameter(parameters[r]); //exp_beta
     }
 
     for (size_t s = 0; s < site_count; ++s) {
@@ -53,12 +54,14 @@ void EmAlgorithm::ExpectationStep() {
         for (size_t r = 0; r < num_category; ++r) {
 //            std::cout << "em_count: " << " num_category: " << r << " site: " << s << std::endl;
 
-            em_model->UpdateParameter(parameters[r]); //exp_beta
+//em_model_ptr->at(r)
+            em_data_ptr->at(s)->UpdateEmModel( em_model_ptr->at(r) );
+//            (*em_data_ptr)[s]->UpdateEmModel( (*em_model_ptr)[r] );
 
-            (*em_data_ptr)[s]->UpdateEmModel(em_model);
 
-            (*em_data_ptr)[s]->UpdateSummaryStat(sum_prob, em_stat_local);
-            //TODO: Should make model take the data, lot's of refactor required to do this for mutation model.
+            em_data_ptr->at(s)->UpdateSummaryStat(sum_prob, em_stat_local);
+            //FIXME: Should make model take the data, lot's of refactor required to do this for mutation model.
+            //CHECK: Should be possible to avoid static_cast
 
 //            all_em_stats[r]->UpdateSumWithProportion(proportion[r], em_stat_local);
 
@@ -88,7 +91,54 @@ void EmAlgorithm::ExpectationStep() {
 
 
 }
+
 void EmAlgorithm::ExpectationStep2() {
+
+    for (size_t r = 0; r < num_category; ++r) {
+        all_em_stats[r]->Reset();
+    }
+
+    for (size_t s = 0; s < site_count; ++s) {
+
+        double sum_prob = 0;
+
+        for (size_t r = 0; r < num_category; ++r) {
+//            std::cout << "em_count: " << " num_category: " << r << " site: " << s << std::endl;
+
+            em_model->UpdateParameter(parameters[r]); //exp_beta
+
+            (*em_data_ptr)[s]->UpdateEmModel(em_model);
+
+            (*em_data_ptr)[s]->UpdateSummaryStat(sum_prob, em_stat_local);
+            //TODO: Should make model take the data, lot's of refactor required to do this for mutation model.
+
+//            all_em_stats[r]->UpdateSumWithProportion(proportion[r], em_stat_local);
+
+            all_probs(r, s) = sum_prob;
+        }
+
+        double sum = all_probs.col(s).sum();
+
+//        auto sum_col = all_probs.colwise().sum();
+//        auto prop_col = all_probs.row(0) / sum_col;
+//        double proportion_sum = prop_col.sum();
+//        proportion[0] = proportion_sum / site_count;
+//        proportion[1] = 1 - proportion[0];
+
+
+        for (size_t r = 0; r < num_category; ++r) {
+
+            double prob = all_probs(r,s) / sum;
+//            std::cout << "===============nem prob: "<< prob << std::endl;
+            all_em_stats[r]->UpdateSumWithProportion(prob, em_stat_local);
+        }
+
+    }
+//    CalculateProportion();
+
+
+}
+void EmAlgorithm::ExpectationStep_Old() {
 
     for (size_t r = 0; r < num_category; ++r) {
         em_model->UpdateParameter(parameters[r]); //exp_beta

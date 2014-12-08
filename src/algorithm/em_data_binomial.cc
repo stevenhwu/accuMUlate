@@ -72,3 +72,11 @@ void EmDataBinomial::UpdateEmModel(EmModel *em_model) {
     //TODO: redo static_cast with visitor??? ?typeid?
 
 }
+
+void EmDataBinomial::UpdateEmModel(std::unique_ptr<EmModelBinomial> &em_model) {
+
+}
+
+void EmDataBinomial::UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model) {
+
+}

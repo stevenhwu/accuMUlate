@@ -433,10 +433,11 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
     em_model[1]->GetParameterInfo();
 
 
-    EmAlgorithmMutation em_alg (2, site_prob, model, em_site_data, em_model0);
-//    EmAlgorithmMutation em_alg2 (em_site_data, em_model);
+//    EmAlgorithmMutation em_alg (2, site_prob, model, em_site_data, em_model0);
+    EmAlgorithmMutation em_alg2 (em_site_data, em_model);
 
-    em_alg.Run();
+//    em_alg.Run();
+    em_alg2.Run2();
 //    em2.Run();
 
 exit(4);

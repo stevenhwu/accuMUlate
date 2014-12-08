@@ -21,7 +21,7 @@ void EmAlgorithmBinomial::InitialiseSummaryStat() {
     em_stat_local = std::unique_ptr<EmSummaryStat>(new EmSummaryStatBinomial());
     em_stat_local->print();
 
-    for (int i = 0; i < num_category; ++i) {
+    for (size_t i = 0; i < num_category; ++i) {
         all_em_stats.emplace_back(new EmSummaryStatBinomial());
     }
 
