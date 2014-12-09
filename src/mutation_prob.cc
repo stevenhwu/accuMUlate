@@ -20,7 +20,7 @@ MutationProb::MutationProb(const ModelParams &model_params) {
     UpdateMu(model_params.mutation_rate);
 }
 
-
+MutationProb::MutationProb() :MutationProb(1){};
 MutationProb::MutationProb(double mu) {
 
     for (int i = 0; i < 4; ++i) {
@@ -119,4 +119,3 @@ double MutationProb::CalculateBeta0(Array4D freq) {
     return beta0;
 
 }
-

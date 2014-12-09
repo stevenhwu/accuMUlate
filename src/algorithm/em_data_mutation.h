@@ -40,13 +40,13 @@ public:
 
 
 
-    virtual void UpdateEmModel(std::unique_ptr<EmModelBinomial> &em_model);
-
     void UpdateEmModel(EmModel *em_model);
 
     virtual void UpdateEmModel(unique_ptr<EmModelMutation> &em_model);
+    virtual void UpdateEmModel(unique_ptr<EmModel> &em_model);
 
 
+    virtual void UpdateSummaryStat(double &prob, vector<double> &temp_stat);
 };
 
 

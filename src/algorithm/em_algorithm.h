@@ -28,6 +28,8 @@ public:
 
     EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0);
 
+    EmAlgorithm(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &model_ptr);
+
 //    EmAlgorithm() ;
 
 //    EmAlgorithm(int category_count);
@@ -40,6 +42,8 @@ public:
 
     virtual void Run() = 0;
 
+    vector<double> GetProportion();
+
 protected:
 
 
@@ -49,16 +53,21 @@ protected:
 
     std::vector<std::unique_ptr<EmData>> *em_data_ptr;
     std::vector<std::unique_ptr<EmModel>> *em_model_ptr;
-    EmModel *em_model;
+    std::vector<std::unique_ptr<EmModel>> em_model;
+    EmModel *em_model0;
 
     std::vector<std::unique_ptr<EmSummaryStat>> all_em_stats;
-    std::unique_ptr<EmSummaryStat> em_stat_local;
+
+    std::vector<std::unique_ptr<EmSummaryStat>> em_stat_local_ptr;
+    std::unique_ptr<EmSummaryStat> em_stat_local_single;
+
+
 
     std::vector<double> parameters;
     std::vector<double> proportion;
     Eigen::ArrayXXd all_probs;
 
-
+    vector<vector<double>> temp_stats;
 
 
     void Init();
@@ -78,9 +87,10 @@ protected:
 
     void ExpectationStep2();
 
-    EmAlgorithm(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &model_ptr);
 
     void ExpectationStep_Old();
+
+
 };
 
 

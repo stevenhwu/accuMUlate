@@ -15,7 +15,6 @@ class EmModel {
 public:
 
 
-
     virtual void UpdateParameter(double param) = 0; //TODO: implement multi parameters later
 
     virtual void GetParameterInfo() = 0;

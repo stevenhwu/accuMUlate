@@ -23,12 +23,13 @@ public:
 
     virtual ~EmData() {
     };
-
+    virtual void UpdateSummaryStat(double &prob, vector<double> &temp_stat) = 0;
     virtual void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat) = 0;
 //    virtual void UpdateEmModel(EmModel &em_model) = 0;
+
     virtual void UpdateEmModel(EmModel *em_model) = 0;
 
-    virtual void UpdateEmModel(std::unique_ptr<EmModelBinomial> & em_model) = 0;
+    virtual void UpdateEmModel(std::unique_ptr<EmModel> &em_model) {};
     virtual void UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model) = 0;
 };
 

@@ -22,14 +22,15 @@ public:
 
     virtual ~EmModelBinomial(){};
 
-    int n;
-    double prob;
-
     void UpdateParameter(double param);
 
     double GetParameter();
 
     virtual void GetParameterInfo();
+
+    int n;
+    double prob;
+
 };
 
 

@@ -24,7 +24,7 @@ void EmModelBinomial::UpdateParameter(double param) {
 //    evo_model->UpdateExpBeta(param);
 //    MutationRate mutation_rate = evo_model->GetMutationRate();
     prob = param;
-    std::cout << "IN EmModelBinomial: updateing: " << param << "\t" << prob<< std::endl;
+//    std::cout << "IN EmModelBinomial: updateing: " << param << "\t" << prob<< std::endl;
 }
 
 

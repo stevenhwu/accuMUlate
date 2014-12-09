@@ -11,7 +11,7 @@ JC69::JC69(MutationProb mutation_prob) : EvolutionModel(mutation_prob) {
 //    cout << "C_JC_PROB\n";
 }
 
-JC69::JC69(double mu) : EvolutionModel(mu) {
+JC69::JC69(double mu) : EvolutionModel( MutationProb(mu) ) {
 //    cout << "C_JC_mu\n";
 ////    UpdateTransitionMatrix();
 

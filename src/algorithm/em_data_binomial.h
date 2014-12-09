@@ -16,30 +16,31 @@
 class EmDataBinomial : public EmData {
 
 public:
+
     EmDataBinomial(std::vector<int> input);
-
-
 
     EmDataBinomial(int total, int count0);
 
     ~EmDataBinomial();
 
 
-    std::vector<int> data;
-
-    int count;
-
-    virtual void UpdateEmModel(std::unique_ptr<EmModelBinomial> &em_model);
-
-    virtual void UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model);
-
+    virtual void UpdateSummaryStat(double &prob, vector<double> &temp_stat);
     void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat);
 
     void UpdateEmModel(EmModel *em_model);
 
-    unsigned long total_count;
+
+public:
+
+    virtual void UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model);
+
+    std::vector<int> data;
+    int count;
+    int count_negative;
+    int total_count;
+
     double binomial_prob;
-    unsigned long count_negative;
+
 };
 
 

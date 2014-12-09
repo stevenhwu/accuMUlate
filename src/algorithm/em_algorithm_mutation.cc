@@ -1,25 +1,36 @@
 #include "em_algorithm_mutation.h"
 
-//EM::EM(int num_category0, vector<SiteProb> em_data0, EvolutionModel &em_model0) : num_category(num_category0), em_data_old(em_data0), em_model_old(&em_model0){
-//
-//    cout << "EM Constructor\n";
-//
-//    if (num_category != 2) {
-//        cout << "Not yet implemented for more than 2 categories" << endl;
-//        exit(222);
-//    }
-//
-//    site_count = em_data_old.size();
-//    num_category = num_category;
-//    em_count = 10;
-//
-//    Init();
-//
-//
-//
-//}
 
 //std::vector<std::unique_ptr<EmData>>
+EmAlgorithmMutation::EmAlgorithmMutation(int num_category0,
+        vector<std::unique_ptr<EmData>> &d_ptr, EmModelMutation &m)
+        : EmAlgorithm(num_category0, d_ptr, m)
+//          EmAlgorithm::em_data_ptr(&d_ptr), em_model(&m) {
+{
+
+    if (num_category != 2) {
+        cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< endl;
+        exit(222);
+    }
+
+    for (int i = 0; i < num_category; ++i) {
+        em_model.emplace_back(new EmModelMutation(m));
+    }
+
+    em_count = 3;
+
+    Init();
+
+//    em_model_ptr->at(0)->GetParameterInfo();
+//    em_model_ptr->at(1)->GetParameterInfo();
+//    em_model[0]->UpdateParameter(parameters[0]);
+//    em_model[1]->UpdateParameter(parameters[1]);
+
+
+}
+
+
+
 EmAlgorithmMutation::EmAlgorithmMutation(
         vector<std::unique_ptr<EmData>> &d_ptr, vector<std::unique_ptr<EmModel>> &m)
         : EmAlgorithm(d_ptr, m)
@@ -30,10 +41,9 @@ EmAlgorithmMutation::EmAlgorithmMutation(
         cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< endl;
         exit(222);
     }
-    em_count = 100;
+    em_count = 10;
 
     Init();
-
 
 
     cout << "=========== Done Constructor smart pointer x 2\n";
@@ -55,7 +65,7 @@ EmAlgorithmMutation::EmAlgorithmMutation(int num_category0, vector<SiteProb> &em
         cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< endl;
         exit(222);
     }
-    em_count = 100;
+    em_count = 10;
 
     Init();
 
@@ -126,21 +136,8 @@ EmAlgorithmMutation::~EmAlgorithmMutation() {
 
 }
 
-void EmAlgorithmMutation::Run2() {
-em_stat_local->print();
-    for (size_t i = 0; i < em_count; ++i) {
-        cout << "EM ite: " << i << endl;
-        ExpectationStep2();
-
-        MaximizationStep();
-
-
-    }
-
-}
-
 void EmAlgorithmMutation::Run() {
-em_stat_local->print();
+em_stat_local_single->print();
     for (size_t i = 0; i < em_count; ++i) {
         cout << "EM ite: " << i << endl;
         ExpectationStep();
@@ -165,8 +162,19 @@ em_stat_local->print();
 }
 
 
+void EmAlgorithmMutation::Run2() {
+
+    for (size_t i = 0; i < em_count; ++i) {
+        cout << "EM2 ite: " << i << endl;
+        ExpectationStep2();
+        MaximizationStep();
+    }
+}
+
+
+
 void EmAlgorithmMutation::InitialiseParameters() {
-    double lower_bound = 1e-12;
+    double lower_bound = 1e-50;
     double upper_bound = 1e-1;
     parameters = std::vector<double>(num_category);
     if (num_category == 2) {
@@ -178,17 +186,33 @@ void EmAlgorithmMutation::InitialiseParameters() {
         //TODO: Should throw exception instead of exit, this will do for now
     }
 
+
 }
 
 
 void EmAlgorithmMutation::InitialiseSummaryStat() {
 
-    em_stat_local = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutation());
-    em_stat_local->print();
+    em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutation());
+    em_stat_local_single->print();
 
+    temp_stats = std::vector<std::vector<double>>(num_category);
     for (size_t i = 0; i < num_category; ++i) {
         all_em_stats.emplace_back(new EmSummaryStatMutation());
+//        all_em_stats.emplace_back(new EmSummaryStatMutation());
+        temp_stats[i] = vector<double>(em_stat_local_single->GetStatCount());
     }
+
+
+//    for (size_t i = 0; i < num_category; ++i) {
+//        EmSummaryStatMutation a;
+//        all_em_stats_nonptr.push_back(a);
+////        all_em_stats_nonptr[i]->SetStats(std::vector<double> {i+1.0, i+1.0});
+////        all_em_stats_nonptr[i]->print();
+//    }
+//    for (size_t i = 0; i < num_category; ++i) {
+//
+////        all_em_stats_nonptr[i]->print();
+//    }
 
 }
 

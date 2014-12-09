@@ -12,6 +12,8 @@
 
 #include <vector>
 #include <memory>
+#include <stddef.h>
+
 class EmSummaryStat {
 
     static const int EM_SUMMARY_STAT_STATS_COUNT = 1;
@@ -30,10 +32,13 @@ public:
     virtual void print();
     virtual void Reset();
     virtual void UpdateSumWithProportion(double &d, std::unique_ptr<EmSummaryStat> &em_stat_local);
+    virtual void UpdateSumWithProportion(double &d, std::vector<double> temp_stats);
 
 
 
     virtual double MaximiseStats();
+
+    size_t GetStatCount();
 
 protected:
     int const stat_count;//int const stat_count;

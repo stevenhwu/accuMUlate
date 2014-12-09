@@ -33,7 +33,7 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params);
 
 void testCalLikelihood(MutationProb muProb, std::vector<SequenceProb> sp);
 
-void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp);
+void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp);
 
 
 
@@ -241,7 +241,7 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
 
     // Generate a normal distribution around that mean
     std::mt19937 e2(rd());
-    std::uniform_int_distribution<int> uniform_dist(10, 20);
+    std::uniform_int_distribution<int> uniform_dist(5, 10);
     for (size_t s = 0; s < site_count; ++s) {
         ModelInput base_custom = base_counts[s];
         base_custom.reference = 0;
@@ -252,10 +252,17 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
             }
             base_custom.all_reads[i].reads[0] = (uint16_t) 100 + uniform_dist(e2);
         }
-        int i=0;
+//        int i=0;
         if(s > 70){ //diff
-            base_custom.all_reads[i].reads[0] = (uint16_t) uniform_dist(e2);
-            base_custom.all_reads[i].reads[2] = (uint16_t) 100 + uniform_dist(e2);
+            base_custom.all_reads[0].reads[0] = (uint16_t) uniform_dist(e2);
+            base_custom.all_reads[0].reads[3] = (uint16_t) 100 + uniform_dist(e2);
+            base_custom.all_reads[1].reads[2] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[2].reads[3] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[3].reads[0] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[4].reads[1] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[5].reads[2] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[6].reads[3] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[0].reads[2] = (uint16_t) 100 + uniform_dist(e2);
         }
         sp[s] = SequenceProb(base_custom, params);
     }
@@ -308,7 +315,7 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     return 0;
 }
 
-void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) {
+void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp) {
     const size_t cat = 2;
 
 
@@ -340,6 +347,7 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 //    JC69 m692(mutation_prob);
 
     F81 model(mutation_prob);
+
 //    exit(-10);
 //    F81 model(mutation_prob);
 //    JC69 m69(mutation_prob);
@@ -361,13 +369,49 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 
 //        std::unique_ptr<EmData> e ( new EmDataMutation(sp[s], model) );
 //        unique_ptr<EmData> e = std::unique_ptr<EmData>  ( );
-        em_site_data.emplace_back(  new EmDataMutation(sp[s], model)  );
+//        em_site_data.emplace_back(  new EmDataMutation(sp[s], model)  );
 //        EmDataMutation em_site = EmDataMutation(sp[s], model);
 ////        EmData *p = &em_site;
 //        em_site_prob.push_back(em_site);
 
     }
+
+    em_site_data.emplace_back(  new EmDataMutation(sp[0], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[1], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[2], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[3], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[4], model)  );
+
+    em_site_data.emplace_back(  new EmDataMutation(sp[0], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[1], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[2], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[3], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[4], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[0], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[1], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[2], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[3], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[4], model)  );
+
+//    em_site_data.emplace_back(  new EmDataMutation(sp[95], model)  );
+//    em_site_data.emplace_back(  new EmDataMutation(sp[96], model)  );
+//    em_site_data.emplace_back(  new EmDataMutation(sp[97], model)  );
+//    em_site_data.emplace_back(  new EmDataMutation(sp[98], model)  );
+//    em_site_data.emplace_back(  new EmDataMutation(sp[99], model)  );
+//    em_site_data.emplace_back(  new EmDataMutation(sp[95], model)  );
+//    em_site_data.emplace_back(  new EmDataMutation(sp[96], model)  );
+//    em_site_data.emplace_back(  new EmDataMutation(sp[97], model)  );
+//    em_site_data.emplace_back(  new EmDataMutation(sp[98], model)  );
+//    em_site_data.emplace_back(  new EmDataMutation(sp[99], model)  );
+
+    em_site_data.emplace_back(  new EmDataMutation(sp[95], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[96], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[97], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[98], model)  );
+    em_site_data.emplace_back(  new EmDataMutation(sp[99], model)  );
+
     /*
+
     //Doesn't work, need new
     EmDataMutation em_site = EmDataMutation(sp[0], model);
     em_site_prob[0] =(&em_site);
@@ -400,13 +444,26 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 
 
 //    exit(100);
-    std::vector<std::unique_ptr<EmModel>> em_model;
     F81 evo_model0(mutation_prob);
-    F81 evo_model1(mutation_prob);
+//    F81 evo_model1(mutation_prob);
+    F81 evo_model1 = evo_model0;
     EmModelMutation em_model0 (evo_model0);
+    EmModelMutation em_model1 (em_model0);
+//    EmModelMutation em_model1 (evo_model1);
 
+    em_model0.GetParameterInfo();
+    em_model1.GetParameterInfo();
+
+//    em_model1.UpdateParameter(0.1);
+//    em_model0.UpdateParameter(0.01);
+    std::vector<std::unique_ptr<EmModel>> em_model;
     em_model.emplace_back(new EmModelMutation(evo_model0));
-    em_model.emplace_back(new EmModelMutation(evo_model1));
+    em_model.emplace_back(new EmModelMutation(em_model0));
+
+//    std::vector<EmModel*> em_model;
+//    EmModelMutation em_model1 (em_model0);
+//    em_model.push_back(&em_model0);
+//    em_model.push_back(&em_model1);
 
 //    EM em (2, site_prob, model);
 //    em.RunOld();
@@ -421,46 +478,56 @@ void testCalWeighting(MutationProb mutation_prob, std::vector<SequenceProb> sp) 
 
     em_model[0]->GetParameterInfo();
     em_model[1]->GetParameterInfo();
-
-    em_model[0]->UpdateParameter(0.5);
-
-    em_model[0]->GetParameterInfo();
-    em_model[1]->GetParameterInfo();
+    printf("H1\n");
 
     em_model[1]->UpdateParameter(0.1);
 
     em_model[0]->GetParameterInfo();
     em_model[1]->GetParameterInfo();
+    printf("H2\n");
+
+    em_model[0]->UpdateParameter(1e-2);
+
+    em_model[0]->GetParameterInfo();
+    em_model[1]->GetParameterInfo();
+    printf("H3\n");
 
 
 //    EmAlgorithmMutation em_alg (2, site_prob, model, em_site_data, em_model0);
-    EmAlgorithmMutation em_alg2 (em_site_data, em_model);
+    EmAlgorithmMutation em_alg2 (2, em_site_data, em_model0);
+    em_alg2.Run();
 
-//    em_alg.Run();
-    em_alg2.Run2();
-//    em2.Run();
+//    EmAlgorithmMutation em_alg3 (em_site_data, em_model);
+//    em_alg3.Run2();
+
+//
+////    em_alg.Run();
+
+
 
 exit(4);
-    std::vector<std::unique_ptr<EmData>> em_data_binomial;
-    for (size_t s = 0; s < 5; ++s) {
-        em_data_binomial.emplace_back(  new EmDataBinomial(10, s+1)  );
-    }
-    em_data_binomial.emplace_back(  new EmDataBinomial(10, 9)  );
-    em_data_binomial.emplace_back(  new EmDataBinomial(10, 9)  );
-    em_data_binomial.emplace_back(  new EmDataBinomial(10, 10)  );
-    EmModelBinomial em_model_binomial (10, 0.5);
-    EmAlgorithmBinomial em_bin (2, em_data_binomial, em_model_binomial);
+//    std::vector<std::unique_ptr<EmData>> em_data_binomial;
+//    for (size_t s = 0; s < 5; ++s) {
+//        em_data_binomial.emplace_back(  new EmDataBinomial(10, s+1)  );
+//    }
+//    em_data_binomial.emplace_back(  new EmDataBinomial(10, 9)  );
+//    em_data_binomial.emplace_back(  new EmDataBinomial(10, 9)  );
+//    em_data_binomial.emplace_back(  new EmDataBinomial(10, 10)  );
+//    EmModelBinomial em_model_binomial (10, 0.5);
+//    EmAlgorithmBinomial em_bin (2, em_data_binomial, em_model_binomial);
+//
+//
+//    em_bin.Run();
+//
+//    vector<double> p1 = em_bin.GetParameters();
+//    for (auto item : p1) {
+//        printf("%f\t", item);
+//    }
+//    printf("\n");
 
-//    em.Run();
-    em_bin.Run();
+//exit(35);
 
-    vector<double> p1 = em_bin.GetParameters();
-    for (auto item : p1) {
-        printf("%f\t", item);
-    }
-    printf("\n");
 
-    exit(35);
     for (size_t i = 0; i < em_count; ++i) {
 
         for (size_t r = 0; r < rate_count; ++r) {

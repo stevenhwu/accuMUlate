@@ -39,7 +39,9 @@ public:
 
 
 public:
+    MutationProb();
     MutationProb(double mu);
+//    MutationProb(const MutationProb& self);
     MutationProb(const ModelParams &model_params);
 	~MutationProb();
 
@@ -53,15 +55,17 @@ public:
     double GetMu0();
     double GetBeta0();
 
-
+    double beta0;
+    MutationRate mutation_rate;
+    Array4D frequency_prior;
 private:
 
-    Array4D frequency_prior;
+
     Array10D ancestor_prior;
-    MutationRate mutation_rate;
+
 
     double mu0;
-    double beta0;
+
     double exp_beta; //exp_beta = exp(-beta0*mu0)
 
     double CalculateExpBeta();

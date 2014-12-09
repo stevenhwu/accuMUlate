@@ -8,6 +8,7 @@
 //}
 
 EvolutionModel::EvolutionModel(MutationProb mu_prob) : mu_prob(mu_prob) {
+
     this->mu = mu_prob.GetMu0();
 }
 
@@ -28,6 +29,10 @@ MutationMatrix EvolutionModel::GetTranstionMatirxAToD() {
 }
 
 MutationRate EvolutionModel::GetMutationRate() {
+//    cout << mu_prob.beta0 << endl;
+//    cout << mu_prob.GetExpBeta() << endl;
+////    cout << mu_prob.beta0 << endl;
+////    cout << mu_prob.beta0 << endl;
     return mu_prob.GetMutationRate();
 
 }
@@ -35,3 +40,9 @@ MutationRate EvolutionModel::GetMutationRate() {
 MutationProb EvolutionModel::GetMutationProb() {
     return mu_prob;
 }
+
+MutationProb EvolutionModel::GetMutationProb() const {
+    MutationProb m2 = mu_prob;
+    return m2;
+}
+

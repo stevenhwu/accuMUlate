@@ -14,9 +14,10 @@
 class EmAlgorithmBinomial : public EmAlgorithm {
 
 public:
+    EmAlgorithmBinomial(int num_category0, vector<unique_ptr<EmData>> &data_ptr0, EmModelBinomial &em_model0);
+
     virtual void Run();
-    virtual void Run2(){}
-    EmAlgorithmBinomial(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr0, EmModel &em_model0);
+       EmAlgorithmBinomial(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr0, EmModel &em_model0);
 
 protected:
     virtual void InitialiseSummaryStat();

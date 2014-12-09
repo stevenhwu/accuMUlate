@@ -55,12 +55,12 @@ SiteProb::SiteProb(SequenceProb sequence_prob,
 }
 
 
-SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel evo_model) {
+SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
 
     counter++;
     thisCount = counter;
 
-    MutationProb mutation_prob = evo_model.GetMutationProb();
+    MutationProb mutation_prob = evo_model.GetMutationProb() ;
     ancestor_prior = mutation_prob.GetAncestorPrior();
     frequency_prior = mutation_prob.GetFrequencyPrior();
 
@@ -80,7 +80,7 @@ SiteProb::~SiteProb() {
 }
 
 
-void SiteProb::UpdateModel(EvolutionModel evo_model) {
+void SiteProb::UpdateModel(EvolutionModel &evo_model) {
     transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
     mutation_rate = evo_model.GetMutationRate();
 //    cout << "new mutation rate: " << mutation_rate.prob  << "\t" << mutation_rate.one_minus_p <<

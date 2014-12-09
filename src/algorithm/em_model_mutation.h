@@ -19,7 +19,7 @@ class EmModelMutation : public EmModel {
 public:
     EmModelMutation(EvolutionModel &evo_model0);
 
-    EmModelMutation(EmModelMutation &em_model);
+    EmModelMutation(const EmModelMutation &em_model);
 
     virtual ~EmModelMutation() {
     }
@@ -28,14 +28,19 @@ public:
 
     void GetParameterInfo();
 
-    EvolutionModel *GetEvoModel() ;
+    EvolutionModel * GetEvoModel();
+//    EvolutionModel * GetEvoModel() const;
+
 
 protected:
     EvolutionModel *evo_model;
 
-
-
-
+//
+//public:
+//    virtual EmModelMutation *GetModel();
+//
+//    std::unique_ptr<EvolutionModel> CopyEvoModel() const;
+//    EvolutionModel* CopyEvoModel2()const ;
 };
 
 

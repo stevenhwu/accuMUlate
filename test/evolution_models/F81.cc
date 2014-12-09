@@ -13,8 +13,9 @@ protected:
     const double freq_equal_beta0 = (1.0 + (1.0 / 3.0));
     const double freq_not_equal_beta0 = 1.0 / ( 1 - 0.1*0.1 - 0.2*0.2 - 0.3*0.3 - 0.4*0.4  );
 
-    ModelParams params_equal;
-    ModelParams params_not_equal;
+    MutationProb mu_prob_equal;
+    MutationProb mu_prob_not_equal;
+
 
     double mu = (-log(0.8)) / freq_equal_beta0; //p = 1-exp(beta*mu) = 0.2, => (1-p) = 0.8
     double mu_not_equal = (-log(0.8)) / freq_not_equal_beta0; //p = 1-exp(beta*mu) = 0.2, => (1-p) = 0.8
@@ -22,8 +23,14 @@ protected:
     MutationMatrix expected_freq_equal_matrix = MutationMatrix::Zero();
 
     virtual void SetUp() {
+        ModelParams params_equal;
+        ModelParams params_not_equal;
+
         params_equal = {0.01, freq_equal, mu, 0.01, 0.01, 0.01};
         params_not_equal = {0.01, freq_not_equal, mu_not_equal, 0.01, 0.01, 0.01};
+
+        mu_prob_equal = MutationProb(params_equal);
+        mu_prob_not_equal = MutationProb(params_not_equal);
 
         // A -> A     = 0.2*0.25 + 0.8 = 0.85   => 0.85 * 0.5 = 0.425
         // A -> C/G/T = 0.2*0.25       = 0.05   => 0.05 * 0.5 = 0.025
@@ -81,7 +88,7 @@ TEST_F(F81Test, F81EqualDoubleConstructorTest) {
 
 TEST_F(F81Test, F81EqualTest) {
 
-    F81 model (params_equal);
+    F81 model (mu_prob_equal);
     MutationMatrix matrix = model.GetTranstionMatirxAToD();
     
     for (int i = 0; i < 4; ++i) {
@@ -97,7 +104,7 @@ TEST_F(F81Test, F81EqualTest) {
 
 TEST_F(F81Test, F81NotEqualTest) {
 
-    F81 model (params_not_equal);
+    F81 model (mu_prob_not_equal);
     MutationMatrix matrix = model.GetTranstionMatirxAToD();
     MutationMatrix expected_matrix = MutationMatrix::Zero();
     // A -> A     = 0.2*0.1  + 0.8 = 0.82   => 0.82 * 0.5 = 0.41
@@ -144,7 +151,7 @@ TEST_F(F81Test, F81NotEqualTest) {
 
 TEST_F(F81Test, F81NotEqualUpdateTest) {
 
-    F81 model (params_not_equal);
+    F81 model (mu_prob_not_equal);
     double new_mu = (-log(0.4)) / freq_not_equal_beta0; //p = 1-exp(beta*mu) = 0.6, => (1-p) = 0.4
     model.UpdateMu(new_mu);
 

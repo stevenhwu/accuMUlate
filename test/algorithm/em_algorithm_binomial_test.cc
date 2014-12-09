@@ -10,6 +10,7 @@
 #include "gtest/gtest.h"
 
 #include "algorithm/em_model_binomial.h"
+
 #include <algorithm/em_data_binomial.h>
 #include <algorithm/em_algorithm_binomial.h>
 
@@ -40,20 +41,30 @@ TEST_F(EmAlgorithmBinomialTest, EmAlgorithmBinomialTest1) {
 
     EmAlgorithmBinomial em_bin(2, em_data_binomial, em_model_binomial);
 
-//    em.Run();
-    em_bin.
-
-            Run();
+    em_bin.Run();
 
     std::vector<double> p1 = em_bin.GetParameters();
-    for (
-        auto item :
-            p1) {
+    std::vector<double> proportion = em_bin.GetProportion();
+    for (auto item :p1) {
         printf("%f\t", item);
     }
-    printf("\n");//0.80, 0.52
 
-//    exit(35);
+    printf("\n");//0.80, 0.52
+    for (auto item :proportion) {
+        printf("%f\t", item);
+    }
+    ASSERT_NEAR(0.793, p1[0], 0.0001);
+    ASSERT_NEAR(0.513, p1[1], 0.0001);
+//    [[1]]
+//    [1] 0.5227561
+//
+//    [[2]]
+//    [1] 0.7933666
+//
+//    [[3]]
+//    [1] 0.5139149
+
+    exit(35);
 
 }
 
@@ -109,11 +120,11 @@ TEST_F(EmAlgorithmBinomialTest, EmAlgorithmBinomialTest2) {
 }
 
 
-
 /*
+N=10
 ## Expectation Step
 estep <- function(obs,pi,p,q){
-  pi_estep <- (pi*dbinom(obs,1,p)) / ( pi*dbinom(obs,1,p) + (1-pi)*dbinom(obs,1,q) )
+  pi_estep <- (pi*dbinom(obs,N,p)) / ( pi*dbinom(obs,N,p) + (1-pi)*dbinom(obs,N,q) )
   return(pi_estep)
 }
 
@@ -125,12 +136,11 @@ mstep <- function(obs,e.step){
   pi_temp <- mean(e.step)
 
   # estimate p,q
-  p_temp <- sum(obs*e.step) / sum(e.step)
-  q_temp <- sum(obs*(1-e.step)) / sum(1-e.step)
+  p_temp <- sum(obs*e.step) / sum(e.step)/n
+  q_temp <- sum(obs*(1-e.step)) / sum(1-e.step)/n
 
   list(pi_temp,p_temp,q_temp)
 }
-
 
 
 ## EM Algorithm
@@ -141,6 +151,8 @@ em.algo <- function(obs,pi_inits,p_inits,q_inits,maxit=1000,tol=1e-6){
 
   # Iterate between expectation and maximization steps
   for(i in 1:maxit){
+
+
     cur <- c(pi_cur,p_cur,q_cur)
     new <- mstep(obs,estep(obs, pi_cur, p_cur, q_cur))
     pi_new <- new[[1]]; p_new <- new[[2]]; q_new <- new[[3]]
@@ -173,19 +185,20 @@ Info.Mat.function <- function(obs, pi.est, p.est, q.est){
 
 ## Generate sample data
 n <- 5000
-pi_true <- 0.90 # prob of using first coin
-p_true <-  0.60 # the first coin has P(heads) = 0.60
-q_true <-  0.50 # the second coin has P(heads) = 0.50
+pi_true <- 0.50 # prob of using first coin
+p_true <-  0.90 # the first coin has P(heads) = 0.70
+q_true <-  0.10 # the second coin has P(heads) = 0.30
 true <- c(pi_true,p_true,q_true)
-u <- ifelse(runif(n)<pi_true, rbinom(n,1,p_true),rbinom(n,1,q_true))
+u <- ifelse(runif(n)<pi_true, rbinom(N,10,p_true),rbinom(N,10,q_true))
+
 
 
 ## Set parameter estimates
-pi_init = 0.70; p_init = 0.70; q_init = 0.60
+pi_init = 0.50; p_init = 0.90; q_init = 0.10
 
-
+u <- c(5,9,8,4,7)
 ## Run EM Algorithm
-output <- em.algo(u,pi_init,p_init,q_init)
+output <- em.algo(u, pi_init, p_init, q_init)
 
 
 ## Calculate Confidence Intervals

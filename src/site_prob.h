@@ -39,7 +39,7 @@ public:
 //    SiteProb(const ModelParams &params, const ModelInput site_data, MutationProb muProb);
 //    SiteProb(const ModelInput site_data, const MutationProb muProb, const EvolutionModel evoModel);
 
-    SiteProb(SequenceProb &traits, EvolutionModel evo_model);
+    SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model);
 
     ~SiteProb();
 
@@ -55,7 +55,7 @@ public:
     void CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs prob_reads_given_descent, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff);
 
 
-    void UpdateModel(EvolutionModel evo_model);
+    void UpdateModel(EvolutionModel &evo_model);
 
 protected:
 

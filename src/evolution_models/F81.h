@@ -13,11 +13,17 @@ class F81 : public EvolutionModel{
 public:
 //    F81(double mu, Array4D freqs);
 //    F81(double mu, vector<double> freqs); //Legacy
-    F81(MutationProb prob);
+    F81(MutationProb &prob);
 
     F81(double mu);
 
     ~F81();
+    F81(const F81&); // copy ctor
+
+
+    virtual std::unique_ptr<EvolutionModel> Clone() const;
+    virtual EvolutionModel *Clone2() const;
+    virtual void UpdateExpBeta(double exp_beta);
 
 protected:
 
@@ -31,7 +37,8 @@ private:
     double beta0;
     Array4D freqs;
 
-    void UpdateExpBeta(double exp_beta);
+
+
 };
 
 
