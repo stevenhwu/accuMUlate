@@ -22,7 +22,6 @@
 class EmAlgorithm {
 
 
-    void CalculateProportion();
 
 public:
 
@@ -44,6 +43,7 @@ public:
 
     vector<double> GetProportion();
 
+    void PrintSummary();
 protected:
 
 
@@ -77,6 +77,8 @@ protected:
 
     void MaximizationStep();
 
+    void CalculateProportion();
+
     virtual void InitialiseProportion();
 
 
@@ -91,7 +93,14 @@ protected:
     void ExpectationStep_Old();
 
 
+    virtual void ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, vector<double> &temp_stat);
+
+    bool EmStoppingCriteria();
+
+    std::vector<double> cache_parameters;
+
 };
 
 
+static const double EM_CONVERGE_THRESHOLD = 1e-10;
 #endif //EM_ALGORITHM_H_

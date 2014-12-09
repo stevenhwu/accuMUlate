@@ -19,9 +19,9 @@ double EmSummaryStatMutation::MaximiseStats() {
 //    double new_one_minus_mu = mutation_prob.ConvertExpBetaToMu(-(new_one_minus_exp_beta - 1));
 
 
-    printf("======= NEM_MU_r:\t\t\t\t\t\t \t\t\t=expBeta=  %.5f %.5f \n",
-            new_exp_beta, new_one_minus_exp_beta
-    );
+//    printf("======= NEM_MU_r:\t\t\t\t\t\t \t\t\t=expBeta=  %.5f %.5f \n",
+//            new_exp_beta, new_one_minus_exp_beta
+//    );
     return new_exp_beta;
     /*
     double sum_stat = all_stats_diff[r] + all_stats_same[r];

@@ -29,8 +29,8 @@ public:
 
     virtual void UpdateEmModel(EmModel *em_model) = 0;
 
-    virtual void UpdateEmModel(std::unique_ptr<EmModel> &em_model) {};
-    virtual void UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model) = 0;
+//    virtual void UpdateEmModel(std::unique_ptr<EmModel> &em_model)=0;
+//    virtual void UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model) = 0;
 };
 
 

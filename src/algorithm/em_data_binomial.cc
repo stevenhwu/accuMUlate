@@ -61,10 +61,6 @@ void EmDataBinomial::UpdateEmModel(EmModel *em_model) {
 
 }
 
-void EmDataBinomial::UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model) {
-    cout << "In EmDataBinomial, UpdateModel: unimplemented" << binomial_prob << endl;
-    exit(99);
-}
 
 void EmDataBinomial::UpdateSummaryStat(double &prob, vector<double> &temp_stat) {
 

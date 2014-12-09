@@ -22,9 +22,9 @@ double EmSummaryStatBinomial::MaximiseStats() {
 //    double new_one_minus_mu = mutation_prob.ConvertExpBetaToMu(-(new_one_minus_exp_beta - 1));
 
 
-    printf("===================================== NEM_Theta: %.5f %.5f \n",
-            new_theta, new_one_minus_theta
-    );
+//    printf("===================================== NEM_Theta: %.5f %.5f \n",
+//            new_theta, new_one_minus_theta
+//    );
     return new_theta;
 }
 /*

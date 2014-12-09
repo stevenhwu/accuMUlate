@@ -40,10 +40,7 @@ public:
 
 
 
-    void UpdateEmModel(EmModel *em_model);
-
-    virtual void UpdateEmModel(unique_ptr<EmModelMutation> &em_model);
-    virtual void UpdateEmModel(unique_ptr<EmModel> &em_model);
+    virtual void UpdateEmModel(EmModel *em_model);
 
 
     virtual void UpdateSummaryStat(double &prob, vector<double> &temp_stat);

@@ -27,12 +27,11 @@ public:
     virtual void UpdateSummaryStat(double &prob, vector<double> &temp_stat);
     void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat);
 
-    void UpdateEmModel(EmModel *em_model);
+    virtual void UpdateEmModel(EmModel *em_model);
+
 
 
 public:
-
-    virtual void UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model);
 
     std::vector<int> data;
     int count;

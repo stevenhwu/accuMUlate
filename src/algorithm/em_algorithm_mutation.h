@@ -73,13 +73,13 @@ private:
     std::vector<double> all_stats_same;
     std::vector<double> all_stats_diff;
 
+    vector<SiteProb> em_data_old;
     EvolutionModel *em_model_old;
-
     vector<double> parameters_old;
 
     Eigen::ArrayXXd all_probs_old;
 
-    vector<SiteProb> em_data_old;
+
     void oldEStep();
 
     void oldMStep();

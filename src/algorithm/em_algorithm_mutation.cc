@@ -13,11 +13,11 @@ EmAlgorithmMutation::EmAlgorithmMutation(int num_category0,
         exit(222);
     }
 
-    for (int i = 0; i < num_category; ++i) {
+    for (size_t i = 0; i < num_category; ++i) {
         em_model.emplace_back(new EmModelMutation(m));
     }
 
-    em_count = 3;
+    em_count = 50;
 
     Init();
 
@@ -138,8 +138,10 @@ EmAlgorithmMutation::~EmAlgorithmMutation() {
 
 void EmAlgorithmMutation::Run() {
 em_stat_local_single->print();
-    for (size_t i = 0; i < em_count; ++i) {
-        cout << "EM ite: " << i << endl;
+    size_t i = 0;
+    bool isConverged = true;
+    while(isConverged & (i< em_count) ){
+//        cout << "EM ite: " << i << endl;
         ExpectationStep();
 
 //        oldEStep();
@@ -155,8 +157,8 @@ em_stat_local_single->print();
 
 
 //        oldMStep();
-
-
+        isConverged = EmStoppingCriteria();
+        i++;
     }
 
 }
@@ -176,7 +178,7 @@ void EmAlgorithmMutation::Run2() {
 void EmAlgorithmMutation::InitialiseParameters() {
     double lower_bound = 1e-50;
     double upper_bound = 1e-1;
-    parameters = std::vector<double>(num_category);
+
     if (num_category == 2) {
         parameters = {upper_bound, lower_bound};
     }
@@ -236,12 +238,12 @@ void EmAlgorithmMutation::oldMStep() {
 //            proportion[r] = all_probs[r]/(all_probs[0]+all_probs[1]);
 
 
-            printf("======= NEM_MU_r: %zu \tMu: %.5e %.5f =expBeta=  %.5f %.5f \t =prop= %.5f %.5f "
-                            "\t =stat= %.5f %.5f \n", r,
-                    new_mu, new_one_minus_mu,
-                    new_exp_beta, new_one_minus_exp_beta,
-                    proportion[0], proportion[1],
-                    all_stats_same[0], all_stats_same[1]);
+//            printf("======= NEM_MU_r: %zu \tMu: %.5e %.5f =expBeta=  %.5f %.5f \t =prop= %.5f %.5f "
+//                            "\t =stat= %.5f %.5f \n", r,
+//                    new_mu, new_one_minus_mu,
+//                    new_exp_beta, new_one_minus_exp_beta,
+//                    proportion[0], proportion[1],
+//                    all_stats_same[0], all_stats_same[1]);
 
             parameters_old[r] = new_mu;
 

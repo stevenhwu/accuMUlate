@@ -7,11 +7,13 @@
 
 
 
+#include "em_algorithm_mutation.h"
 #include "em_algorithm_binomial.h"
 #include "em_algorithm.h"
 #include "em_summary_stat_mutation.h"
 
 #include <iostream>
+#include <stddef.h>
 
 
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
@@ -35,6 +37,9 @@ void EmAlgorithm::Init() {
 
     site_count = em_data_ptr->size();
     all_probs = Eigen::ArrayXXd::Zero(num_category, site_count);
+    parameters = std::vector<double>(num_category);
+    cache_parameters = std::vector<double>(num_category);
+
     InitialiseProportion();
 
     InitialiseParameters();
@@ -43,7 +48,7 @@ void EmAlgorithm::Init() {
 
 }
 
-void EmAlgorithm::ExpectationStep() {
+void EmAlgorithm::ExpectationStep(  ) {
 
 
     for (size_t r = 0; r < num_category; ++r) {
@@ -61,9 +66,8 @@ void EmAlgorithm::ExpectationStep() {
 //            std::cout << "em_count: " << " num_category: " << r << " site: " << s << std::endl;
 //            std::cout << "em_count: " << " num_category: " << r << " site: " << s << std::endl;
 //em_model_ptr->at(r)
-            em_data_ptr->at(s)->UpdateEmModel( em_model[r].get() );
+            ExpectationStepCustom(s, r, sum_prob, temp_stats[r]);
 
-            em_data_ptr->at(s)->UpdateSummaryStat(sum_prob, temp_stats[r]);
             //FIXME: Should make model take the data, lot's of refactor required to do this for mutation model.
             //CHECK: Should be possible to avoid static_cast
 
@@ -86,6 +90,15 @@ void EmAlgorithm::ExpectationStep() {
 
 }
 
+void EmAlgorithm::ExpectationStepCustom(size_t data_index, size_t category_index,
+        double &sum_prob, vector<double> &temp_stat) {
+
+    em_data_ptr->at(data_index)->UpdateEmModel( em_model[category_index].get() );
+    em_data_ptr->at(data_index)->UpdateSummaryStat(sum_prob, temp_stat);
+    
+
+}
+
 void EmAlgorithm::ExpectationStep2() {
     printf("here\n");
     vector<vector<double>> temp_stat = std::vector<std::vector<double>>(num_category);
@@ -104,7 +117,7 @@ void EmAlgorithm::ExpectationStep2() {
 
 //            em_model0->UpdateParameter(parameters[r]); //exp_beta
 
-            (*em_data_ptr)[s]->UpdateEmModel(em_model_ptr->at(r));
+            (*em_data_ptr)[s]->UpdateEmModel(em_model_ptr->at(r).get());
 
             (*em_data_ptr)[s]->UpdateSummaryStat(sum_prob, temp_stat[r]);
             //TODO: Should make model take the data, lot's of refactor required to do this for mutation model.
@@ -216,7 +229,7 @@ void EmAlgorithm::CalculateProportion() {
     double proportion_sum = prop_col.sum();
     proportion[0] = proportion_sum / site_count;
     proportion[1] = 1 - proportion[0];
-    std::cout << "Update Proportion: " << "\t" << proportion[0] << "\t" << proportion[1] << std::endl;
+//    std::cout << "Update Proportion: " << "\t" << proportion[0] << "\t" << proportion[1] << std::endl;
 
 
     if (num_category != 2) {
@@ -238,4 +251,32 @@ std::vector<double> EmAlgorithm::GetParameters() {
 
 vector<double> EmAlgorithm::GetProportion() {
     return proportion;
+}
+
+bool EmAlgorithm::EmStoppingCriteria() {
+
+
+    double sum_diff = 0;
+    for (size_t r = 0; r < num_category; ++r) {
+        sum_diff += abs(parameters[r] - cache_parameters[r]);
+
+        cache_parameters[r] = parameters[r];
+
+    }
+    if(sum_diff < EM_CONVERGE_THRESHOLD){
+        return false;
+    }
+    return true;
+}
+
+void EmAlgorithm::PrintSummary(){
+    printf("\n========================\nEM Summary\n");
+     for (auto item :parameters) {
+        printf("%f\t", item);
+    }
+
+    printf("\n");
+    for (auto item :proportion) {
+        printf("%f\t", item);
+    }
 }

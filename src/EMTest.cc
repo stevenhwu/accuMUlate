@@ -497,6 +497,7 @@ void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp)
     EmAlgorithmMutation em_alg2 (2, em_site_data, em_model0);
     em_alg2.Run();
 
+    em_alg2.PrintSummary();
 //    EmAlgorithmMutation em_alg3 (em_site_data, em_model);
 //    em_alg3.Run2();
 

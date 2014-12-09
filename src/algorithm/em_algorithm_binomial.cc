@@ -6,13 +6,15 @@
  */
 
 
+#include <stddef.h>
 #include "em_algorithm_binomial.h"
 #include "em_summary_stat_binomial.h"
+#include "em_algorithm.h"
 
 EmAlgorithmBinomial::EmAlgorithmBinomial(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr0, EmModelBinomial &em_model0)
         : EmAlgorithm(num_category0, data_ptr0, em_model0) {
 
-   for (int i = 0; i < num_category; ++i) {
+   for (size_t i = 0; i < num_category; ++i) {
         em_model.emplace_back(new EmModelBinomial(em_model0));
     }
 
@@ -47,7 +49,7 @@ void EmAlgorithmBinomial::Run() {
 void EmAlgorithmBinomial::InitialiseParameters() {
     double lower_bound = 0.1;
     double upper_bound = 0.9;
-    parameters = std::vector<double>(num_category);
+
     if (num_category == 2) {
         parameters = {upper_bound, lower_bound};
     }
@@ -59,3 +61,11 @@ void EmAlgorithmBinomial::InitialiseParameters() {
 
 }
 
+void EmAlgorithmBinomial::ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, vector<double> &temp_stat) {
+
+
+    em_data_ptr->at(data_index)->UpdateEmModel( em_model[category_index].get() );
+    em_data_ptr->at(data_index)->UpdateSummaryStat(sum_prob, temp_stat);
+
+
+}
