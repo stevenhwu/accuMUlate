@@ -17,40 +17,6 @@ Eigen::IOFormat nice_row(Eigen::StreamPrecision, Eigen::DontAlignCols, " ", " ")
 const bool DEBUG = false;
 
 
-int base_index2[128] ={
-//    17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,	// 0-15
-//    17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,	// 16-31
-////                                          -
-//    17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,	// 32-47
-////                                                ?
-//    17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,16,	// 48-63
-////	    A  B  C  D  e  f  G  H  i  j  K  l  M  N  o
-//    17, 0,11, 1,12,16,16, 2,13,16,16,10,16, 7,15,16,	// 64-79
-////	 p  q  R  S  T  U  V  W  x  Y  z
-//    16,16, 5, 9, 3, 3,14, 8,16, 6,16,17,17,17,17,17,	// 80-95
-////	    A  B  C  D  e  f  G  H  i  j  K  l  M  N  o
-//    17, 0,11, 1,12,16,16, 2,13,16,16,10,16, 7,15,16,	// 96-111
-////	 p  q  R  S  T  U  V  W  x  Y  z
-//    16,16, 5, 9, 3, 3,14, 8,16, 6,16,17,17,17,17,17		// 112-127
-
-		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,	// 0-15
-		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,	// 16-31
-//                                          -
-		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,	// 32-47
-//                                                ?
-		-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,	// 48-63
-//	    A  B  C  D  e  f  G  H  i  j  K  l  M  N  o
-		-1, 0,-1, 1,-1,-1,-1, 2,-1,-1,-1,-1,-1,-1,-1,-1,    // 64-79
-//	 p  q  R  S  T  U  V  W  x  Y  z
-		-1,-1,-1,-1, 3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,	// 80-95
-//	    A  B  C  D  e  f  G  H  i  j  K  l  M  N  o
-		-1, 0,-1, 1,-1,-1,-1, 2,-1,-1,-1,-1,-1,-1,-1,-1,   	// 96-111
-//	 p  q  R  S  T  U  V  W  x  Y  z
-		-1,-1,-1,-1, 3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1		// 112-127
-};
-
-
-
 
 
 SequenceProb::SequenceProb(ModelInput const site_data,  ModelParams const model_params) {
@@ -87,10 +53,6 @@ SequenceProb::~SequenceProb() {
 }
 
 
-void SequenceProb::PrintReads(ReadData data) {
-    printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);
-
-}
 
 
 DiploidProbs SequenceProb::DiploidPopulation(int ref_allele) { //TODO: refactor out, noly need to do this 4 times
@@ -247,4 +209,14 @@ array<DiploidProbs, 4> SequenceProb::DiploidPopulationFactory(ModelParams const 
 
 int SequenceProb::GetDescendantCount() {
 	return descendant_count;
+}
+
+void SequenceProb::printReadData(ReadData read_data) {
+	printf("%d %d %d %d\n", read_data.reads[0], read_data.reads[1], read_data.reads[2], read_data.reads[3]);
+
+}
+
+void SequenceProb::PrintReads(ReadData data) {
+	printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);
+
 }

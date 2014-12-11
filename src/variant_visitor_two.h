@@ -21,6 +21,8 @@
 using namespace BamTools;
 
 extern int global_count;
+extern int global_count2;
+extern int global_count3;
 
 class VariantVisitorTwo : public PileupVisitor{
 

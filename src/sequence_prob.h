@@ -36,7 +36,7 @@ extern Eigen::IOFormat nice_row;
 class SequenceProb {
 public:
     static array<DiploidProbs, 4> DiploidPopulationFactory(ModelParams const model_params);
-
+    static void printReadData(ReadData read_data);
 
     SequenceProb(ModelInput const site_data, ModelParams const model_params);
     ~SequenceProb();

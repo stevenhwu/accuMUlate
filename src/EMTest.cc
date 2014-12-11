@@ -74,8 +74,30 @@ void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
 //    site_count = 5000;
     for (size_t i = 0; i < site_count; ++i) {
         sp.push_back(SequenceProb(base_counts[ i], params));
+
+        cout << base_counts[i].reference << endl;
+//        SequenceProb::printReadData(base_counts[i].all_reads[0]) ;
+//        SequenceProb::printReadData(base_counts[i].all_reads[1]) ;
+//        SequenceProb::printReadData(base_counts[i].all_reads[2]) ;
+//        SequenceProb::printReadData(base_counts[i].all_reads[3]) ;
+
+        for (int j = 0; j < base_counts[i].all_reads.size(); ++j) {
+
+//            base_counts[i].all_reads[3]
+            auto reads = base_counts[i].all_reads[j].reads;
+            uint16_t max = *std::max_element(reads, reads + 4);
+            cout << max << "\t==" ;
+                    SequenceProb::printReadData(base_counts[i].all_reads[j]) ;
+            cout << base_counts[i].all_reads[j].reads[0] << "\t";
+            cout << base_counts[i].all_reads[j].reads[1] << "\t";
+            cout << base_counts[i].all_reads[j].reads[2] << "\t";
+            cout << base_counts[i].all_reads[j].reads[3] << "\t";
+            cout << endl;
+        }
+        cout << "================================="<< endl;
     }
     cout << "================Done: SequenceProb. Total: " << site_count << endl;
+    exit(14);
 //    const size_t cat = 2;
 //
 //
@@ -248,9 +270,9 @@ int main(int argc, char** argv){
 //    };
     GenomeData base_counts;
 //    TestV1(ref_file, vm);
-    
-    TestV2(ref_file, vm, base_counts);
-    TestV2(ref_file, vm, base_counts);TestV2(ref_file, vm, base_counts);TestV2(ref_file, vm, base_counts);TestV2(ref_file, vm, base_counts);
+    cout << base_counts.size() << endl;
+    TestV1(ref_file, vm, base_counts);
+//    TestV2(ref_file, vm, base_counts);TestV2(ref_file, vm, base_counts);TestV2(ref_file, vm, base_counts);TestV2(ref_file, vm, base_counts);
 //    exit(13);
 
 //    exit(14);
@@ -327,6 +349,8 @@ void TestV1(string &ref_file, boost::program_options::variables_map &vm, GenomeD
     else {
 //        cout << "Use index file\n" << endl;
         reference_genome.Open(ref_file, ref_file + ".fai");
+        reference_genome.Open(ref_file);
+
     }
     PileupEngine pileup;
     BamAlignment ali;
@@ -348,7 +372,7 @@ void TestV1(string &ref_file, boost::program_options::variables_map &vm, GenomeD
         });
     }
     base_counts.clear();
-    base_counts.reserve(total_len);
+//    base_counts.reserve(total_len);
 
     SampleMap samples;
     uint16_t sindex = 0;
@@ -409,10 +433,11 @@ void TestV1(string &ref_file, boost::program_options::variables_map &vm, GenomeD
         clock_t start = clock();
         t=start;
         global_count = 0;
+
         while( experiment.GetNextAlignment(ali)){           // Fast, 0.2s
             pileup.AddAlignment(ali);                     // AddAlignment ~2s, visitor ~3s
             ali_counter += 1;
-            if (ali_counter % 50000 == 0){
+            if (ali_counter % 1 == 0){
 //                time_temp = clock() ;
 //                t = time_temp - t;
 //                cout << "Processed 1 million reads ("
@@ -428,6 +453,9 @@ void TestV1(string &ref_file, boost::program_options::variables_map &vm, GenomeD
         printf("Total time V1: %f Count:%lu G_count:%d Base_count:%lu\n", ((double) (clock()-start)/ CLOCKS_PER_SEC),
                 ali_counter, global_count, base_counts.size());
 
+        cout << "G: " << global_count << endl;
+        cout << "G2: " << global_count2 << endl;
+        cout << "G3: " << global_count3 << endl;
 
 /*
         Let's work with 50k count for now, 4.5~5s   6788 base_count, 2s overhead
@@ -553,14 +581,14 @@ void TestV2(string &ref_file, boost::program_options::variables_map &vm, GenomeD
         while( experiment.GetNextAlignment(ali)){           // Fast, 0.2s
             pileup.AddAlignment(ali);                     // AddAlignment ~2s + visitor ~3s
             ali_counter += 1;
-            if (ali_counter % 50000 == 0){
+            if (ali_counter % 1000 == 0){
 //                time_temp = clock() ;
 //                t = time_temp - t;
 //                cout << "Processed 1 million reads ("
 //                        << ((float)t)/CLOCKS_PER_SEC
 //                        << " seconds)" << endl;
 //                t = time_temp;
-//                break;
+                break;
             }
 
         }
@@ -576,6 +604,7 @@ void TestV2(string &ref_file, boost::program_options::variables_map &vm, GenomeD
         // 10s for 194927 count without visitor
         update: 50k ~ 3.3~4s
         Full 194927 ali_count: 15-18s
+        Full EM: ~130s
 
 */
 

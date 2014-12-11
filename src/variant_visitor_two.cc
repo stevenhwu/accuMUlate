@@ -10,6 +10,8 @@
 
 
 int global_count = 0 ;
+int global_count2 = 0 ;
+int global_count3 = 0 ;
 
 
 void VariantVisitorTwo::Visit(const PileupPosition &pileupData)
