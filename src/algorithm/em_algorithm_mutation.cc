@@ -17,7 +17,7 @@ EmAlgorithmMutation::EmAlgorithmMutation(int num_category0,
         em_model.emplace_back(new EmModelMutation(m));
     }
 
-    em_count = 50;
+    em_count = 1000;
 
     Init();
 
@@ -157,7 +157,7 @@ em_stat_local_single->print();
 
 
 //        oldMStep();
-        isConverged = EmStoppingCriteria();
+        isConverged = EmStoppingCriteria(i);
         i++;
     }
 
@@ -176,7 +176,7 @@ void EmAlgorithmMutation::Run2() {
 
 
 void EmAlgorithmMutation::InitialiseParameters() {
-    double lower_bound = 1e-50;
+    double lower_bound = 1e-20;
     double upper_bound = 1e-1;
 
     if (num_category == 2) {

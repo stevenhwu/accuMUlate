@@ -253,7 +253,7 @@ vector<double> EmAlgorithm::GetProportion() {
     return proportion;
 }
 
-bool EmAlgorithm::EmStoppingCriteria() {
+bool EmAlgorithm::EmStoppingCriteria(int ite) {
 
 
     double sum_diff = 0;
@@ -263,19 +263,22 @@ bool EmAlgorithm::EmStoppingCriteria() {
         cache_parameters[r] = parameters[r];
 
     }
-    if(sum_diff < EM_CONVERGE_THRESHOLD){
+    if (sum_diff < EM_CONVERGE_THRESHOLD) {
         return false;
+    }
+    if (ite % 10 == 0) {
+        cout << "Ite: " << ite << " sum_diff: " << sum_diff << endl;
     }
     return true;
 }
 
 void EmAlgorithm::PrintSummary(){
-    printf("\n========================\nEM Summary\n");
+    printf("\n========================\nEM Summary\nParameters: ");
      for (auto item :parameters) {
         printf("%f\t", item);
     }
 
-    printf("\n");
+    printf("\nProportions: ");
     for (auto item :proportion) {
         printf("%f\t", item);
     }

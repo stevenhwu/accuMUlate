@@ -3,11 +3,15 @@
 #include <map>
 #include <vector>
 
+#include <google/profiler.h>
+
 #include <boost/program_options.hpp>
 #include <time.h>
 #include <algorithm/em_model_binomial.h>
 #include <algorithm/em_data_binomial.h>
 #include <algorithm/em_algorithm_binomial.h>
+#include <stdint.h>
+//#include <sys/socket.h>
 
 
 #include "api/BamReader.h"
@@ -18,12 +22,14 @@
 #include "parsers.h"
 #include "sequence_prob.h"
 #include "VariantVisitor.h"
+#include "variant_visitor_two.h"
 #include "evolution_models/JC69.h"
 #include "evolution_models/F81.h"
 #include "site_prob.h"
 #include "algorithm/em_algorithm_mutation.h"
 #include "algorithm/em_data_mutation.h"
 
+#include <sys/stat.h>
 using namespace std;
 using namespace BamTools;
 
@@ -36,6 +42,155 @@ void testCalLikelihood(MutationProb muProb, std::vector<SequenceProb> sp);
 void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp);
 
 
+void TestV1(string &ref_file, boost::program_options::variables_map &vm, GenomeData &base_counts);
+void TestV2(string &ref_file, boost::program_options::variables_map &vm, GenomeData &base_counts);
+
+bool file_exists_test3 (const std::string& name) {
+    struct stat buffer;
+    return (stat (name.c_str(), &buffer) == 0);
+}
+bool file_exists_test1(const std::string& name)
+{
+  ifstream ifile(name.c_str());
+  return ifile;
+}
+
+inline bool exists_test0 (const std::string& name) {
+    ifstream f(name.c_str());
+    if (f.good()) {
+        f.close();
+        return true;
+    } else {
+        f.close();
+        return false;
+    }
+}
+
+void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
+    cout << "init" << endl;
+    size_t site_count = base_counts.size();
+    MutationProb mutation_prob = MutationProb(params);
+    std::vector<SequenceProb> sp;
+//    site_count = 5000;
+    for (size_t i = 0; i < site_count; ++i) {
+        sp.push_back(SequenceProb(base_counts[ i], params));
+    }
+    cout << "================Done: SequenceProb. Total: " << site_count << endl;
+//    const size_t cat = 2;
+//
+//
+//    double muArray[cat];
+//    muArray[0] = 1e-10;
+//    muArray[1] = 1;
+//
+//    double proportion[cat] {0.5,0.5};
+//    double all_stats_same[cat];
+//    double all_stats_diff[cat];
+
+//    double weight[2];
+
+
+    F81 evo_model0(mutation_prob);
+
+//    exit(-10);
+//    F81 model(mutation_prob);
+//    JC69 m69(mutation_prob);
+//    MutationMatrix conditional_prob = model.GetTransitionMatirxAToD();
+//    const int c_site_count = 100;
+//    size_t site_count = c_site_count;
+    std::vector<SiteProb> site_prob;
+    std::vector<EmData*> em_site_prob;
+
+    std::vector<std::unique_ptr<EmData>> em_site_data;
+//    stuff.reserve(site_count);
+//    for( int i = 0; i < 10; ++i )
+    cout << "======================== Setup EmData:" << endl;
+
+    for (size_t s = 0; s < site_count; ++s) {
+//        SiteProb site  (sp[s],mutation_prob, model );
+        SiteProb site  (sp[s], evo_model0 );
+        site_prob.push_back(site);
+
+//        std::unique_ptr<EmData> e ( new EmDataMutation(sp[s], model) );
+//        unique_ptr<EmData> e = std::unique_ptr<EmData>  ( );
+        em_site_data.emplace_back(  new EmDataMutation(sp[s], evo_model0)  );
+//        EmDataMutation em_site = EmDataMutation(sp[s], model);
+////        EmData *p = &em_site;
+//        em_site_prob.push_back(em_site);
+
+    }
+
+
+    cout << "========= Add diff data" << endl;
+    std::random_device rd;
+    std::mt19937 e2(rd());
+    std::uniform_int_distribution<int> uniform_dist(5, 10);
+    int total_sample_count = 11;
+    for (size_t s = 0; s < 1000; ++s) {
+
+        ReadDataVector bcalls(total_sample_count, ReadData{{0, 0, 0, 0}});
+//        ModelInput base_custom = base_counts[s];
+//        base_custom.reference = 0;
+        for (int i = 0; i < total_sample_count; ++i) {
+            bcalls[i].key=0;
+            for (int j = 0; j < 4; ++j) {
+                bcalls[i].reads[j] = (uint16_t) uniform_dist(e2);
+            }
+            bcalls[i].reads[0] = (uint16_t) 100 + uniform_dist(e2);
+        }
+//        int i=0;
+        if(s > 0){ //diff
+            bcalls[0].reads[0] = (uint16_t) uniform_dist(e2);
+            bcalls[0].reads[3] = (uint16_t) 100 + uniform_dist(e2);
+            bcalls[1].reads[2] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[2].reads[3] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[3].reads[0] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[4].reads[1] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[5].reads[2] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[6].reads[3] = (uint16_t) 100 + uniform_dist(e2);
+//            base_custom.all_reads[0].reads[2] = (uint16_t) 100 + uniform_dist(e2);
+//            sp[s] = SequenceProb(base_custom, params);
+        }
+
+        SequenceProb sp1 = SequenceProb( ModelInput{0, bcalls} , params);
+//        em_site_data.emplace_back(  new EmDataMutation(sp1, evo_model0)  );
+    }
+
+
+    cout << "\n========================\nStart em_algorithm:" << endl;
+    
+    
+
+//    exit(100);
+//    F81 evo_model0(mutation_prob);
+//    F81 evo_model1(mutation_prob);
+//    F81 evo_model1 = evo_model0;
+    EmModelMutation em_model0 (evo_model0);
+//    EmModelMutation em_model1 (em_model0);
+//    EmModelMutation em_model1 (evo_model1);
+
+//    em_model0.GetParameterInfo();
+//    em_model1.GetParameterInfo();
+
+//    em_model1.UpdateParameter(0.1);
+//    em_model0.UpdateParameter(0.01);
+//    std::vector<std::unique_ptr<EmModel>> em_model;
+//    em_model.emplace_back(new EmModelMutation(evo_model0));
+//    em_model.emplace_back(new EmModelMutation(em_model0));
+
+
+
+//    EmAlgorithmMutation em_alg (2, site_prob, model, em_site_data, em_model0);
+    EmAlgorithmMutation em_alg2 (2, em_site_data, em_model0);
+    em_alg2.Run();
+
+    em_alg2.PrintSummary();
+//    EmAlgorithmMutation em_alg3 (em_site_data, em_model);
+//    em_alg3.Run2();
+
+//
+
+}
 
 int main(int argc, char** argv){
 
@@ -91,6 +246,61 @@ int main(int argc, char** argv){
 //        vm["phi-haploid"].as<double>(),
 //        vm["phi-diploid"].as<double>(),
 //    };
+    GenomeData base_counts;
+//    TestV1(ref_file, vm);
+    
+    TestV2(ref_file, vm, base_counts);
+    TestV2(ref_file, vm, base_counts);TestV2(ref_file, vm, base_counts);TestV2(ref_file, vm, base_counts);TestV2(ref_file, vm, base_counts);
+//    exit(13);
+
+//    exit(14);
+
+
+//    TestV1(ref_file, vm, base_counts);
+//    TestV2(ref_file, vm, base_counts);
+//    TestV2(ref_file, vm, base_counts);
+//    TestV1(ref_file, vm, base_counts);
+//
+//    TestV1(ref_file, vm, base_counts);
+//    TestV2(ref_file, vm, base_counts);
+//    TestV2(ref_file, vm, base_counts);
+//    TestV1(ref_file, vm, base_counts);
+//
+//    TestV1(ref_file, vm, base_counts);
+//    TestV2(ref_file, vm, base_counts);
+//    TestV2(ref_file, vm, base_counts);
+//    TestV1(ref_file, vm, base_counts);
+
+
+
+
+//    delete  v;
+//    delete v2;
+
+    ModelParams params = {
+        vm["theta"].as<double>(),
+        vm["nfreqs"].as<vector< double> >(),
+        vm["mu"].as<double>(),
+        vm["seq-error"].as<double>(),
+        vm["phi-haploid"].as<double>(),
+        vm["phi-diploid"].as<double>(),
+    };
+//    RunBasicProbCalc(base_counts, params);
+
+
+
+
+
+    clock_t start = clock();
+
+    RunEmWithRealData(base_counts, params);
+
+    printf("Total EM Time: %f \n", ((double) (clock()-start)/ CLOCKS_PER_SEC) );
+
+
+}
+
+void TestV1(string &ref_file, boost::program_options::variables_map &vm, GenomeData &base_counts) {
     string bam_path = vm["bam"].as<string>();
     string index_path = vm["bam-index"].as<string>();
     if(index_path == ""){
@@ -105,8 +315,19 @@ int main(int argc, char** argv){
     RefVector references = experiment.GetReferenceData();
     SamHeader header = experiment.GetHeader();
     Fasta reference_genome; // BamTools::Fasef_file);
-    reference_genome.Open(ref_file, ref_file+ ".fai");
+//    reference_genome.Open(ref_file, ref_file+ ".fai");
+//    reference_genome.Open(ref_file, ref_file);
 //    reference_genome.CreateIndex(ref_file + ".fai");
+    if(!file_exists_test1( ref_file+ ".fai")  ){
+        cout << "Creating index *.fai" ;
+        reference_genome.Open(ref_file);
+        reference_genome.CreateIndex(ref_file + ".fai");
+        cout << " ..... Done" << endl;
+    }
+    else {
+//        cout << "Use index file\n" << endl;
+        reference_genome.Open(ref_file, ref_file + ".fai");
+    }
     PileupEngine pileup;
     BamAlignment ali;
 
@@ -126,7 +347,7 @@ int main(int argc, char** argv){
             total_len += chrom.RefLength;
         });
     }
-    GenomeData base_counts;
+    base_counts.clear();
     base_counts.reserve(total_len);
 
     SampleMap samples;
@@ -140,7 +361,6 @@ int main(int argc, char** argv){
             }
         }
     }
-
     VariantVisitor *v = new VariantVisitor(
             references,
             header,
@@ -155,6 +375,9 @@ int main(int argc, char** argv){
             vm["prob"].as<double>()
     );
     pileup.AddVisitor(v);
+
+
+
 //  TODO: Only allocate interval-sized memory vector
 //  if intervals are set
     if (vm.count("intervals")){
@@ -170,11 +393,12 @@ int main(int argc, char** argv){
     }
     else{
         clock_t t;
+        clock_t time_temp;
+
         uint64_t ali_counter = 0;
-        t = clock();
         BamAlignment ali;
 
-        std::cerr.setstate(std::ios::failbit) ;
+        cerr.setstate(ios_base::failbit) ; //Supress bamtool camplain, "Pileup::Run() : Data not sorted correctly!"
 //        streambuf *old = cout.rdbuf(); // <-- save
 //        stringstream ss;
 //
@@ -182,32 +406,184 @@ int main(int argc, char** argv){
 //        foobar();                      // <-- call
 //        cout.rdbuf (old);
 
-        while( experiment.GetNextAlignment(ali)){
-            pileup.AddAlignment(ali);
+        clock_t start = clock();
+        t=start;
+        global_count = 0;
+        while( experiment.GetNextAlignment(ali)){           // Fast, 0.2s
+            pileup.AddAlignment(ali);                     // AddAlignment ~2s, visitor ~3s
             ali_counter += 1;
-            if (ali_counter % 1000000 == 0){
-                t = clock() - t;
-                cout << "Processed 1 million reads ("
-                        << ((float)t)/CLOCKS_PER_SEC
-                        << " seconds)" << endl;
+            if (ali_counter % 50000 == 0){
+//                time_temp = clock() ;
+//                t = time_temp - t;
+//                cout << "Processed 1 million reads ("
+//                        << ((float)t)/CLOCKS_PER_SEC
+//                        << " seconds)" << endl;
+//                t = time_temp;
+                break;
+            }
+
+        }
+        pileup.Flush();
+
+        printf("Total time V1: %f Count:%lu G_count:%d Base_count:%lu\n", ((double) (clock()-start)/ CLOCKS_PER_SEC),
+                ali_counter, global_count, base_counts.size());
+
+
+/*
+        Let's work with 50k count for now, 4.5~5s   6788 base_count, 2s overhead
+        //Init test: ~1 to 1.5s per 10k. ~25s for 30.7k base_count, 194927 ali_count
+        // 10s for 194927 count without visitor
+*/
+
+        cerr.clear() ;
+    }
+    reference_genome.Close();
+}
+
+
+void TestV2(string &ref_file, boost::program_options::variables_map &vm, GenomeData &base_counts) {
+    string bam_path = vm["bam"].as<string>();
+    string index_path = vm["bam-index"].as<string>();
+    if(index_path == ""){
+        index_path = bam_path + ".bai";
+    }
+
+//    ofstream result_stream (vm["out"].as<string>());
+    //TODO: check sucsess of all these opens/reads:
+    BamReader experiment;
+    experiment.Open(bam_path);
+    experiment.OpenIndex(index_path);
+    RefVector references = experiment.GetReferenceData();
+    SamHeader header = experiment.GetHeader();
+
+    Fasta reference_genome; // BamTools::Fasef_file);
+    if(!file_exists_test1( ref_file+ ".fai")  ){
+        cout << "Creating index *.fai" ;
+        reference_genome.Open(ref_file);
+        reference_genome.CreateIndex(ref_file + ".fai");
+        cout << " ..... Done" << endl;
+    }
+    else {
+//        cout << "Use index file\n" << endl;
+        reference_genome.Open(ref_file, ref_file + ".fai");
+    }
+//    reference_genome.Open(ref_file, ref_file);
+
+    PileupEngine pileup;
+    BamAlignment ali;
+
+
+//  Assign some memory for the big list
+    uint32_t total_len = 0;
+    if (vm.count("intervals")){
+        BedFile bed (vm["intervals"].as<string>());
+        BedInterval region;
+        while(bed.get_interval(region) == 0){
+            total_len += (region.end - region.start);
+        }
+    }
+    else {
+
+        for_each(references.begin(),references.end(),[&](RefData chrom){
+            total_len += chrom.RefLength;
+        });
+    }
+    base_counts.clear();
+    base_counts.reserve(total_len);
+
+    SampleMap samples;
+    uint16_t sindex = 0;
+    for(auto it = header.ReadGroups.Begin(); it!= header.ReadGroups.End(); it++){
+        if(it->HasSample()){
+            auto s  = samples.find(it->Sample);
+            if( s == samples.end()){ // not in there yet
+                samples[it->Sample] = sindex;
+                sindex += 1;
             }
         }
-        std::cerr.clear() ;
     }
-    pileup.Flush();
-    cout << "Base_count: " << base_counts.size() << endl;
+    VariantVisitorTwo *v = new VariantVisitorTwo(
+            references,
+            header,
+            reference_genome,
+            base_counts,
+//            &result_stream,
+//            samples,
+//            params,
+//            ali,
+            vm["qual"].as<int>(),
+            vm["mapping-qual"].as<int>(),
+            vm["prob"].as<double>()
+    );
+    pileup.AddVisitor(v);
 
-    ModelParams params = {
-        vm["theta"].as<double>(),
-        vm["nfreqs"].as<vector< double> >(),
-        vm["mu"].as<double>(),
-        vm["seq-error"].as<double>(),
-        vm["phi-haploid"].as<double>(),
-        vm["phi-diploid"].as<double>(),
-    };
-    RunBasicProbCalc(base_counts, params);
 
+
+//  TODO: Only allocate interval-sized memory vector
+//  if intervals are set
+    if (vm.count("intervals")){
+        BedFile bed (vm["intervals"].as<string>());
+        BedInterval region;
+        while(bed.get_interval(region) == 0){
+            int ref_id = experiment.GetReferenceID(region.chr);
+            experiment.SetRegion(ref_id, region.start, ref_id, region.end);
+            while( experiment.GetNextAlignment(ali) ){
+                pileup.AddAlignment(ali);
+            }
+        }
+    }
+    else{
+        clock_t t;
+        clock_t time_temp;
+
+        uint64_t ali_counter = 0;
+        BamAlignment ali;
+
+        cerr.setstate(ios_base::failbit) ; //Supress bamtool camplain, "Pileup::Run() : Data not sorted correctly!"
+//        streambuf *old = cout.rdbuf(); // <-- save
+//        stringstream ss;
+//
+//        cout.rdbuf (ss.rdbuf());       // <-- redirect
+//        foobar();                      // <-- call
+//        cout.rdbuf (old);
+
+        clock_t start = clock();
+        t=start;
+        global_count = 0;
+        while( experiment.GetNextAlignment(ali)){           // Fast, 0.2s
+            pileup.AddAlignment(ali);                     // AddAlignment ~2s + visitor ~3s
+            ali_counter += 1;
+            if (ali_counter % 50000 == 0){
+//                time_temp = clock() ;
+//                t = time_temp - t;
+//                cout << "Processed 1 million reads ("
+//                        << ((float)t)/CLOCKS_PER_SEC
+//                        << " seconds)" << endl;
+//                t = time_temp;
+//                break;
+            }
+
+        }
+        pileup.Flush();
+
+        printf("Total time V2: %f Count:%lu G_count:%d Base_count:%lu\n", ((double) (clock()-start)/ CLOCKS_PER_SEC),
+                ali_counter, global_count, base_counts.size());
+
+
+/*
+        Let's work with 50k count for now, 4.5~5s   6788 base_count, 2s overhead
+        //Init test: ~1 to 1.5s per 10k. ~25s for 30.7k base_count, 194927 ali_count
+        // 10s for 194927 count without visitor
+        update: 50k ~ 3.3~4s
+        Full 194927 ali_count: 15-18s
+
+*/
+
+        cerr.clear() ;
+    }
+    reference_genome.Close();
 }
+
 
 int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     cout << "init" << endl;

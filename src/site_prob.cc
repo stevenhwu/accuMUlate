@@ -118,6 +118,7 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
         CalculateAllDescendantGivenAncestor(a, prod_prob_ancestor, summary_stat_same_ancestor, summary_stat_diff_ancestor);
 
         double prob_reads_given_a = ancestor_genotypes[index16] * ancestor_prior[index10] *  prod_prob_ancestor;
+            //TODO: IF need speed, cache this
 //            prob_reads_given_a = log(ancestor_genotypes(index16)) + log( ancestor_prior[index10]) + prod_prob_ancestor[a];
         prob_reads += prob_reads_given_a;
 
@@ -160,7 +161,7 @@ void SiteProb::CalculateAllDescendantGivenAncestor(int a, double &product_prob_g
     summary_stat_diff_ancestor = 0;
     summary_stat_same_ancestor = 0;
 //    descendant_count = 1; // FIXME:
-    for (int d = 0; d < descendant_count; ++d) {
+    for (int d = 0; d < descendant_count; ++d) {//TODO: Check descendant info, merge some of them together
         double summary_stat_same = 0;
         double summary_stat_diff = 0;
         double sum_over_probs = 0;
@@ -207,6 +208,7 @@ void SiteProb::CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs
 
         summary_stat_same += prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
         summary_stat_diff += prob_reads_given_descent[b] * mutation_rate.prob * frequency_prior[b];
+        //TODO: Cache these as lookup as well
 //
 //        summary_stat_same += prob * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[a][b];
 //        summary_stat_diff += prob * mutation_rate.mu * frequency_prior[b];

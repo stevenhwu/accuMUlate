@@ -7,6 +7,7 @@ SET(SOURCE_FILES ${SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantVisitor.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/variant_visitor_two.cc
 
     ${CMAKE_CURRENT_SOURCE_DIR}/lookup.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/mutation_prob.cc
@@ -21,6 +22,7 @@ SET(SOURCE_FILES_accuMUlate ${SOURCE_FILES_accuMUlate}
     ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantVisitor.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/variant_visitor_two.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/lookup.cc
     )
 
@@ -41,7 +43,7 @@ target_link_libraries(accuMUlate ${LIBS} )
 
 add_executable(EMTest EMTest.cc ${SOURCE_FILES})
 target_link_libraries(EMTest ${LIBS} )
-
+target_link_libraries(EMTest profiler)
 #target_link_libraries(accuMUlate distributions)
 #target_link_libraries(accuMUlate bamtools bamtools-utils ${LIBS} distributions)
 

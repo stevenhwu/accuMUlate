@@ -95,7 +95,7 @@ protected:
 
     virtual void ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, vector<double> &temp_stat);
 
-    bool EmStoppingCriteria();
+    bool EmStoppingCriteria(int ite);
 
     std::vector<double> cache_parameters;
 

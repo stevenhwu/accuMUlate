@@ -14,7 +14,8 @@ IF(NOT CMAKE_BUILD_TYPE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
 
-set(CMAKE_CXX_FLAGS  "-std=c++11 -g -Wall")
+set(CMAKE_CXX_FLAGS  "-std=c++11 -Wall")
+set(CMAKE_CXX_FLAGS_RelWithDebInfo "-std=c++11 -O3 -Wall")
 set(CMAKE_CXX_FLAGS_DEBUG  "-std=c++11 -g -O0 -Wvla -Wall  -Wextra -pedantic ")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} "-std=c++11 -g -Wvla -Wall  -Wextra -pedantic -Wno-unused-private-field -Wno-unused-variable")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wextra -Waggregate-return -Wcast-align") #-pedantic-errors
@@ -95,7 +96,8 @@ ENDIF(ZLIB_FOUND)
 set(LIBS ${LIBS} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${Bamtools_LIBRARIES})
 set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src ${Boost_INCLUDE_DIR} ${Bamtools_INCLUDE_DIR}  ${EIGEN3_INCLUDE_DIR})
 
-
+include_directories("/usr/include/")
+include_directories("/usr/include/google")
 include_directories("${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
 include_directories(${INCLUDE_DIR})
 

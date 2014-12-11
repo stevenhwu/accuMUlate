@@ -1,4 +1,5 @@
 #include "VariantVisitor.h"
+#include "variant_visitor_two.h"
 
 
 void VariantVisitor::Visit(const PileupPosition &pileupData) {
@@ -7,15 +8,14 @@ void VariantVisitor::Visit(const PileupPosition &pileupData) {
     m_idx_ref.GetBase(pileupData.RefId, pos, current_base);
     ReadDataVector bcalls(m_samples.size(), ReadData{{0, 0, 0, 0}});
     string tag_id;
-    for (auto it = begin(pileupData.PileupAlignments);
-         it != end(pileupData.PileupAlignments);
-         ++it) {
+    for (auto it = begin(pileupData.PileupAlignments); it != end(pileupData.PileupAlignments); ++it) {
         if (include_site(*it, m_mapping_cut, m_qual_cut)) {
             it->Alignment.GetTag("RG", tag_id);
             string sm = m_header.ReadGroups[tag_id].Sample;
             uint32_t sindex = m_samples[sm]; //TODO check samples existed!
             uint16_t bindex = base_index(it->Alignment.QueryBases[it->PositionInAlignment]);
             if (bindex < 4) {
+                global_count++;
                 bcalls[sindex].reads[bindex] += 1;
             }
         }

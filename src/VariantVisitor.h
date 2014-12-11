@@ -29,9 +29,9 @@ public:
             m_all_the_data(all_the_data), m_prob_cut(prob_cut),
             m_mapping_cut(mapping_cut)
     { }
-    ~VariantVisitor(void) { }
+    virtual ~VariantVisitor(void) { }
 public:
-    void Visit(const PileupPosition& pileupData);
+    virtual void Visit(const PileupPosition& pileupData);
 private:
     Fasta m_idx_ref;
     RefVector m_bam_ref;

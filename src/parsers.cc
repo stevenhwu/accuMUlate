@@ -114,6 +114,57 @@ bool include_site(PileupAlignment pileup, uint16_t map_cut, uint16_t qual_cut){
 }
 
 
+bool include_site_2(const PileupAlignment & pileup, uint16_t map_cut, uint16_t qual_cut){
+    const BamAlignment *ali = &(pileup.Alignment);
+    if(ali->MapQuality > map_cut){
+        uint16_t bqual = static_cast<short>(ali->Qualities[pileup.PositionInAlignment]) - 33;
+        if(bqual > qual_cut){
+            return(not (ali->IsDuplicate()) && not(ali->IsFailedQC()) && ali->IsPrimaryAlignment());
+        }
+    }
+
+    return false;
+}
+
+
+
+bool include_site_3(const PileupAlignment & pileup, uint16_t map_cut, char qual_cut){
+//    const BamAlignment *ali = &(pileup.Alignment);
+    if(pileup.Alignment.MapQuality > map_cut){
+        char reference = pileup.Alignment.Qualities[pileup.PositionInAlignment];
+
+//        uint16_t bqual = static_cast<short>(ali->Qualities[pileup.PositionInAlignment]) - 33;
+//
+//        char rc = (char)(qual_cut+33);
+//        if(  (bqual > qual_cut) != (reference > rc)    ){
+//            cout << reference << "\t" <<
+//                    (static_cast<short>(ali->Qualities[pileup.PositionInAlignment]) - 33) << "\t" << qual_cut << "\t" <<
+//                    ((char)(qual_cut+33)) <<  (bqual > qual_cut) << "\t" <<  (reference > rc) << endl;
+//        }
+        if(reference > qual_cut){
+            return(not (pileup.Alignment.IsDuplicate()) && not(pileup.Alignment.IsFailedQC()) && pileup.Alignment.IsPrimaryAlignment());
+        }
+    }
+
+    return false;
+}
+
+
+bool include_site_4(const BamAlignment & alignment, const int &pos, const uint16_t &map_cut, const char &qual_cut){
+//    const BamAlignment *ali = &(pileup.Alignment);
+    if(alignment.MapQuality > map_cut){
+        char reference = alignment.Qualities[pos];
+
+        if(reference > qual_cut){
+            return(not (alignment.IsDuplicate()) && not(alignment.IsFailedQC()) && alignment.IsPrimaryAlignment());
+        }
+    }
+
+    return false;
+}
+
+
+
 
 
 
