@@ -266,7 +266,7 @@ void GenomeDataStream::ReadGenomeData(std::vector<ModelInput> &data) {
     data.clear();
     data.reserve(site_count);
 
-    for (int l = 0; l < site_count; ++l) {
+    for (size_t i = 0; i < site_count; ++i) {
         ModelInput m(read_data_count);
         ReadModelInput(m);
         data.push_back(m);
@@ -281,9 +281,9 @@ void GenomeDataStream::ReadModelInput(ModelInput &model_input) {
 
     model_input.reference = ref;
 
-    for (int k = 0; k < read_data_count; ++k) {
+    for (size_t i = 0; i < read_data_count; ++i) {
         ReadReadDataKey(key);
-        model_input.all_reads[k].key = key;
+        model_input.all_reads[i].key = key;
     }
 
 }

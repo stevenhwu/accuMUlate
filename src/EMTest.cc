@@ -31,6 +31,7 @@
 #include "genome_data_stream.h"
 
 #include "boost_input_utils.h"
+#include "pileup_utils.h"
 
 using namespace std;
 using namespace BamTools;
@@ -39,13 +40,8 @@ using namespace BamTools;
 namespace po = boost::program_options;
 int RunBasicProbCalc(GenomeData base_counts, ModelParams params);
 
-void testCalLikelihood(MutationProb muProb, std::vector<SequenceProb> sp);
-
 void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp);
 
-
-void TestVariantVisitorV1(boost::program_options::variables_map &vm, GenomeData &genome_data);
-void TestVariantVisitorTwo(boost::program_options::variables_map &vm, GenomeData &genome_data);
 
 void SummariseReadsData(GenomeData base_counts) {
     size_t site_count = base_counts.size();
@@ -98,50 +94,6 @@ void SummariseReadsData(GenomeData base_counts) {
 ======= Site: 9473 R: 3	==114 117 0.974359
 
     */
-
-}
-void WriteGenomeDataToBinary(std::string file_name, GenomeData &base_counts) {
-
-    GenomeDataStream gd_stream = GenomeDataStream(file_name, true);
-//    uint64_t total_base_count = base_counts.size();
-    uint64_t sequence_count = base_counts[0].all_reads.size();
-
-    gd_stream.WriteHeader(sequence_count);
-
-    for (auto baseCount : base_counts) {
-        gd_stream.WriteModelInput(baseCount);
-    }
-    gd_stream.close();
-}
-
-void ReadGenomeDataFromBinary(std::string file_name, GenomeData &genome_data) {
-
-    GenomeDataStream gd_stream_read = GenomeDataStream( file_name, false);
-
-    uint64_t total_base_count2 = 0;
-    uint64_t sequence_count2 = 0;
-    gd_stream_read.ReadHeader(total_base_count2, sequence_count2);
-    cout << total_base_count2 << "\t" << sequence_count2 << endl;
-
-    gd_stream_read.ReadGenomeData(genome_data);
-
-
-//    int count = 0;
-//    for (auto baseCount : base_counts) {
-////        cout << baseCount.reference << " : ";
-//        for (auto item : baseCount.all_reads) {
-////            cout << item.key << " : ";
-////            SequenceProb::printReadData(item);
-//        }
-////        cout << "\n";
-//        count++;
-////        if(count == 2){
-//////            break;
-////        }
-//    }
-
-    cout << "========= conut: " << genome_data.size() << endl;
-    gd_stream_read.close();
 
 }
 
@@ -257,19 +209,18 @@ int main(int argc, char** argv){
 //    TestVariantVisitorV1(ref_file, vm);
 
 //    TestVariantVisitorV1(ref_file, vm, base_counts);
-    cout << "G0: " << global_count[0] << endl;
-//    cout << "G1: " << global_count[1] << endl;
-//    cout << "G2: " << global_count[2] << endl;
+    PileupUtils::CreatePileupAlignment(variable_map, genome_data, 1);
+    cout << "G0: " << global_count[0] << "\tG1: " << global_count[1] << "\tG2: " << global_count[2] << endl;
 
-    TestVariantVisitorTwo(variable_map, genome_data);
-//    cout << "G0: " << global_count[0] << endl;
-//    cout << "G1: " << global_count[1] << endl;
-//    cout << "G2: " << global_count[2] << endl;
+//    TestVariantVisitorTwo(variable_map, genome_data);
+    PileupUtils::CreatePileupAlignment(variable_map, genome_data, 2);
+    cout << "G0: " << global_count[0] << "\tG1: " << global_count[1] << "\tG2: " << global_count[2] << endl;
+
 
     clock_t start0 = clock();
     std::string file_name = "zz_test_GenomeData_binary_subset";
-    WriteGenomeDataToBinary(file_name, genome_data);
-    ReadGenomeDataFromBinary(file_name, genome_data);
+    PileupUtils::WriteGenomeDataToBinary(file_name, genome_data);
+    PileupUtils::ReadGenomeDataFromBinary(file_name, genome_data);
 
     printf("Total ReadWrite Time: %f \n", ((double) (clock()-start0)/ CLOCKS_PER_SEC) );
 //    SummariseReadsData(genome_datas);
@@ -319,211 +270,6 @@ int main(int argc, char** argv){
 
 }
 
-void TestVariantVisitorV1(boost::program_options::variables_map &vm, GenomeData &genome_data) {
-    BamReader experiment;
-    RefVector references;
-    SamHeader header;
-    Fasta reference_genome;
-
-    BoostUtils::ExtractInputVariables(vm, genome_data, experiment, references, header, reference_genome);
-
-    SampleMap samples;
-    uint16_t sindex = 0;
-    for(auto it = header.ReadGroups.Begin(); it!= header.ReadGroups.End(); it++){
-        if(it->HasSample()){
-            auto s  = samples.find(it->Sample);
-            if( s == samples.end()){ // not in there yet
-                samples[it->Sample] = sindex;
-                sindex += 1;
-            }
-        }
-    }
-    BamAlignment ali;
-
-    VariantVisitor *v = new VariantVisitor(
-            references,
-            header,
-            reference_genome,
-            genome_data,
-//            &result_stream,
-            samples,
-//            params,
-            ali,
-            vm["qual"].as<int>(),
-            vm["mapping-qual"].as<int>(),
-            vm["prob"].as<double>()
-    );
-    PileupEngine pileup;
-    pileup.AddVisitor(v);
-
-
-
-//  TODO: Only allocate interval-sized memory vector
-//  if intervals are set
-    if (vm.count("intervals")){
-        BedFile bed (vm["intervals"].as<string>());
-        BedInterval region;
-        while(bed.get_interval(region) == 0){
-            int ref_id = experiment.GetReferenceID(region.chr);
-            experiment.SetRegion(ref_id, region.start, ref_id, region.end);
-            while( experiment.GetNextAlignment(ali) ){
-                pileup.AddAlignment(ali);
-            }
-        }
-    }
-    else{
-        clock_t t;
-        clock_t time_temp;
-
-        uint64_t ali_counter = 0;
-
-
-        cerr.setstate(ios_base::failbit) ; //Supress bamtool camplain, "Pileup::Run() : Data not sorted correctly!"
-//        streambuf *old = cout.rdbuf(); // <-- save
-//        stringstream ss;
-//
-//        cout.rdbuf (ss.rdbuf());       // <-- redirect
-//        foobar();                      // <-- call
-//        cout.rdbuf (old);
-
-        clock_t start = clock();
-        t=start;
-        global_count[0] = 0;global_count[1] = 0;global_count[2] = 0;global_count[3] = 0;
-
-        while( experiment.GetNextAlignment(ali)){           // Fast, 0.2s
-            pileup.AddAlignment(ali);                     // AddAlignment ~2s, visitor ~3s
-            ali_counter += 1;
-            if (ali_counter % 50000 == 0){
-//                time_temp = clock() ;
-//                t = time_temp - t;
-//                cout << "Processed 1 million reads ("
-//                        << ((float)t)/CLOCKS_PER_SEC
-//                        << " seconds)" << endl;
-//                t = time_temp;
-                break;
-            }
-
-        }
-        pileup.Flush();
-
-        printf("Total time V1: %f Count:%lu G_count:%d Base_count:%lu\n", ((double) (clock()-start)/ CLOCKS_PER_SEC),
-                ali_counter, global_count[0], genome_data.size());
-
-//        cout << "G0: " << global_count[0] << endl;
-//        cout << "G1: " << global_count[1] << endl;
-//        cout << "G2: " << global_count[2] << endl;
-
-/*
-        Let's work with 50k count for now, 4.5~5s   6788 base_count, 2s overhead
-        //Init test: ~1 to 1.5s per 10k. ~25s for 30.7k base_count, 194927 ali_count
-        // 10s for 194927 count without visitor
-*/
-
-        cerr.clear() ;
-    }
-    experiment.Close();
-    reference_genome.Close();
-}
-
-
-void TestVariantVisitorTwo(boost::program_options::variables_map &vm, GenomeData &genome_data) {
-
-    BamReader experiment;
-    RefVector references;
-    SamHeader header;
-    Fasta reference_genome;
-
-    BoostUtils::ExtractInputVariables(vm, genome_data, experiment, references, header, reference_genome);
-
-    VariantVisitorTwo *v = new VariantVisitorTwo(
-            references,
-            header,
-            reference_genome,
-            genome_data,
-//            &result_stream,
-//            samples,
-//            params,
-//            ali,
-            vm["qual"].as<int>(),
-            vm["mapping-qual"].as<int>(),
-            vm["prob"].as<double>()
-    );
-    PileupEngine pileup;
-    pileup.AddVisitor(v);
-
-
-
-//  TODO: Only allocate interval-sized memory vector
-//  if intervals are set
-    BamAlignment ali;
-
-    if (vm.count("intervals")){
-        BedFile bed (vm["intervals"].as<string>());
-        BedInterval region;
-        while(bed.get_interval(region) == 0){
-            int ref_id = experiment.GetReferenceID(region.chr);
-            experiment.SetRegion(ref_id, region.start, ref_id, region.end);
-            while( experiment.GetNextAlignment(ali) ){
-                pileup.AddAlignment(ali);
-            }
-        }
-    }
-    else{
-        clock_t t;
-        clock_t time_temp;
-        uint64_t ali_counter = 0;
-
-        cerr.setstate(ios_base::failbit) ; //Supress bamtool camplain, "Pileup::Run() : Data not sorted correctly!"
-//        streambuf *old = cout.rdbuf(); // <-- save
-//        stringstream ss;
-//
-//        cout.rdbuf (ss.rdbuf());       // <-- redirect
-//        foobar();                      // <-- call
-//        cout.rdbuf (old);
-
-        clock_t start = clock();
-        t=start;
-        global_count[0] = 0;global_count[1] = 0;global_count[2] = 0;
-        cout << experiment.IsOpen() << experiment.GetReferenceCount() << endl;
-        while( experiment.GetNextAlignment(ali)){           // Fast, 0.2s
-            pileup.AddAlignment(ali);                     // AddAlignment ~2s + visitor ~3s
-            ali_counter += 1;
-            if (ali_counter % 10000 == 0){  //3800 => 67
-//                time_temp = clock() ;
-//                t = time_temp - t;
-//                cout << "Processed 1 million reads ("
-//                        << ((float)t)/CLOCKS_PER_SEC
-//                        << " seconds)" << endl;
-//                t = time_temp;
-//                break;
-            }
-
-        }
-        pileup.Flush();
-
-        printf("Total time V2: %f Count:%lu G_count:%d Base_count:%lu\n", ((double) (clock()-start)/ CLOCKS_PER_SEC),
-                ali_counter, global_count[0], genome_data.size());
-        cout.flush();
-//        cout << "G0: " << global_count[0] << endl;
-//        cout << "G1: " << global_count[1] << endl;
-//        cout << "G2: " << global_count[2] << endl;
-
-/*
-        Let's work with 50k count for now, 4.5~5s   6788 base_count, 2s overhead
-        //Init test: ~1 to 1.5s per 10k.
-        // ~25s for 30.7k base_count, 194927 ali_count
-        // 10s for 194927 count without visitor
-        update: 50k ~ 3.3~4s
-        Full 194927 ali_count: 15-18s
-        Full EM: ~130s
-
-*/
-
-        cerr.clear() ;
-    }
-    experiment.Close();
-    reference_genome.Close();
-}
 
 int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     cout << "init" << endl;
@@ -908,105 +654,4 @@ exit(4);
 }
 
 
-void RunMaProb(ModelParams params, po::variables_map vm, BamReader experiment, PileupEngine pileup, GenomeData base_counts) {
-    BamAlignment ali;
-    if (vm.count("intervals")){
-        BedFile bed (vm["intervals"].as<string>());
-        BedInterval region;
-        while(bed.get_interval(region) == 0){
-            int ref_id = experiment.GetReferenceID(region.chr);
-            experiment.SetRegion(ref_id, region.start, ref_id, region.end);
-            while( experiment.GetNextAlignment(ali) ){
-                pileup.AddAlignment(ali);
-            }
-        }
-    }
-    else {
-        cout << "here" << endl;
-
-
-        cout << base_counts.size() << endl;
-        cout << "here3" << endl;
-
-//        ModelParams params = {
-//                vm["theta"].as<double>(),
-//                vm["nfreqs"].as<vector<double> >(),
-//                vm["mu"].as<double>(),
-//                vm["seq-error"].as<double>(),
-//                vm["phi-haploid"].as<double>(),
-//                vm["phi-diploid"].as<double>(),
-//        };
-        int count = 0;
-        for (auto base : base_counts) {
-
-//		ModelInput d = {ref_base_idx, bcalls};
-//		double prob_one = TetMAProbOneMutation(params,d);
-            for (auto t : base.all_reads) {
-                cout << t.reads[0] << t.reads[1] << t.reads[2] << t.reads[3] << endl;
-            }
-            cout << "" << endl;
-//    	exit(-1);
-//            double prob = TetMAProbability(params, base);
-            double prob = 0;
-            if (prob >= 0.1) {
-                cout.precision(10);
-                cout << "=================" << endl;
-                cout << prob << "\t" << (1 - prob) << endl;
-                cout << base.reference << "\tSIZE:\t" << base.all_reads.size() << endl;
-                for (auto t : base.all_reads) {
-                    cout << t.reads[0] << t.reads[1] << t.reads[2] << t.reads[3] << endl;
-                }
-                cout << count << endl;
-                MutationProb muProb = MutationProb(params);
-                SequenceProb sp(base, params);
-//                sp.UpdateSummaryStat();
-//                double likelihood = sp.GetLikelihood();
-//                cout << likelihood << (1 - likelihood) << endl;
-
-                const int size = 20;
-                double muArray[size];
-                muArray[0] = 0.1;
-                for (int i = 1; i < size; ++i) {
-                    muArray[i] = muArray[i - 1] * 0.1;
-                }
-                for (int i = 0; i < size; ++i) {
-//                    muProb.UpdateMu(muArray[i]);
-//                    sp.UpdateMuProb(muProb);
-//                    likelihood = sp.GetLikelihood();
-//
-//                    printf("I:%d %e %e %e\n", i, muArray[i], likelihood, (1 - likelihood));
-                }
-
-
-
-//			sp.UpdateMu(1e-7);
-//			 likelihood = sp.GetLikelihood();
-//			cout << likelihood << (1-likelihood) << endl;
-//
-//			sp.UpdateMu(1e-8);
-//			 likelihood = sp.GetLikelihood();
-//			cout << likelihood << (1-likelihood) << endl;
-//
-//			sp.UpdateMu(1e-60);
-//			 likelihood = sp.GetLikelihood();
-//			cout << likelihood << (1-likelihood) << endl;
-
-
-                cout << "=================" << endl;
-////					std::cout << base.reference << base.all_reads << endl;
-////			 *m_ostream << chr << '\t'
-////						<< pos << '\t'
-////						<< current_base << '\t'
-////						<< prob << '\t'
-////						<< prob_one << '\t'
-////					   << endl;
-            }
-
-            count++;
-            if (count == 600) { //598 4195 5391 6589
-                break;
-            }
-        }
-    }
-}
 

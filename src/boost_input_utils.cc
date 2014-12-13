@@ -133,9 +133,6 @@ namespace BoostUtils {
         genome_data.reserve(total_len);
 
 
-        cout << vm["qual"].as<int>() <<
-                vm["mapping-qual"].as<int>() <<
-                vm["prob"].as<double>() << endl;
     }
 
 
