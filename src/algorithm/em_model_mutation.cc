@@ -15,7 +15,7 @@ EmModelMutation::EmModelMutation(const EmModelMutation &em_model) {
 //    evo_model = em_model.evo_model->Clone2(); //CHECK: initial test no memory leak, new without delete?
 
     MutationRate rate = evo_model->GetMutationRate();
-    cout << "Copy Constructor EmModelEvolution: "<< rate.prob << "\t" << rate.one_minus_p << endl;
+    std::cout << "Copy Constructor EmModelEvolution: "<< rate.prob << "\t" << rate.one_minus_p << std::endl;
 //FIXME: Implemente rule of three,   Copy assignment operator!!
 
 }
@@ -24,7 +24,7 @@ EmModelMutation::EmModelMutation(const EmModelMutation &em_model) {
 EmModelMutation::EmModelMutation(EvolutionModel &evo_model0) : evo_model(&evo_model0){
 
     MutationRate rate = evo_model->GetMutationRate();
-    cout << rate.prob << "\t" << rate.one_minus_p << endl;
+    std::cout << rate.prob << "\t" << rate.one_minus_p << std::endl;
 
 }
 
@@ -44,7 +44,7 @@ void EmModelMutation::GetParameterInfo(){
     MutationMatrix transition_matrix_a_to_d = evo_model->GetTranstionMatirxAToD();
     MutationRate mutation_rate = evo_model->GetMutationRate();
     MutationProb mutation_prob = evo_model->GetMutationProb();
-    cout << "Called GetUpdateInfo: " << mutation_rate.prob << "\t" << mutation_rate.one_minus_p <<  "\t" << mutation_prob.GetExpBeta()<< endl;
+    std::cout << "Called GetUpdateInfo: " << mutation_rate.prob << "\t" << mutation_rate.one_minus_p <<  "\t" << mutation_prob.GetExpBeta()<< std::endl;
 }
 
 

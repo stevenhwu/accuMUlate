@@ -4,29 +4,43 @@
 #pragma clang diagnostic push
 // in reality, you will likely need to disable *more* than Wmultichar
 #pragma clang diagnostic ignored "-Wall"
+
+#include <stdint.h>
 #include "Eigen/Dense"
 #pragma clang diagnostic pop
 
 
-using namespace std;//TODO: maybe remove this later to avoid confusion
 
 union ReadData{
-    uint16_t reads[4];
     uint64_t key;
+    uint16_t reads[4];
 };
 
-typedef vector<ReadData> ReadDataVector;
+typedef std::vector<ReadData> ReadDataVector;
 
 struct ModelInput{// Can probably stand to lose this, started out more complex..
+
     uint16_t reference;
     ReadDataVector all_reads;
+
+    ModelInput() : reference(-1){
+    }
+
+
+    ModelInput(uint read_data_count) : reference(-1){
+        all_reads = ReadDataVector(read_data_count, ReadData{0}     );
+    }
+
+    ModelInput(uint16_t reference, ReadDataVector &all_reads) : reference(reference), all_reads(all_reads) {
+    }
 };
 
-typedef vector<ModelInput> GenomeData;
+
+typedef std::vector<ModelInput> GenomeData;
 
 struct ModelParams{
     double theta;               //
-    vector<double> nuc_freq;    //ACGT
+    std::vector<double> nuc_freq;    //ACGT
     double mutation_rate;       //
     double error_prob;          // Sequencing error-rate 
     double phi_haploid;         // Overdispersion for haploid sequencing

@@ -20,9 +20,8 @@
 
 using namespace BamTools;
 
-extern int global_count;
-extern int global_count2;
-extern int global_count3;
+extern int global_count[10];
+
 
 class VariantVisitorTwo : public PileupVisitor{
 
@@ -47,6 +46,7 @@ public:
 
 public:
     virtual void Visit(const PileupPosition& pileupData);
+    static bool filter_data(ReadDataVector &read_vector);
 private:
 
     Fasta m_idx_ref;
@@ -66,15 +66,19 @@ private:
 
     char qual_cut_char;
 
-    string rg_tag;
+    std::string rg_tag;
 
 
 
 //    unordered_map<std::string, std::string> map_tag_sample_two_stage;
-    unordered_map<std::string, int> map_tag_sample;
+    std::unordered_map<std::string, int> map_tag_sample;
 
     int quit = 0;
     int total_samele_count;
+
+    int GetSampleIndex(std::string const &tag_data);
+
+
 };
 
 

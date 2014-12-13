@@ -4,6 +4,8 @@
 SET(SOURCE_FILES CACHE INTERNAL "Global")
 message("A: ${SOURCE_FILES}")
 SET(SOURCE_FILES ${SOURCE_FILES}
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/boost_input_utils.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantVisitor.cc
@@ -14,7 +16,7 @@ SET(SOURCE_FILES ${SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/site_prob.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/sequence_prob.cc
 
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/genome_data_stream.cc
     CACHE INTERNAL "Global"
     )
 

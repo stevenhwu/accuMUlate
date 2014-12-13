@@ -18,6 +18,7 @@
 #ifndef EM_ALGORITHM_H_
 #define EM_ALGORITHM_H_
 
+extern const double EM_CONVERGE_THRESHOLD;
 
 class EmAlgorithm {
 
@@ -41,7 +42,7 @@ public:
 
     virtual void Run() = 0;
 
-    vector<double> GetProportion();
+    std::vector<double> GetProportion();
 
     void PrintSummary();
 protected:
@@ -67,7 +68,7 @@ protected:
     std::vector<double> proportion;
     Eigen::ArrayXXd all_probs;
 
-    vector<vector<double>> temp_stats;
+    std::vector<std::vector<double>> temp_stats;
 
 
     void Init();
@@ -93,7 +94,7 @@ protected:
     void ExpectationStep_Old();
 
 
-    virtual void ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, vector<double> &temp_stat);
+    virtual void ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, std::vector<double> &temp_stat);
 
     bool EmStoppingCriteria(int ite);
 
@@ -102,5 +103,5 @@ protected:
 };
 
 
-static const double EM_CONVERGE_THRESHOLD = 1e-10;
+
 #endif //EM_ALGORITHM_H_

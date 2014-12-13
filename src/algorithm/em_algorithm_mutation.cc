@@ -3,13 +3,13 @@
 
 //std::vector<std::unique_ptr<EmData>>
 EmAlgorithmMutation::EmAlgorithmMutation(int num_category0,
-        vector<std::unique_ptr<EmData>> &d_ptr, EmModelMutation &m)
+        std::vector<std::unique_ptr<EmData>> &d_ptr, EmModelMutation &m)
         : EmAlgorithm(num_category0, d_ptr, m)
 //          EmAlgorithm::em_data_ptr(&d_ptr), em_model(&m) {
 {
 
     if (num_category != 2) {
-        cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< endl;
+        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
         exit(222);
     }
 
@@ -18,7 +18,7 @@ EmAlgorithmMutation::EmAlgorithmMutation(int num_category0,
     }
 
     em_count = 1000;
-
+    std::cout << "data_count: " << em_data_ptr->size() << std::endl;
     Init();
 
 //    em_model_ptr->at(0)->GetParameterInfo();
@@ -32,13 +32,13 @@ EmAlgorithmMutation::EmAlgorithmMutation(int num_category0,
 
 
 EmAlgorithmMutation::EmAlgorithmMutation(
-        vector<std::unique_ptr<EmData>> &d_ptr, vector<std::unique_ptr<EmModel>> &m)
+        std::vector<std::unique_ptr<EmData>> &d_ptr, std::vector<std::unique_ptr<EmModel>> &m)
         : EmAlgorithm(d_ptr, m)
 //          EmAlgorithm::em_data_ptr(&d_ptr), em_model(&m) {
 {
 
     if (num_category != 2) {
-        cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< endl;
+        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
         exit(222);
     }
     em_count = 10;
@@ -46,15 +46,15 @@ EmAlgorithmMutation::EmAlgorithmMutation(
     Init();
 
 
-    cout << "=========== Done Constructor smart pointer x 2\n";
+    std::cout << "=========== Done Constructor smart pointer x 2\n";
 
 }
 
 
 
 //std::vector<std::unique_ptr<EmData>>
-EmAlgorithmMutation::EmAlgorithmMutation(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0,
-        vector<std::unique_ptr<EmData>> &d_ptr, EmModel &m)
+EmAlgorithmMutation::EmAlgorithmMutation(int num_category0, std::vector<SiteProb> &em_data0, EvolutionModel &em_model0,
+        std::vector<std::unique_ptr<EmData>> &d_ptr, EmModel &m)
         : EmAlgorithm(num_category0, d_ptr, m), em_data_old(em_data0), em_model_old(&em_model0)
 //          EmAlgorithm::em_data_ptr(&d_ptr), em_model(&m) {
 {
@@ -62,7 +62,7 @@ EmAlgorithmMutation::EmAlgorithmMutation(int num_category0, vector<SiteProb> &em
 
 //    em_model->UpdateParameter(2);
     if (num_category != 2) {
-        cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< endl;
+        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
         exit(222);
     }
     em_count = 10;
@@ -75,15 +75,15 @@ EmAlgorithmMutation::EmAlgorithmMutation(int num_category0, vector<SiteProb> &em
     double lower_bound = mutation_prob.ConvertExpBetaToMu(1e-12);
     double upper_bound = mutation_prob.ConvertExpBetaToMu(1e-1);
     all_probs_old = Eigen::ArrayXXd::Zero(num_category, site_count);
-    parameters_old = vector<double>(num_category);
+    parameters_old = std::vector<double>(num_category);
     if (num_category == 2) {
         parameters_old = {upper_bound, lower_bound};
     }
-    all_stats_same = vector<double>(num_category, 0);
-    all_stats_diff = vector<double>(num_category, 0);
+    all_stats_same = std::vector<double>(num_category, 0);
+    all_stats_diff = std::vector<double>(num_category, 0);
 
 
-    cout << "=========== Done Constructor smart pointer\n";
+    std::cout << "=========== Done Constructor smart pointer\n";
 
 }
 
@@ -167,7 +167,7 @@ em_stat_local_single->print();
 void EmAlgorithmMutation::Run2() {
 
     for (size_t i = 0; i < em_count; ++i) {
-        cout << "EM2 ite: " << i << endl;
+        std::cout << "EM2 ite: " << i << std::endl;
         ExpectationStep2();
         MaximizationStep();
     }
@@ -176,8 +176,8 @@ void EmAlgorithmMutation::Run2() {
 
 
 void EmAlgorithmMutation::InitialiseParameters() {
-    double lower_bound = 1e-20;
-    double upper_bound = 1e-1;
+    double lower_bound = 1e-10;
+    double upper_bound = 1e-2;
 
     if (num_category == 2) {
         parameters = {upper_bound, lower_bound};
@@ -201,7 +201,7 @@ void EmAlgorithmMutation::InitialiseSummaryStat() {
     for (size_t i = 0; i < num_category; ++i) {
         all_em_stats.emplace_back(new EmSummaryStatMutation());
 //        all_em_stats.emplace_back(new EmSummaryStatMutation());
-        temp_stats[i] = vector<double>(em_stat_local_single->GetStatCount());
+        temp_stats[i] = std::vector<double>(em_stat_local_single->GetStatCount());
     }
 
 
@@ -271,7 +271,7 @@ void EmAlgorithmMutation::oldEStep() {
 //            em_model->UpdateParameter(parameters[r]+0.05);
 
             for (size_t s = 0; s < site_count; ++s) {
-                cout << "em_E: "  << " num_category: " << r << " site: " << s << endl;
+                std::cout << "em_E: "  << " num_category: " << r << " site: " << s << std::endl;
                 double sum_prob = 0;
                 auto site_old = em_data_old[s];
                 site_old.UpdateModel(*em_model_old);

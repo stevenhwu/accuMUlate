@@ -154,7 +154,7 @@ T SequenceProb::ScaleLogArray(T result) {
     return result;
 }
 
-vector<HaploidProbs> SequenceProb::GetDescendantGenotypes() {
+std::vector<HaploidProbs> SequenceProb::GetDescendantGenotypes() {
     return all_descendant_genotypes;
 }
 
@@ -172,11 +172,11 @@ DiploidProbs SequenceProb::GetAncestorGenotypes() {
 }
 
 
-array<DiploidProbs, 4> SequenceProb::DiploidPopulationFactory(ModelParams const model_params) {
+std::array<DiploidProbs, 4> SequenceProb::DiploidPopulationFactory(ModelParams const model_params) {
 
 
 	double theta = model_params.theta;
-	vector<double> frequency_prior = model_params.nuc_freq;
+	std::vector<double> frequency_prior = model_params.nuc_freq;
 
 	double alphas[4];
 	for(int i : {0,1,2,3}){
@@ -185,7 +185,7 @@ array<DiploidProbs, 4> SequenceProb::DiploidPopulationFactory(ModelParams const 
 
 	ReadData d;
 	DiploidProbs result;
-	array<DiploidProbs, 4> cache_results;
+	std::array<DiploidProbs, 4> cache_results;
 	for (int ref = 0; ref < 4; ++ref) {
 		for (int i : {0, 1, 2, 3}) {
 			for (int j = 0; j < i; ++j) {

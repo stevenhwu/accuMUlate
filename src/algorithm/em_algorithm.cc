@@ -15,11 +15,10 @@
 #include <iostream>
 #include <stddef.h>
 
+const double EM_CONVERGE_THRESHOLD = 1e-10;
 
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
-
-
 
 }
 
@@ -38,7 +37,7 @@ void EmAlgorithm::Init() {
     site_count = em_data_ptr->size();
     all_probs = Eigen::ArrayXXd::Zero(num_category, site_count);
     parameters = std::vector<double>(num_category);
-    cache_parameters = std::vector<double>(num_category);
+    cache_parameters = std::vector<double>(num_category, 0);
 
     InitialiseProportion();
 
@@ -91,7 +90,7 @@ void EmAlgorithm::ExpectationStep(  ) {
 }
 
 void EmAlgorithm::ExpectationStepCustom(size_t data_index, size_t category_index,
-        double &sum_prob, vector<double> &temp_stat) {
+        double &sum_prob, std::vector<double> &temp_stat) {
 
     em_data_ptr->at(data_index)->UpdateEmModel( em_model[category_index].get() );
     em_data_ptr->at(data_index)->UpdateSummaryStat(sum_prob, temp_stat);
@@ -101,9 +100,9 @@ void EmAlgorithm::ExpectationStepCustom(size_t data_index, size_t category_index
 
 void EmAlgorithm::ExpectationStep2() {
     printf("here\n");
-    vector<vector<double>> temp_stat = std::vector<std::vector<double>>(num_category);
+    std::vector<std::vector<double>> temp_stat = std::vector<std::vector<double>>(num_category);
     for (size_t r = 0; r < num_category; ++r) {
-        temp_stat[r] = vector<double> (2);
+        temp_stat[r] = std::vector<double> (2);
         all_em_stats[r]->Reset();
         em_model_ptr->at(r)->UpdateParameter(parameters[r]); //exp_beta
     }
@@ -229,6 +228,10 @@ void EmAlgorithm::CalculateProportion() {
     double proportion_sum = prop_col.sum();
     proportion[0] = proportion_sum / site_count;
     proportion[1] = 1 - proportion[0];
+
+//    std::cout << sum_col << std::endl;
+//    std::cout << prop_col << std::endl;
+//    std::cout << proportion_sum << std::endl;
 //    std::cout << "Update Proportion: " << "\t" << proportion[0] << "\t" << proportion[1] << std::endl;
 
 
@@ -249,7 +252,7 @@ std::vector<double> EmAlgorithm::GetParameters() {
     return parameters;
 }
 
-vector<double> EmAlgorithm::GetProportion() {
+std::vector<double> EmAlgorithm::GetProportion() {
     return proportion;
 }
 
@@ -258,28 +261,32 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 
     double sum_diff = 0;
     for (size_t r = 0; r < num_category; ++r) {
-        sum_diff += abs(parameters[r] - cache_parameters[r]);
-
+        sum_diff += fabs(parameters[r] - cache_parameters[r]);
+//        std::cout << parameters[r] << "\t" << cache_parameters[r] << "\t" << fabs(parameters[r] - cache_parameters[r]) <<std::endl;
         cache_parameters[r] = parameters[r];
 
     }
-    if (sum_diff < EM_CONVERGE_THRESHOLD) {
-        return false;
+
+    if ( (ite % 10) == 0) {
+        std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << std::endl;
+        PrintSummary();
     }
-    if (ite % 10 == 0) {
-        cout << "Ite: " << ite << " sum_diff: " << sum_diff << endl;
+    if (sum_diff < EM_CONVERGE_THRESHOLD) {
+        std::cout <<"============ DONE =======\n";
+        return false;
     }
     return true;
 }
 
 void EmAlgorithm::PrintSummary(){
-    printf("\n========================\nEM Summary\nParameters: ");
+    printf("========================\nEM Summary\nParameters: ");
      for (auto item :parameters) {
-        printf("%f\t", item);
+        printf("%.5e\t", item);
     }
 
     printf("\nProportions: ");
     for (auto item :proportion) {
-        printf("%f\t", item);
+        printf("%.3f\t", item);
     }
+    printf("\n");
 }

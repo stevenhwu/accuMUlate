@@ -35,7 +35,7 @@ extern Eigen::IOFormat nice_row;
 
 class SequenceProb {
 public:
-    static array<DiploidProbs, 4> DiploidPopulationFactory(ModelParams const model_params);
+    static std::array<DiploidProbs, 4> DiploidPopulationFactory(ModelParams const model_params);
     static void printReadData(ReadData read_data);
 
     SequenceProb(ModelInput const site_data, ModelParams const model_params);
@@ -73,7 +73,7 @@ private:
     DiploidProbs ancestor_genotypes;
     std::vector<HaploidProbs> all_descendant_genotypes;
 
-    vector<double> frequency_prior;
+    std::vector<double> frequency_prior;
     Array10D ancestor_prior;
 
     int descendant_count;

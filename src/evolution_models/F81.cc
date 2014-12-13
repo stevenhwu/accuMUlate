@@ -17,7 +17,7 @@ F81::F81(MutationProb &mutation_prob) : EvolutionModel(mutation_prob) {
 }
 
 F81::F81(F81 const &self) : EvolutionModel(self.GetMutationProb()) {
-	std::cout << "Call F81 Copy cons\n";
+//	std::cout << "Call F81 Copy cons\n";
 	mu_prob = self.GetMutationProb();
 	freqs = mu_prob.GetFrequencyPrior();
 	UpdateTransitionMatrix();
@@ -190,11 +190,11 @@ MutationMatrix MutationProb::MutationAccumulation(const ModelParams &params, boo
 
  */
 std::unique_ptr<EvolutionModel> F81::Clone() const {
-	printf("call F81 clone function\n");
+//	printf("call F81 clone function\n");
 	return std::unique_ptr<EvolutionModel> (new F81(*this) );
 }
 
 EvolutionModel* F81::Clone2() const {
-	printf("call F81 clone function raw pointer\n");
+//	printf("call F81 clone function raw pointer\n");
 	return new F81(*this) ;
 }

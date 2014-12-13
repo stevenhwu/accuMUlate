@@ -6,47 +6,63 @@
  */
 
 
+
 #include "variant_visitor_two.h"
 
 
-int global_count = 0 ;
-int global_count2 = 0 ;
-int global_count3 = 0 ;
+int global_count[10];
 
-
-void VariantVisitorTwo::Visit(const PileupPosition &pileupData)
-{
+void VariantVisitorTwo::Visit(const PileupPosition &pileupData) {
 
 //    string chr = m_bam_ref[pileupData.RefId].RefName;
     uint64_t pos = pileupData.Position;
-    ReadDataVector bcalls(total_samele_count, ReadData{{0, 0, 0, 0}});
 
     m_idx_ref.GetBase(pileupData.RefId, pos, current_base);//Check: Room for improvemnt here?
-//    string tag_id;
 
-    uint16_t ref_base_idx = base_index2[(int)current_base];
+    uint16_t ref_base_idx = base_index2[(int) current_base];
     if (ref_base_idx < 4) { //TODO Model for bases at which reference is 'N'
+        global_count[2]++;
+        ReadDataVector bcalls(total_samele_count, ReadData{0});
+        
+        for (auto it = begin(pileupData.PileupAlignments); it != end(pileupData.PileupAlignments); ++it) {//auto it2 = *it;
 
-    for (auto it = begin(pileupData.PileupAlignments); it != end(pileupData.PileupAlignments); ++it) {//auto it2 = *it;
-//    for (auto it2 : pileupData.PileupAlignments) {
-//        auto *it = &it2;
-//            if (include_site(*it, m_mapping_cut, m_qual_cut)) {
-        int32_t pos_in_alignment = it->PositionInAlignment;
-//        if (include_site_3(*it, m_mapping_cut, qual_cut_char)) {
-        if (include_site_4( it->Alignment, pos_in_alignment, m_mapping_cut, qual_cut_char)) {
+            int32_t pos_in_alignment = it->PositionInAlignment;
+            if (include_site_4(it->Alignment, pos_in_alignment, m_mapping_cut, qual_cut_char)) {
+                int sindex = GetSampleIndex(it->Alignment.TagData);
 
+                uint16_t bindex = base_index2[(int) it->Alignment.QueryBases[pos_in_alignment]];
 
-            string tag_data = it->Alignment.TagData;
-            size_t start_index = tag_data.find(rg_tag);
-            if(start_index != string::npos){
-                start_index+=4;
+                if (bindex < 4) {
+                    global_count[0]++;
+                    bcalls[sindex].reads[bindex] += 1;
+                }
             }
-            else{
-                size_t x = tag_data.find("RG");
-                cout << "ERRER: "<< tag_data << "\t" << x << endl;
-            }
-            size_t end_index = tag_data.find(  ZERO_CHAR, start_index);
-            string tag_id_2 = tag_data.substr(start_index, (end_index - start_index));
+        }
+        if( filter_data(bcalls) ) {
+            global_count[1]++;
+            m_all_the_data.push_back(ModelInput{ref_base_idx, bcalls});
+        }
+
+
+    }
+    else {
+        std::cout << "Invalid ref_base_idx: " << ref_base_idx << "\t" << current_base << std::endl;
+    }
+
+
+}
+
+int VariantVisitorTwo::GetSampleIndex(std::string const &tag_data) {
+    size_t start_index = tag_data.find(rg_tag);
+    if (start_index != std::string::npos) {
+                    start_index += 4;
+                }
+                else {
+                    size_t x = tag_data.find("RG");//TODO: Check for (char)0, RG, Z
+                    std::cout << "ERRER: " << tag_data << "\t" << x << std::endl;
+                }
+    size_t end_index = tag_data.find(ZERO_CHAR, start_index);
+    std::string tag_id_2 = tag_data.substr(start_index, (end_index - start_index));
 //
 //
 ////            string tag_id;
@@ -64,37 +80,8 @@ void VariantVisitorTwo::Visit(const PileupPosition &pileupData)
 ////            string sm2 = map_tag_sample_two_stage[tag_id_2]; //TODO:catch exception
 ////            uint32_t sindex = m_samples[sm2]; //TODO check samples existed!
 //
-            int sindex = map_tag_sample[tag_id_2];
-
-//            cout << tag_id_2 << endl;
-//            cout << tag_id_2 << "\t" << sm2 << "\t" << sindex << "\t" << sindex2 << endl;
-
-
-            uint16_t bindex = base_index2[(int) it->Alignment.QueryBases[pos_in_alignment]];
-
-            if (bindex < 4) {
-                global_count++;
-                bcalls[sindex].reads[bindex] += 1;
-            }
-
-        }
-    }
-
-
-//                ModelInput d = {ref_base_idx, bcalls};
-        m_all_the_data.push_back(ModelInput{ref_base_idx, bcalls});
-
-    }
-    else{//Hardly ever happen
-//        quit ++;
-//        bool x = m_idx_ref.GetBase(pileupData.RefId, pos, current_base);
-//        cout << "ref_base > 4: " << ref_base_idx << "===" << pos <<"="<< pileupData.RefId <<"=" << current_base << "=" << x << endl;
-//        string t;
-////        m_idx_ref.GetSequence(pileupData.RefId, 0, pos, t);
-//        cout << quit << endl;
-    }
-
-
+    int sindex = map_tag_sample[tag_id_2];
+    return sindex;
 }
 
 VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamHeader &header, const Fasta &idx_ref,
@@ -112,11 +99,8 @@ VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamH
     rg_tag.push_back(ZERO_CHAR);
     rg_tag += "RGZ";
 
-
     SampleMap sample_map_temp;
-
     total_samele_count = 0;
-
     SamReadGroupDictionary dictionary = m_header.ReadGroups;
     size_t tag_count = dictionary.Size();
 
@@ -132,7 +116,7 @@ VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamH
 
 //        m_samples = sample_map_temp;
 
-    map_tag_sample = unordered_map<std::string, int>(tag_count);
+    map_tag_sample = std::unordered_map<std::string, int>(tag_count);
     for (auto dict = dictionary.Begin(); dict != dictionary.End(); dict++) {
         map_tag_sample.emplace(dict->ID, sample_map_temp[dict->Sample]);
 //        map_tag_sample_two_stage.emplace(dict->ID, dict->Sample);
@@ -150,3 +134,25 @@ VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamH
 };
 
 
+bool VariantVisitorTwo::filter_data(ReadDataVector &read_vector) {
+
+    int pass_count = read_vector.size();
+    for (auto item : read_vector) {
+        if (item.key!=0){
+            for (auto read : item.reads) {
+                if(read>1){ //Simple filter, at least 1 base > than N==1 CHECK:
+                    pass_count--;
+                    break;
+                }
+            }
+        }
+    }
+
+    if(pass_count < 3 ){// ALL samples must exist?? OR we allow some gaps. Use 3 (2 samples missing) for now?? CHECK:
+//        std::cout << "PASS " << pass_count << std::endl;
+        return true;
+    }
+//    std::cout << "FAIL " << pass_count << std::endl;
+    return false;
+
+}

@@ -26,7 +26,7 @@ void EmDataMutation::UpdateSummaryStat(double &prob, std::unique_ptr<EmSummarySt
 
     site.CalculateAncestorToDescendant(prob, stat_same, stat_diff);
 
-    summaryStat->SetStats(vector<double> {stat_same, stat_diff});
+    summaryStat->SetStats(std::vector<double> {stat_same, stat_diff});
 
 //    std::cout << "call EMDATA2: " << stat_same << "\t" << stat_diff << "\t" << prob <<std::endl;
 //    site->UpdateSummaryStat(sum_prob, local);
@@ -62,7 +62,7 @@ void EmDataMutation::UpdateEmModel(EmModel *em_model) {
 //    site.UpdateModel(*evo_model);
 //}
 
-void EmDataMutation::UpdateSummaryStat(double &prob, vector<double> &temp_stat) {
+void EmDataMutation::UpdateSummaryStat(double &prob, std::vector<double> &temp_stat) {
 
 
 //    summaryStat->print();

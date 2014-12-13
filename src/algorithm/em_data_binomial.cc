@@ -43,7 +43,7 @@ void EmDataBinomial::UpdateSummaryStat(double &prob, std::unique_ptr<EmSummarySt
 
     double stat_same = count;
     double stat_diff = count_negative;
-    summaryStat->SetStats(vector<double> {stat_same, stat_diff});
+    summaryStat->SetStats(std::vector<double> {stat_same, stat_diff});
 
 //    std::cout << "call EMDATA_Binomial: "<< count << "\t" << binomial_prob << "\t" <<
 //        stat_same << "\t" << stat_diff << "\t" << prob <<std::endl;
@@ -62,7 +62,7 @@ void EmDataBinomial::UpdateEmModel(EmModel *em_model) {
 }
 
 
-void EmDataBinomial::UpdateSummaryStat(double &prob, vector<double> &temp_stat) {
+void EmDataBinomial::UpdateSummaryStat(double &prob, std::vector<double> &temp_stat) {
 
 
 

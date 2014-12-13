@@ -29,7 +29,7 @@ void EmAlgorithmBinomial::InitialiseSummaryStat() {
     temp_stats = std::vector<std::vector<double>>(num_category);
     for (size_t i = 0; i < num_category; ++i) {
         all_em_stats.emplace_back(new EmSummaryStatBinomial());
-        temp_stats[i] = vector<double>(em_stat_local_single->GetStatCount());
+        temp_stats[i] = std::vector<double>(em_stat_local_single->GetStatCount());
     }
 
 }
@@ -61,7 +61,7 @@ void EmAlgorithmBinomial::InitialiseParameters() {
 
 }
 
-void EmAlgorithmBinomial::ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, vector<double> &temp_stat) {
+void EmAlgorithmBinomial::ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, std::vector<double> &temp_stat) {
 
 
     em_data_ptr->at(data_index)->UpdateEmModel( em_model[category_index].get() );

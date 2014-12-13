@@ -43,11 +43,11 @@ public:
 
 //    EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<EmData*> &d, EmModel &m);
 
-    EmAlgorithmMutation(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<unique_ptr<EmData>> &data_ptr, EmModel &em_model);
+    EmAlgorithmMutation(int num_category0, std::vector<SiteProb> &em_data0, EvolutionModel &em_model0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModel &em_model);
 
-    EmAlgorithmMutation(vector<unique_ptr<EmData>> &data_ptr, vector<unique_ptr<EmModel>> &em_model_ptr);
+    EmAlgorithmMutation(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &em_model_ptr);
 
-    EmAlgorithmMutation(int num_category0, vector<unique_ptr<EmData>> &data_ptr, EmModelMutation &em_model);
+    EmAlgorithmMutation(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModelMutation &em_model);
 
     virtual ~EmAlgorithmMutation();
 
@@ -73,9 +73,9 @@ private:
     std::vector<double> all_stats_same;
     std::vector<double> all_stats_diff;
 
-    vector<SiteProb> em_data_old;
+    std::vector<SiteProb> em_data_old;
     EvolutionModel *em_model_old;
-    vector<double> parameters_old;
+    std::vector<double> parameters_old;
 
     Eigen::ArrayXXd all_probs_old;
 

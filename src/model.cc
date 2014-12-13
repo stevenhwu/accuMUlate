@@ -12,7 +12,7 @@
 #include "model.h"
 
 
-using namespace std;
+//using namespace std;
 
 double DirichletMultinomialLogProbability(double alphas[4], ReadData data) {
 	// TODO: Cache most of the math here
@@ -206,12 +206,12 @@ double TetMAProbOneMutation(const ModelParams &params, const ModelInput site_dat
 
 	MutationMatrix mt = MutationAccumulation(params, true);//
 	MutationMatrix mn = m-mt;	                           //
-	cout.precision(10);
-	cout <<"+============"<< endl;
-	cout << m << endl;cout <<"++============"<< endl;
-	cout << mt << endl;cout <<"+++============"<< endl;
-	cout << mn << endl;cout <<"++++============"<< endl;
-	cout << "========="<<endl;
+//	cout.precision(10);
+//	cout <<"+============"<< endl;
+//	cout << m << endl;cout <<"++============"<< endl;
+//	cout << mt << endl;cout <<"+++============"<< endl;
+//	cout << mn << endl;cout <<"++++============"<< endl;
+//	cout << "========="<<endl;
 	DiploidProbs pop_genotypes = DiploidPopulation(params, site_data.reference);
 
 	auto it = site_data.all_reads.begin();

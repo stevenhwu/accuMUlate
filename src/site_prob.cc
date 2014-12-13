@@ -132,11 +132,11 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
         //        prod_prob_ancestor[a] = sum(sum_prob_d);
         //        summary_stat_ancestor[a] =
         if (DEBUG>1) {
-            cout << "==A: " << a << " " << index16 << " " << LookupTable::genotype_lookup_10[a] << " " <<
+            std::cout << "==A: " << a << " " << index16 << " " << LookupTable::genotype_lookup_10[a] << " " <<
                     ancestor_genotypes[index16] << "\t";
-            cout << "Same: " << all_stats_same << "\tDiff:" << all_stats_diff <<
+            std::cout << "Same: " << all_stats_same << "\tDiff:" << all_stats_diff <<
             "\t" << summary_stat_same_ancestor << "\t" <<summary_stat_diff_ancestor <<
-            "\tProb:" << prod_prob_ancestor  << "\t" << prob_reads_given_a << endl ;
+            "\tProb:" << prod_prob_ancestor  << "\t" << prob_reads_given_a << std::endl ;
         }
 
     }
@@ -145,8 +145,8 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
     all_stats_diff /= prob_reads;
 
     if(DEBUG>0){
-        cout << "summaryALL\tSame:" << all_stats_same << "\tDiff:" << all_stats_diff << "\t" << (all_stats_diff + all_stats_same) << endl << endl;
-        cout << "total_sum2: "<< total_sum2 << "\tProb: " << prob_reads <<endl;
+        std::cout << "summaryALL\tSame:" << all_stats_same << "\tDiff:" << all_stats_diff << "\t" << (all_stats_diff + all_stats_same) << std::endl;
+        std::cout << "total_sum2: "<< total_sum2 << "\tProb: " << prob_reads <<std::endl;
 
     }
 
@@ -177,10 +177,10 @@ void SiteProb::CalculateAllDescendantGivenAncestor(int a, double &product_prob_g
 //        sum_prob_ancestor[a] += log(sum_over_probs);
         product_prob_given_ancestor *= sum_over_probs;
         if (DEBUG>0) {
-            cout << "====D: " << d << "\t Sum:" <<
+            std::cout << "====D: " << d << "\t Sum:" <<
                     sum_over_probs << "\t" << product_prob_given_ancestor << "\t" <<
                     "\tSame:" << summary_stat_same << "\tDiff:" << summary_stat_diff << "\t" <<
-                    " BASE FREQ: " << prob_reads_given_descent.format(nice_row) << endl;
+                    " BASE FREQ: " << prob_reads_given_descent.format(nice_row) << std::endl;
         }
 
     }
@@ -221,14 +221,14 @@ void SiteProb::CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs
         if (DEBUG>3) {
             double t1 = prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
             double t2 = prob_reads_given_descent[b] * mutation_rate.prob * frequency_prior[b];
-            cout << "======Loop base: " << b << "\t" << "\tP:" << prob <<"\tReadGivenD:"<< prob_reads_given_descent[b] << "\t T1:" << t1 << "\t T2:" << t2 <<"\t SAME:"<<summary_stat_same << "\t" << summary_stat_diff << endl;//t1 << "\t" << t2 <<endl;
+            std::cout << "======Loop base: " << b << "\t" << "\tP:" << prob <<"\tReadGivenD:"<< prob_reads_given_descent[b] << "\t T1:" << t1 << "\t T2:" << t2 <<"\t SAME:"<<summary_stat_same << "\t" << summary_stat_diff << std::endl;//t1 << "\t" << t2 <<std::endl;
         }
     }
     summary_stat_same /= prob_reads_d_given_a;
     summary_stat_diff /= prob_reads_d_given_a;
 
     if (DEBUG>2) {
-        cout << anc_index10 << "\t" <<summary_stat_same << "\t" << summary_stat_diff << endl;
+        std::cout << anc_index10 << "\t" <<summary_stat_same << "\t" << summary_stat_diff << std::endl;
     }
 }
 

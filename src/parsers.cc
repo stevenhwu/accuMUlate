@@ -7,21 +7,21 @@
 #include "parsers.h"
 
 
-using namespace std;
+
 using namespace BamTools;
 
-FastaReference::FastaReference(string ref_file_name){
-    ifstream ref_file (ref_file_name);
-    string L;
+FastaReference::FastaReference(std::string ref_file_name){
+    std::ifstream ref_file (ref_file_name);
+    std::string L;
     uint64_t cummulative_len = 0;
     while( getline(ref_file, L)){
         size_t i = 0;
-        string chrom;
+        std::string chrom;
         for(; L[i] != '\t'; i++){
             chrom.push_back(L[i]);
         }
         i += 1;
-        string s_len;
+        std::string s_len;
         for (; L[i] !='\t'; i++){
             s_len.push_back(L[i]);
         }
@@ -34,7 +34,7 @@ FastaReference::FastaReference(string ref_file_name){
     }
 }
     
-void FastaReference::get_ref_id(string search_name, int& chr_id){
+void FastaReference::get_ref_id(std::string search_name, int& chr_id){
     auto it = find_if(chromosomes.begin(), chromosomes.end(),
                      [&search_name](const FastaReferenceData& chrom){
                         return chrom.name == search_name;
@@ -44,23 +44,23 @@ void FastaReference::get_ref_id(string search_name, int& chr_id){
 }
 
 
-BedFile::BedFile(string bed_file_name){
+BedFile::BedFile(std::string bed_file_name){
      bed_file.open(bed_file_name);
 }
 
 int BedFile::get_interval(BedInterval& current_interval){
-    string L;
+    std::string L;
     if(getline(bed_file, L)){
-        stringstream Lstream(L);
-        string chrom;
-        string start_s;
-        string end_s;        
+        std::stringstream Lstream(L);
+        std::string chrom;
+        std::string start_s;
+        std::string end_s;
         getline(Lstream, chrom, '\t');
         getline(Lstream, start_s, '\t');
         getline(Lstream, end_s, '\t');
-        current_interval = BedInterval{ chrom, 
-                                         stoul(start_s), 
-                                         stoul(end_s)};
+        current_interval = BedInterval{ chrom,
+                std::stoul(start_s),
+                std::stoul(end_s)};
         return 0;
     }
    else {return 1;}

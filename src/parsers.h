@@ -4,41 +4,40 @@
 #include "utils/bamtools_pileup_engine.h"
 #include <unordered_map>
 
-using namespace std;
-
+//using namespace std;
 //typedef vector< string > SampleNames;
-typedef unordered_map<string, uint16_t> SampleMap;
+typedef std::unordered_map<std::string, uint16_t> SampleMap;
 
 struct FastaReferenceData{
-    string name;
+    std::string name;
     uint32_t length; 
     uint64_t end; //endpoint relative to entire length of whole ref
 };
 
 struct BedInterval{
-    string chr;
+    std::string chr;
     uint64_t start;
     uint64_t end;
 };
 
-typedef vector<FastaReferenceData> FastaReferenceVector;
+typedef std::vector<FastaReferenceData> FastaReferenceVector;
 
 class FastaReference{
         //string ref_file_name;
     public:
-        FastaReference(string ref_file_name);
+        FastaReference(std::string ref_file_name);
         FastaReferenceVector chromosomes;
-        void get_ref_id(string name, int& chr_id);
+        void get_ref_id(std::string name, int& chr_id);
     private:
-        ifstream ref_file;
+    std::ifstream ref_file;
 };
 
 class BedFile{
 //        string bed_file_name;
     public:
-        BedFile(string bed_file_name);
+        BedFile(std::string bed_file_name);
         int get_interval(BedInterval& current_interval);
-        ifstream bed_file;
+    std::ifstream bed_file;
         
 };
 //Helper functions
@@ -67,7 +66,7 @@ bool include_site_3(const BamTools::PileupAlignment & pileup, uint16_t map_cut, 
 //using namespace BamTools;
 bool include_site_4(const BamTools::BamAlignment & alignment, const int &pos, const uint16_t &map_cut, const char &qual_cut);
 uint16_t base_index(char b);
-string get_sample(string& tag);
+std::string get_sample(std::string& tag);
 
 extern int base_index2[128];
 

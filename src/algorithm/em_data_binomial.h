@@ -24,7 +24,7 @@ public:
     ~EmDataBinomial();
 
 
-    virtual void UpdateSummaryStat(double &prob, vector<double> &temp_stat);
+    virtual void UpdateSummaryStat(double &prob, std::vector<double> &temp_stat);
     void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat);
 
     virtual void UpdateEmModel(EmModel *em_model);
