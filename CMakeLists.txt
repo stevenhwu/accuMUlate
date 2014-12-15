@@ -107,21 +107,27 @@ message("------------------------BUILD TYPE ${CMAKE_BUILD_TYPE}")
 ADD_SUBDIRECTORY(src)
 
 ########### Find/add GTest #################
+## find_package (GTEST) not setup properly yet
 #1
 ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/include/googletest-trunk/")
 #SET(GTEST_ROOT "${CMAKE_SOURCE_DIR}/include/googletest-trunk")
-
-#2
-SET(GTEST_ROOT "${CMAKE_SOURCE_DIR}/include/googletest-trunk")
-find_package( GTest  )
-IF(GTEST_FOUND)
-    message("Found GTEST at ${GTEST_INCLUDE_DIRS} ${gtest_SOURCE_DIR} ")
-ENDIF(GTEST_FOUND)
-
-#3
-ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/gtest")
-
 ADD_SUBDIRECTORY(test)
+
+
+#2 Some link error??
+#SET(GTEST_ROOT "${CMAKE_SOURCE_DIR}/include/googletest-trunk")
+#find_package( GTest  )
+#IF(GTEST_FOUND)
+#    message("Found GTEST at ${GTEST_INCLUDE_DIRS} ${gtest_SOURCE_DIR} ")
+#    include_directories(${GTEST_INCLUDE_DIRS})
+#    ADD_SUBDIRECTORY(test)
+#ENDIF(GTEST_FOUND)
+
+#3 SVN checkout version
+#ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/gtest")
+
+
+
 
 
 
