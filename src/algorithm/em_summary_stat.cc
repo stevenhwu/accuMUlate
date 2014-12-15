@@ -68,7 +68,7 @@ double EmSummaryStat::MaximiseStats() {
 void EmSummaryStat::UpdateSumWithProportion(double &d, std::vector<double> temp_stats) {
     for (int i = 0; i < stat_count; ++i) {
         stat[i] += d * temp_stats[i];
-        double temp = d * temp_stats[i];
+//        double temp = d * temp_stats[i];
 //        std::cout << "VECTOR STAT: " << stat.size() << "\t" << i<<"\t" << d << "\t" <<  stat[i] << "\t" << temp_stats[i] << "\t" << temp  <<std::endl;
     }
 }

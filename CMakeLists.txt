@@ -8,13 +8,14 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE DEBUG CACHE STRING
+  SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
 
-set(CMAKE_CXX_FLAGS  "-std=c++11 -Wall")
+set(CMAKE_CXX_FLAGS  "-std=c++11")
+set(CMAKE_CXX_FLAGS_RELEASE  "-std=c++11 -O3")
 set(CMAKE_CXX_FLAGS_RelWithDebInfo "-std=c++11 -O3 -Wall")
 set(CMAKE_CXX_FLAGS_DEBUG  "-std=c++11 -g -O0 -Wvla -Wall  -Wextra -pedantic ")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} "-std=c++11 -g -Wvla -Wall  -Wextra -pedantic -Wno-unused-private-field -Wno-unused-variable")
@@ -47,7 +48,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-conversion -Wno-padded
 
 #set(CMAKE_CXX_FLAGS_DEBUG  "-std=c++11 -g -Wvla -Wall  -Wextra ")
 
-set(CMAKE_CXX_FLAGS_RELEASE  "-std=c++11 ")
+
 
 #set(CMAKE_CXX_FLAGS  "-std=c++11 -g -Wvla -Weverything -Wno-unused-private-field -Wno-unused-variable -Wno-documentation -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-deprecated -Wno-sign-conversion")
 

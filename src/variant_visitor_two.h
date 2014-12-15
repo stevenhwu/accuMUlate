@@ -17,6 +17,7 @@
 
 #include "model.h"
 #include "parsers.h"
+#include "genome_data_stream.h"
 
 using namespace BamTools;
 
@@ -28,57 +29,51 @@ class VariantVisitorTwo : public PileupVisitor{
     static const char ZERO_CHAR = ((char) 0);
 
 public:
-    VariantVisitorTwo(const RefVector& bam_references,
-            const SamHeader& header,
-            const Fasta& idx_ref,
-            GenomeData& all_the_data,
-//                      const ModelParams& p,
-//            const SampleMap& samples,
-//            BamAlignment& ali,
-            int qual_cut,
-            int mapping_cut,
-            double prob_cut);
+    VariantVisitorTwo(const RefVector &bam_references, const SamHeader &header, const Fasta &idx_ref,
+            GenomeData &all_the_data, std::string binary_outfile, int qual_cut, int mapping_cut, double prob_cut);
 
 
 
     virtual ~VariantVisitorTwo(void) {
+        gd_stream.close();
     }
 
 public:
     virtual void Visit(const PileupPosition& pileupData);
     static bool filter_data(ReadDataVector &read_vector);
+
 private:
 
-    Fasta m_idx_ref;
+
     RefVector m_bam_ref;
     SamHeader m_header;
-//    SampleMap m_samples;
-
-//        ModelParams m_params;
+    Fasta m_idx_ref;
+    GenomeData &m_all_the_data;
     int m_qual_cut;
-//    BamAlignment& m_ali;
-    GenomeData& m_all_the_data;
-    double m_prob_cut;
     int m_mapping_cut;
 
     char current_base;
-    uint64_t chr_index;
-
     char qual_cut_char;
-
     std::string rg_tag;
-
-
-
-//    unordered_map<std::string, std::string> map_tag_sample_two_stage;
     std::unordered_map<std::string, int> map_tag_sample;
 
-    int quit = 0;
-    int total_samele_count;
+
+    double m_prob_cut;
+//    SampleMap m_samples;
+//        ModelParams m_params;
+//    uint64_t chr_index;
+//    unordered_map<std::string, std::string> map_tag_sample_two_stage;
+
+private:
+    int total_sample_count;
 
     int GetSampleIndex(std::string const &tag_data);
 
 
+public:
+    int getTotal_sample_count() const ;
+
+    GenomeDataStream gd_stream;
 };
 
 

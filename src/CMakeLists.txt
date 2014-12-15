@@ -2,7 +2,7 @@
 
 
 SET(SOURCE_FILES CACHE INTERNAL "Global")
-message("A: ${SOURCE_FILES}")
+#message("A: ${SOURCE_FILES}")
 SET(SOURCE_FILES ${SOURCE_FILES}
 
     ${CMAKE_CURRENT_SOURCE_DIR}/boost_input_utils.cc
@@ -25,28 +25,20 @@ SET(SOURCE_FILES ${SOURCE_FILES}
     CACHE INTERNAL "Global"
     )
 
-SET(SOURCE_FILES_accuMUlate ${SOURCE_FILES_accuMUlate}
-    ${CMAKE_CURRENT_SOURCE_DIR}/lookup.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/variant_visitor_two.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/VariantVisitor.cc
-
-)
 
 #list (APPEND SOURCE_LIST ${SOURCE_FILES})
 #file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 
-message("BB: ${SOURCE_FILES} ${PROJECT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ")
+#message("BB: ${SOURCE_FILES} ${PROJECT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ")
 
 ADD_SUBDIRECTORY(distributions)
 ADD_SUBDIRECTORY(evolution_models)
 ADD_SUBDIRECTORY(algorithm)
 
 
-message("C: ${SOURCE_FILES} ")
+#message("C: ${SOURCE_FILES} ")
 
-add_executable(accuMUlate main.cc ${SOURCE_FILES_accuMUlate})
+add_executable(accuMUlate main.cc ${SOURCE_FILES})
 target_link_libraries(accuMUlate ${LIBS} )
 
 add_executable(EMTest EMTest.cc ${SOURCE_FILES})

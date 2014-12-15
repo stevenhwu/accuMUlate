@@ -61,7 +61,9 @@ namespace BoostUtils {
                 ("mu", po::value<double>()->required(), "")
                 ("seq-error", po::value<double>()->required(), "")
                 ("phi-haploid", po::value<double>()->required(), "")
-                ("phi-diploid", po::value<double>()->required(), "");
+                ("phi-diploid", po::value<double>()->required(), "")
+                ("output_binary_file,", po::value<string>()->default_value("default_binary_output.bin"),
+                        "Output the parsed BAM file to binary file");
 
 
         po::store(po::parse_command_line(argc, argv, cmd), vm);

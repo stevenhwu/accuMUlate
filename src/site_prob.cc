@@ -70,8 +70,7 @@ SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
     all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
     descendant_count = all_descendant_genotypes.size();
 
-    double a,b,c;
-
+//    double a,b,c;
 //    CalculateAncestorToDescendant(a,b,c);
 }
 

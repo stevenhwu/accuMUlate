@@ -19,4 +19,4 @@ SET(SOURCE_FILES ${SOURCE_FILES}
     CACHE INTERNAL "Global"
     )
 #list (APPEND SOURCE_LIST ${SOURCE_FILES})
-message("Algorithm: ${SOURCE_FILES} ")
+#message("Algorithm: ${SOURCE_FILES} ")

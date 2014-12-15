@@ -31,79 +31,79 @@ GenomeDataStream::GenomeDataStream(std::string given_filename, bool write) : siz
     buffer = (void *) malloc(WRITE_BUFFER);
     cpt_buffer=0;
 }
-GenomeDataStream::GenomeDataStream(char *given_filename, int given_sizeElement, bool write) : sizeElement(given_sizeElement)
-{
-    strcpy(filename,given_filename);
-    open(write);
-    buffer_size_nelem= (WRITE_BUFFER/given_sizeElement);
-    buffer = (void *) malloc(given_sizeElement * buffer_size_nelem);
-    cpt_buffer=0;
-}
-
-
-void GenomeDataStream::write_element( void *element)
-{
-    //  flockfile(binary_read_file);ca
-    // fprintf(stderr,"write elem %lli \n",*(int64_t *)element);
-    if (!fwrite(element, sizeElement, 1, binary_read_file))
-    {
-        // funlockfile(binary_read_file);
-        printf("error: can't fwrite (disk full?)\n");
-        exit(1);
-    }
-    //  funlockfile(binary_read_file);
-}
-
-void GenomeDataStream::write_element( void *element, int size)
-{
-
-    if (!fwrite(element, size, 1, binary_read_file))
-    {
-        printf("error: can't fwrite (disk full?)\n");
-        exit(1);
-    }
-
-}
-
-void GenomeDataStream::write_element_buffered( void *element)
-{
-
-    if(cpt_buffer==buffer_size_nelem)
-    {
-        if (!fwrite(buffer, sizeElement, buffer_size_nelem, binary_read_file))
-        {
-            printf("error: can't fwrite (disk full?)\n");
-            exit(1);
-        }
-        cpt_buffer=0;
-    }
-
-    //((kmer_type *)buffer)[cpt_buffer]= *((kmer_type *)element);
-    memcpy((unsigned char *)buffer + (cpt_buffer * sizeElement), element, sizeElement);
-    cpt_buffer++;
-
-
-
-}
-
-
-
-size_t GenomeDataStream::read_element( void *element)
-{
-    return fread(element, sizeElement,1, binary_read_file);
-}
-
-size_t GenomeDataStream::read_element_buffered( void *element)
-{
-    if(cpt_buffer==0)
-    {
-        cpt_buffer=fread(buffer, sizeElement,buffer_size_nelem, binary_read_file);
-        if (cpt_buffer==0) return 0;
-    }
-    memcpy(element, (unsigned char *)buffer + (cpt_buffer-1) * sizeElement, sizeElement);
-    cpt_buffer --;
-    return cpt_buffer+1; // nb remaining before read
-}
+//GenomeDataStream::GenomeDataStream(char *given_filename, int given_sizeElement, bool write) : sizeElement(given_sizeElement)
+//{
+//    strcpy(filename,given_filename);
+//    open(write);
+//    buffer_size_nelem= (WRITE_BUFFER/given_sizeElement);
+//    buffer = (void *) malloc(given_sizeElement * buffer_size_nelem);
+//    cpt_buffer=0;
+//}
+//
+//
+//void GenomeDataStream::write_element( void *element)
+//{
+//    //  flockfile(binary_read_file);ca
+//    // fprintf(stderr,"write elem %lli \n",*(int64_t *)element);
+//    if (!fwrite(element, sizeElement, 1, binary_read_file))
+//    {
+//        // funlockfile(binary_read_file);
+//        printf("error: can't fwrite (disk full?)\n");
+//        exit(1);
+//    }
+//    //  funlockfile(binary_read_file);
+//}
+//
+//void GenomeDataStream::write_element( void *element, int size)
+//{
+//
+//    if (!fwrite(element, size, 1, binary_read_file))
+//    {
+//        printf("error: can't fwrite (disk full?)\n");
+//        exit(1);
+//    }
+//
+//}
+//
+//void GenomeDataStream::write_element_buffered( void *element)
+//{
+//
+//    if(cpt_buffer==buffer_size_nelem)
+//    {
+//        if (!fwrite(buffer, sizeElement, buffer_size_nelem, binary_read_file))
+//        {
+//            printf("error: can't fwrite (disk full?)\n");
+//            exit(1);
+//        }
+//        cpt_buffer=0;
+//    }
+//
+//    //((kmer_type *)buffer)[cpt_buffer]= *((kmer_type *)element);
+//    memcpy((unsigned char *)buffer + (cpt_buffer * sizeElement), element, sizeElement);
+//    cpt_buffer++;
+//
+//
+//
+//}
+//
+//
+//
+//size_t GenomeDataStream::read_element( void *element)
+//{
+//    return fread(element, sizeElement,1, binary_read_file);
+//}
+//
+//size_t GenomeDataStream::read_element_buffered( void *element)
+//{
+//    if(cpt_buffer==0)
+//    {
+//        cpt_buffer=fread(buffer, sizeElement,buffer_size_nelem, binary_read_file);
+//        if (cpt_buffer==0) return 0;
+//    }
+//    memcpy(element, (unsigned char *)buffer + (cpt_buffer-1) * sizeElement, sizeElement);
+//    cpt_buffer --;
+//    return cpt_buffer+1; // nb remaining before read
+//}
 
 // used to read/write raw information to the binary file (e.g. kmer count)
 
@@ -179,10 +179,10 @@ off_t GenomeDataStream::file_size()
     return fsize(filename);
 }
 
-off_t GenomeDataStream::nb_elements()
-{
-    return fsize(filename)/sizeElement;
-}
+//off_t GenomeDataStream::nb_elements()
+//{
+//    return fsize(filename)/sizeElement;
+//}
 
 //
 //size_t GenomeDataStream::read_kmer(void *element)

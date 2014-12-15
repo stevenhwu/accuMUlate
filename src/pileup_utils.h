@@ -33,6 +33,12 @@
 
 namespace PileupUtils {
 
+    extern uint64_t print_count;
+    extern float fix_counter;
+    extern float time_scaler;
+
+
+
     void CreatePileupAlignment(boost::program_options::variables_map &vm, GenomeData &genome_data, int index);
 
     void CreatePileupV2(boost::program_options::variables_map &vm, GenomeData &genome_data, RefVector &references, SamHeader &header, Fasta &reference_genome, PileupEngine &pileup);
@@ -43,6 +49,9 @@ namespace PileupUtils {
 
     void ReadGenomeDataFromBinary(std::string file_name, GenomeData &genome_data) ;
 
+    void VerboseAlignmentInfo(clock_t time_stored, uint64_t ali_counter);
+
+    void SummariseReadsData(GenomeData base_counts);
 };
 
 

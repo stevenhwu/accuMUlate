@@ -22,7 +22,7 @@ void VariantVisitorTwo::Visit(const PileupPosition &pileupData) {
     uint16_t ref_base_idx = base_index2[(int) current_base];
     if (ref_base_idx < 4) { //TODO Model for bases at which reference is 'N'
         global_count[2]++;
-        ReadDataVector bcalls(total_samele_count, ReadData{0});
+        ReadDataVector bcalls(total_sample_count, ReadData{0});
         
         for (auto it = begin(pileupData.PileupAlignments); it != end(pileupData.PileupAlignments); ++it) {//auto it2 = *it;
 
@@ -41,6 +41,7 @@ void VariantVisitorTwo::Visit(const PileupPosition &pileupData) {
         if( filter_data(bcalls) ) {
             global_count[1]++;
             m_all_the_data.push_back(ModelInput{ref_base_idx, bcalls});
+            gd_stream.WriteModelInput(m_all_the_data.back());
         }
 
 
@@ -84,23 +85,25 @@ int VariantVisitorTwo::GetSampleIndex(std::string const &tag_data) {
     return sindex;
 }
 
-VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamHeader &header, const Fasta &idx_ref,
-        GenomeData &all_the_data,
-//        const SampleMap &samples, BamAlignment &ali,
-        int qual_cut, int mapping_cut, double prob_cut) :
-        PileupVisitor(), m_idx_ref(idx_ref), m_bam_ref(bam_references),
-        m_header(header), //m_samples(samples),
-        m_qual_cut(qual_cut), // m_ali(ali),
-        m_all_the_data(all_the_data), m_prob_cut(prob_cut),
-        m_mapping_cut(mapping_cut) {
+VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamHeader &header,
+        const Fasta &idx_ref, GenomeData &all_the_data, std::string binary_outfile, int qual_cut, int mapping_cut, double prob_cut)
+        :
+        PileupVisitor(),  m_bam_ref(bam_references),
+        m_header(header), m_idx_ref(idx_ref),
+        m_all_the_data(all_the_data),
+        m_qual_cut(qual_cut),
+        m_mapping_cut(mapping_cut),
+        m_prob_cut(prob_cut) {
 
-    qual_cut_char = (char) (qual_cut + 33);
+
+
+    qual_cut_char = (char) (m_qual_cut + 33);
 
     rg_tag.push_back(ZERO_CHAR);
     rg_tag += "RGZ";
 
     SampleMap sample_map_temp;
-    total_samele_count = 0;
+    total_sample_count = 0;
     SamReadGroupDictionary dictionary = m_header.ReadGroups;
     size_t tag_count = dictionary.Size();
 
@@ -108,8 +111,8 @@ VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamH
         if (it->HasSample()) {
             auto s = sample_map_temp.find(it->Sample);
             if (s == sample_map_temp.end()) { // not in there yet
-                sample_map_temp[it->Sample] = total_samele_count;
-                total_samele_count++;
+                sample_map_temp[it->Sample] = total_sample_count;
+                total_sample_count++;
             }
         }
     }
@@ -129,13 +132,16 @@ VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamH
 //        exit(29);
 //
 
+    gd_stream = GenomeDataStream(binary_outfile, true);
+    gd_stream.WriteHeader(total_sample_count);
+
 
 
 };
 
 
 bool VariantVisitorTwo::filter_data(ReadDataVector &read_vector) {
-
+    return true;
     int pass_count = read_vector.size();
     for (auto item : read_vector) {
         if (item.key!=0){
@@ -155,4 +161,8 @@ bool VariantVisitorTwo::filter_data(ReadDataVector &read_vector) {
 //    std::cout << "FAIL " << pass_count << std::endl;
     return false;
 
+}
+
+int VariantVisitorTwo::getTotal_sample_count() const {
+    return total_sample_count;
 }

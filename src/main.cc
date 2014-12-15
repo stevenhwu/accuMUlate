@@ -41,7 +41,8 @@ class VariantVisitorMain : public PileupVisitor{
              string chr = m_bam_ref[pileupData.RefId].RefName;
              uint64_t pos  = pileupData.Position;
              m_idx_ref.GetBase(pileupData.RefId, pos, current_base);
-             ReadDataVector bcalls (m_samples.size(), ReadData{{ 0,0,0,0 }}); 
+//             ReadDataVector bcalls (m_samples.size(), ReadData{{ 0,0,0,0 }});
+             ReadDataVector bcalls (m_samples.size(), ReadData{0});
              string tag_id;
              for(auto it = begin(pileupData.PileupAlignments);
                       it !=  end(pileupData.PileupAlignments); 
