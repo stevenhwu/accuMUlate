@@ -11,6 +11,7 @@ SET(SOURCE_FILES ${SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/lookup.cc
 
     ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/mutation_model.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/mutation_prob.cc
 
     ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc

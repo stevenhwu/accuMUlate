@@ -177,7 +177,7 @@ void EmAlgorithmMutation::Run2() {
 
 void EmAlgorithmMutation::InitialiseParameters() {
     double lower_bound = 1e-10;
-    double upper_bound = 1e-2;
+    double upper_bound = 0.9;
 
     if (num_category == 2) {
         parameters = {upper_bound, lower_bound};

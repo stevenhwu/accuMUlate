@@ -42,11 +42,17 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params);
 
 void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp);
 
+std::set<double> allD;
+std::set<HaploidProbs> allHap;
+std::set<std::array<double, 4>> allHapArray;
+//std::set<std::array<double, 4>> allHapArray;
+std::unordered_map<double, double> allDMaps;
+std::unordered_map<double, array<double, 4>> allDMaps4;
 
 void SummariseReadsData(GenomeData base_counts) {
     size_t site_count = base_counts.size();
     for (size_t i = 0; i < site_count; ++i) {
-
+        
         int sum = 0;
         int total = 0;
         for (size_t j = 0; j < base_counts[i].all_reads.size(); ++j) {
@@ -105,10 +111,50 @@ void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
 //    site_count = 5000;
     cout << "init: site_count: " << site_count << endl;
     for (size_t i = 0; i < site_count; ++i) {
-        sp.push_back(SequenceProb(base_counts[ i], params));
+        SequenceProb ss = SequenceProb(base_counts[ i], params);
+        sp.push_back(ss);
     }
-    
+    int i = 0;
+    int count_one = 0;
+    for (auto item : sp) {
+        for (HaploidProbs item2 : item.GetDescendantGenotypes()) {
+            cout << item2.format(nice_row) << endl;
 
+            for (int j = 0; j < 4; ++j) {
+                allD.insert(item2[j]);
+
+                auto find1 = allDMaps.find(item2[j]);
+                if(find1 == allDMaps.end()){
+                    allDMaps.emplace(item2[j], 1);
+                }
+                else{
+                    allDMaps[item2[j] ]++;
+                }
+                if(item2[j]==1){
+
+                    count_one++;
+                }
+            }
+            array<double, 4> aa {{item2[0], item2[1], item2[2], item2[3]}};
+            allHapArray.insert(aa);
+//            allHap.insert(item2);//TODO eigen vs array??
+//            HaploidProbs hh = item2;
+            //allHap.insert(item2.);
+        };
+        cout << i << endl;
+        i++;
+    }
+    cout << "END: " << sp.size() << "\t" << sp.size()*11 << "\t" << sp.size()*4*11 <<  endl;
+    cout << "Set: " << allD.size() << endl; // TODO: cache * mutationProb.(1-p)
+    cout << "MapProbsCount: " << allDMaps.size() << endl;
+    cout << "Count==1 " << count_one << endl;
+    cout << "ArraySet: " << allHapArray.size() << endl;
+//TODO: Calculet 2130 reads values, then merge that into 4462 patterns. All possible lookup for descendant
+    for (auto allDMap : allDMaps) {
+//        cout << allDMap.first << "\t" << allDMap.second << endl;
+
+    }
+    exit(32);
 
     F81 evo_model0(mutation_prob);
 
@@ -202,50 +248,27 @@ void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
 int main(int argc, char** argv){
 //using namespace BoostUtils;
     boost::program_options::variables_map variable_map;
-//    BoostUtils::
     BoostUtils::ParseCommandLinkeInput(argc, argv, variable_map);
-
+//
     GenomeData genome_data;
-//    TestVariantVisitorV1(ref_file, vm);
-
-//    TestVariantVisitorV1(ref_file, vm, base_counts);
-    PileupUtils::CreatePileupAlignment(variable_map, genome_data, 1);
-    cout << "G0: " << global_count[0] << "\tG1: " << global_count[1] << "\tG2: " << global_count[2] << endl;
-
-//    TestVariantVisitorTwo(variable_map, genome_data);
-    PileupUtils::CreatePileupAlignment(variable_map, genome_data, 2);
-    cout << "G0: " << global_count[0] << "\tG1: " << global_count[1] << "\tG2: " << global_count[2] << endl;
-
-
+////    TestVariantVisitorV1(ref_file, vm);
+//
+////    TestVariantVisitorV1(ref_file, vm, base_counts);
+//    PileupUtils::CreatePileupAlignment(variable_map, genome_data, 1);
+//    cout << "G0: " << global_count[0] << "\tG1: " << global_count[1] << "\tG2: " << global_count[2] << endl;
+//
+////    TestVariantVisitorTwo(variable_map, genome_data);
+//    PileupUtils::CreatePileupAlignment(variable_map, genome_data, 2);
+//    cout << "G0: " << global_count[0] << "\tG1: " << global_count[1] << "\tG2: " << global_count[2] << endl;
+//
+//
     clock_t start0 = clock();
     std::string file_name = "zz_test_GenomeData_binary_subset";
-    PileupUtils::WriteGenomeDataToBinary(file_name, genome_data);
+//    PileupUtils::WriteGenomeDataToBinary(file_name, genome_data);
     PileupUtils::ReadGenomeDataFromBinary(file_name, genome_data);
 
     printf("Total ReadWrite Time: %f \n", ((double) (clock()-start0)/ CLOCKS_PER_SEC) );
-//    SummariseReadsData(genome_datas);
-
-//    TestV2(ref_file, vm, genome_datas);TestV2(ref_file, vm, genome_datas);TestV2(ref_file, vm, genome_datas);TestVariantVisitorTwo(ref_file, vm, genome_datas);
-    exit(13);
-
-//    exit(14);
-
-
-//    TestVariantVisitorV1(ref_file, vm, base_counts);
-//    TestVariantVisitorTwo(ref_file, vm, base_counts);
-//    TestVariantVisitorTwo(ref_file, vm, base_counts);
-//    TestVariantVisitorV1(ref_file, vm, base_counts);
-//
-//    TestVariantVisitorV1(ref_file, vm, base_counts);
-//    TestVariantVisitorTwo(ref_file, vm, base_counts);
-//    TestVariantVisitorTwo(ref_file, vm, base_counts);
-//    TestVariantVisitorV1(ref_file, vm, base_counts);
-//
-//    TestVariantVisitorV1(ref_file, vm, base_counts);
-//    TestVariantVisitorTwo(ref_file, vm, base_counts);
-//    TestVariantVisitorTwo(ref_file, vm, base_counts);
-//    TestVariantVisitorV1(ref_file, vm, base_counts);
-
+//    SummariseReadsData(genome_data);
 
 
     ModelParams params = {
@@ -257,9 +280,6 @@ int main(int argc, char** argv){
             variable_map["phi-diploid"].as<double>(),
     };
 //    RunBasicProbCalc(genome_data, params);
-
-
-
 
     clock_t start = clock();
 
@@ -569,15 +589,15 @@ void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp)
 
 
 exit(4);
-//    std::vector<std::unique_ptr<EmData>> em_data_binomial;
+//    std::vector<std::unique_ptr<EmData>> em_data_mutation;
 //    for (size_t s = 0; s < 5; ++s) {
-//        em_data_binomial.emplace_back(  new EmDataBinomial(10, s+1)  );
+//        em_data_mutation.emplace_back(  new EmDataBinomial(10, s+1)  );
 //    }
-//    em_data_binomial.emplace_back(  new EmDataBinomial(10, 9)  );
-//    em_data_binomial.emplace_back(  new EmDataBinomial(10, 9)  );
-//    em_data_binomial.emplace_back(  new EmDataBinomial(10, 10)  );
+//    em_data_mutation.emplace_back(  new EmDataBinomial(10, 9)  );
+//    em_data_mutation.emplace_back(  new EmDataBinomial(10, 9)  );
+//    em_data_mutation.emplace_back(  new EmDataBinomial(10, 10)  );
 //    EmModelBinomial em_model_binomial (10, 0.5);
-//    EmAlgorithmBinomial em_bin (2, em_data_binomial, em_model_binomial);
+//    EmAlgorithmBinomial em_bin (2, em_data_mutation, em_model_binomial);
 //
 //
 //    em_bin.Run();

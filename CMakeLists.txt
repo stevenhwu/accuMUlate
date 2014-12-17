@@ -103,7 +103,7 @@ include_directories("${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
 include_directories(${INCLUDE_DIR})
 
 
-message("------------------------BUILD TYPE ${CMAKE_BUILD_TYPE}")
+message("==================== BUILD TYPE ${CMAKE_BUILD_TYPE} ====================")
 ADD_SUBDIRECTORY(src)
 
 ########### Find/add GTest #################

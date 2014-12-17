@@ -54,7 +54,7 @@ void EmAlgorithm::ExpectationStep(  ) {
         all_em_stats[r]->Reset();
         em_model[r]->UpdateParameter(parameters[r]); //exp_beta
     }
-
+    double total = 0;
     for (size_t s = 0; s < site_count; ++s) {
 
         double sum_prob = 0;
@@ -72,20 +72,26 @@ void EmAlgorithm::ExpectationStep(  ) {
 
 //            all_em_stats[r]->UpdateSumWithProportion(proportion[r], em_stat_local_single);
 
-            all_probs(r, s) = sum_prob;
+            all_probs(r, s) = proportion[r] * sum_prob;
+
         }
 
         double sum = all_probs.col(s).sum();
 
-
+        double total_site = 0;
         for (size_t r = 0; r < num_category; ++r) {
 
             double prob = all_probs(r,s) / sum;
             all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
+
+            total_site += all_probs(r,s);
         }
 
-    }
+        total += log(total_site);
 
+    }
+    printf("DEBUG_CHECK: %.10f\n", total );
+    fflush(stdout);
 
 }
 
@@ -97,6 +103,105 @@ void EmAlgorithm::ExpectationStepCustom(size_t data_index, size_t category_index
     
 
 }
+
+
+void EmAlgorithm::MaximizationStep() {
+    CalculateProportion();
+
+
+    for (size_t r = 0; r < num_category; ++r) {
+//        double sum = all_probs.row(r).sum();
+//        std::cout << proportion[r] << "\t" <<  proportion[r] *site_count <<"\t" ;
+        double new_parameter = all_em_stats[r]->MaximiseStats();
+//        double new_mu = mutation_prob.ConvertExpBetaToMu(new_exp_beta);
+
+//        double new_one_minus_mu = mutation_prob.ConvertExpBetaToMu(-(new_one_minus_exp_beta - 1));
+
+
+        parameters[r] = new_parameter;
+
+    }
+
+
+//    printf("======= NEM_MU_r: %zu \tMu: %.5e %.5f =expBeta=  %.5f %.5f \t =prop= %.5f %.5f "
+//                    "\t =stat= %.5f %.5f \n", r,
+//            new_mu, new_one_minus_mu,
+//            new_exp_beta, new_one_minus_exp_beta,
+//            proportion[0], proportion[1],
+//            all_stats_same[0], all_stats_same[1]
+
+}
+
+void EmAlgorithm::CalculateProportion() {
+
+    auto sum_col = all_probs.colwise().sum();
+    auto prop_col = all_probs.row(0) / sum_col;
+    double proportion_sum = prop_col.sum();
+    proportion[0] = proportion_sum / site_count;
+    proportion[1] = 1 - proportion[0];
+
+//    std::cout << sum_col << std::endl;
+//    std::cout << prop_col << std::endl;
+//    std::cout << proportion_sum << std::endl;
+//    std::cout << "Update Proportion: " << "\t" << proportion[0] << "\t" << proportion[1] << std::endl;
+
+
+    if (num_category != 2) {
+        std::cout << "Not yet implemented for more than 2 categories" << std::endl;
+        exit(222);
+    }
+
+}
+
+
+void EmAlgorithm::InitialiseProportion() {
+    double default_proportion = 1.0 / num_category;
+    proportion = std::vector<double>(num_category, default_proportion);
+}
+
+std::vector<double> EmAlgorithm::GetParameters() {
+    return parameters;
+}
+
+std::vector<double> EmAlgorithm::GetProportion() {
+    return proportion;
+}
+
+bool EmAlgorithm::EmStoppingCriteria(int ite) {
+
+
+    double sum_diff = 0;
+    for (size_t r = 0; r < num_category; ++r) {
+        sum_diff += fabs(parameters[r] - cache_parameters[r]);
+//        std::cout << parameters[r] << "\t" << cache_parameters[r] << "\t" << fabs(parameters[r] - cache_parameters[r]) <<std::endl;
+        cache_parameters[r] = parameters[r];
+
+    }
+
+    if ( (ite % 10) == 0) {
+        std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << std::endl;
+//        PrintSummary();
+    }
+    if (sum_diff < EM_CONVERGE_THRESHOLD) {
+        std::cout <<"============ DONE =======\n";
+        return false;
+    }
+    return true;
+}
+
+void EmAlgorithm::PrintSummary(){
+    printf("========================\nEM Summary\nParameters: ");
+     for (auto item :parameters) {
+        printf("%.5e\t", item);
+    }
+
+    printf("\nProportions: ");
+    for (auto item :proportion) {
+        printf("%.3f\t", item);
+    }
+    printf("\n");
+}
+
 
 void EmAlgorithm::ExpectationStep2() {
     printf("here\n");
@@ -193,100 +298,4 @@ void EmAlgorithm::ExpectationStep_Old() {
 
 
     }
-}
-
-void EmAlgorithm::MaximizationStep() {
-    CalculateProportion();
-
-
-    for (size_t r = 0; r < num_category; ++r) {
-
-        double new_parameter = all_em_stats[r]->MaximiseStats();
-//        double new_mu = mutation_prob.ConvertExpBetaToMu(new_exp_beta);
-
-//        double new_one_minus_mu = mutation_prob.ConvertExpBetaToMu(-(new_one_minus_exp_beta - 1));
-
-
-        parameters[r] = new_parameter;
-
-    }
-
-
-//    printf("======= NEM_MU_r: %zu \tMu: %.5e %.5f =expBeta=  %.5f %.5f \t =prop= %.5f %.5f "
-//                    "\t =stat= %.5f %.5f \n", r,
-//            new_mu, new_one_minus_mu,
-//            new_exp_beta, new_one_minus_exp_beta,
-//            proportion[0], proportion[1],
-//            all_stats_same[0], all_stats_same[1]
-
-}
-
-void EmAlgorithm::CalculateProportion() {
-
-    auto sum_col = all_probs.colwise().sum();
-    auto prop_col = all_probs.row(0) / sum_col;
-    double proportion_sum = prop_col.sum();
-    proportion[0] = proportion_sum / site_count;
-    proportion[1] = 1 - proportion[0];
-
-//    std::cout << sum_col << std::endl;
-//    std::cout << prop_col << std::endl;
-//    std::cout << proportion_sum << std::endl;
-//    std::cout << "Update Proportion: " << "\t" << proportion[0] << "\t" << proportion[1] << std::endl;
-
-
-    if (num_category != 2) {
-        std::cout << "Not yet implemented for more than 2 categories" << std::endl;
-        exit(222);
-    }
-
-}
-
-
-void EmAlgorithm::InitialiseProportion() {
-    double default_proportion = 1.0 / num_category;
-    proportion = std::vector<double>(num_category, default_proportion);
-}
-
-std::vector<double> EmAlgorithm::GetParameters() {
-    return parameters;
-}
-
-std::vector<double> EmAlgorithm::GetProportion() {
-    return proportion;
-}
-
-bool EmAlgorithm::EmStoppingCriteria(int ite) {
-
-
-    double sum_diff = 0;
-    for (size_t r = 0; r < num_category; ++r) {
-        sum_diff += fabs(parameters[r] - cache_parameters[r]);
-//        std::cout << parameters[r] << "\t" << cache_parameters[r] << "\t" << fabs(parameters[r] - cache_parameters[r]) <<std::endl;
-        cache_parameters[r] = parameters[r];
-
-    }
-
-    if ( (ite % 10) == 0) {
-        std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << std::endl;
-        PrintSummary();
-    }
-    if (sum_diff < EM_CONVERGE_THRESHOLD) {
-        std::cout <<"============ DONE =======\n";
-        return false;
-    }
-    return true;
-}
-
-void EmAlgorithm::PrintSummary(){
-    printf("========================\nEM Summary\nParameters: ");
-     for (auto item :parameters) {
-        printf("%.5e\t", item);
-    }
-
-    printf("\nProportions: ");
-    for (auto item :proportion) {
-        printf("%.3f\t", item);
-    }
-    printf("\n");
 }

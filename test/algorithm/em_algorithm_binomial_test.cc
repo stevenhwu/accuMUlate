@@ -46,23 +46,27 @@ TEST_F(EmAlgorithmBinomialTest, EmAlgorithmBinomialTest1) {
     std::vector<double> p1 = em_bin.GetParameters();
     std::vector<double> proportion = em_bin.GetProportion();
     for (auto item :p1) {
-        printf("%f\t", item);
+        printf("%.20f\t", item);
     }
 
     printf("\n");//0.80, 0.52
     for (auto item :proportion) {
-        printf("%f\t", item);
+        printf("%.20f\t", item);
     }
-    ASSERT_NEAR(0.793, p1[0], 0.0001);
-    ASSERT_NEAR(0.513, p1[1], 0.0001);
-//    [[1]]
-//    [1] 0.5227561
-//
-//    [[2]]
-//    [1] 0.7933666
-//
-//    [[3]]
-//    [1] 0.5139149
+    ASSERT_NEAR(0.5227513173839890559, proportion[0], 1e-9);
+    ASSERT_NEAR(0.79336764950715998879, p1[0], 1e-9);
+    ASSERT_NEAR(0.51391659104406917091, p1[1], 1e-9);
+/*
+    [[1]]
+    [1] 0.5227513173839890559
+
+    [[2]]
+    [1] 0.79336764950715998879
+
+    [[3]]
+    [1] 0.51391659104406917091
+inits, 0.5, 0.6, 0.5, tol=1e-10
+*/
 
     exit(35);
 
@@ -72,7 +76,7 @@ TEST_F(EmAlgorithmBinomialTest, EmAlgorithmBinomialTest1) {
 
 TEST_F(EmAlgorithmBinomialTest, EmAlgorithmBinomialTest2) {
 
-
+    exit(35);
     std::vector<std::unique_ptr<EmData>> em_data_binomial;
 
     em_data_binomial.emplace_back(new EmDataBinomial(10, 1));
@@ -103,9 +107,7 @@ TEST_F(EmAlgorithmBinomialTest, EmAlgorithmBinomialTest2) {
     EmAlgorithmBinomial em_bin(2, em_data_binomial, em_model_binomial);
 
 //    em.Run();
-    em_bin.
-
-            Run();
+    em_bin.Run();
 
     std::vector<double> p1 = em_bin.GetParameters();
     for (
@@ -125,6 +127,8 @@ N=10
 ## Expectation Step
 estep <- function(obs,pi,p,q){
   pi_estep <- (pi*dbinom(obs,N,p)) / ( pi*dbinom(obs,N,p) + (1-pi)*dbinom(obs,N,q) )
+	#print(pi_estep)
+
   return(pi_estep)
 }
 
@@ -136,15 +140,15 @@ mstep <- function(obs,e.step){
   pi_temp <- mean(e.step)
 
   # estimate p,q
-  p_temp <- sum(obs*e.step) / sum(e.step)/n
-  q_temp <- sum(obs*(1-e.step)) / sum(1-e.step)/n
+  p_temp <- sum(obs*e.step) / sum(e.step)/N
+  q_temp <- sum(obs*(1-e.step)) / sum(1-e.step)/N
 
   list(pi_temp,p_temp,q_temp)
 }
 
 
 ## EM Algorithm
-em.algo <- function(obs,pi_inits,p_inits,q_inits,maxit=1000,tol=1e-6){
+em.algo <- function(obs,pi_inits,p_inits,q_inits,maxit=1000,tol=1e-10){
   # Initial parameter estimates
   flag <- 0
   pi_cur <- pi_inits; p_cur <- p_inits; q_cur <- q_inits
@@ -152,12 +156,12 @@ em.algo <- function(obs,pi_inits,p_inits,q_inits,maxit=1000,tol=1e-6){
   # Iterate between expectation and maximization steps
   for(i in 1:maxit){
 
-
     cur <- c(pi_cur,p_cur,q_cur)
     new <- mstep(obs,estep(obs, pi_cur, p_cur, q_cur))
     pi_new <- new[[1]]; p_new <- new[[2]]; q_new <- new[[3]]
     new_step <- c(pi_new,p_new,q_new)
-
+#print(new_step)
+#print("==============")
     # Stop iteration if the difference between the current and new estimates is less than a tolerance level
     if( all(abs(cur - new_step) < tol) ){ flag <- 1; break}
 
@@ -194,9 +198,12 @@ u <- ifelse(runif(n)<pi_true, rbinom(N,10,p_true),rbinom(N,10,q_true))
 
 
 ## Set parameter estimates
-pi_init = 0.50; p_init = 0.90; q_init = 0.10
+pi_init = 0.50; p_init = 0.60; q_init = 0.50
+pi_inits = 0.50; p_inits = 0.60; q_inits = 0.50
+
 
 u <- c(5,9,8,4,7)
+N <- 10
 ## Run EM Algorithm
 output <- em.algo(u, pi_init, p_init, q_init)
 

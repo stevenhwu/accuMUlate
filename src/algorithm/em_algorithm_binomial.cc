@@ -36,19 +36,25 @@ void EmAlgorithmBinomial::InitialiseSummaryStat() {
 
 void EmAlgorithmBinomial::Run() {
 
-//    em_stat_local_single->print();
-    for (size_t i = 0; i < em_count; ++i) {
+    size_t i = 0;
+    bool isConverged = true;
+    while(isConverged & (i< em_count) ){
+
         ExpectationStep();
         MaximizationStep();
+
+        isConverged = EmStoppingCriteria(i);
+        i++;
     }
+
 
 }
 
 
 
 void EmAlgorithmBinomial::InitialiseParameters() {
-    double lower_bound = 0.1;
-    double upper_bound = 0.9;
+    double lower_bound = 0.5;
+    double upper_bound = 0.6;
 
     if (num_category == 2) {
         parameters = {upper_bound, lower_bound};

@@ -16,7 +16,7 @@
 #include <boost/program_options.hpp>
 #include <time.h>
 //#include <algorithm/em_model_binomial.h>
-//#include <algorithm/em_data_binomial.h>
+//#include <algorithm/em_data_mutation.h>
 //#include <algorithm/em_algorithm_binomial.h>
 //#include <stdint.h>
 //#include <fcntl.h>
