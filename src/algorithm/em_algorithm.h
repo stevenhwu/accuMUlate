@@ -94,7 +94,7 @@ protected:
     void ExpectationStep_Old();
 
 
-    virtual void ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, std::vector<double> &temp_stat);
+    virtual void ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, std::vector<double> &temp_stat) = 0;
 
     bool EmStoppingCriteria(int ite);
 

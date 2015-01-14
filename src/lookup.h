@@ -11,7 +11,8 @@
 #define LOOKUP_H_
 
 #include "string"
-
+//#include <pair>
+#include <array>
 namespace LookupTable {
 //    class Lookup{
 //struct LookupTable {
@@ -26,6 +27,7 @@ namespace LookupTable {
 
     extern const int index_converter_4_4_to_16[4][4];
     extern const int index_converter_10_to_16[10];
+    extern const std::array<int, 2> index_converter_16_to_4_4[16];
 
     extern const std::string genotype_lookup_10[10];
 

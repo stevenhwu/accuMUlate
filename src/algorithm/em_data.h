@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <bits/unique_ptr.h>
+//#include <unordered_map>
 #include "em_summary_stat.h"
 #include "em_model.h"
 #include "em_model_mutation.h"
@@ -29,7 +30,7 @@ public:
 
     virtual void UpdateEmModel(EmModel *em_model) = 0;
 
-    virtual unsorted_map<std::string ,vector<double>> GetDataVector() const;
+//    virtual std::unordered_map<std::string ,std::vector<double>> GetDataVector() const;
 //    virtual void UpdateEmModel(std::unique_ptr<EmModel> &em_model)=0;
 //    virtual void UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model) = 0;
 };

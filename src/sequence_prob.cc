@@ -8,7 +8,6 @@
 #include "sequence_prob.h"
 
 
-
 const int ANCESTOR_COUNT = 10;
 const int BASE_COUNT = 4;
 
@@ -34,17 +33,38 @@ SequenceProb::SequenceProb(ModelInput const site_data,  ModelParams const model_
 	ancestor_genotypes *= pop_genotypes;
 
 //	DiploidProbs num_genotypes = ancestor_genotypes;
-
-    for (i = 1; i < site_data.all_reads.size(); ++i) {
+	descendant_count = site_data.all_reads.size() - 1;
+//	descendant_count = 3;
+    for (i = 1; i < (descendant_count+1); ++i) {
         ReadData data = site_data.all_reads[i];
         all_descendant_data.push_back(data);
 
         HaploidProbs p = HaploidSequencing(data);
         all_descendant_genotypes.push_back(p);
 
+		auto find1 = temp_map.find(data.key);
+		if(find1 == temp_map.end()){
+			temp_map.emplace(data.key, 1);
+		}
+		else{
+			temp_map[data.key]++;
+		}
     }
 
-    descendant_count = site_data.all_reads.size() - 1;
+//	std::cout << "==================="<< std::endl;
+//
+	for (auto item : temp_map) {
+
+		condense_genotype.emplace_back(std::make_pair(item.first, item.second));
+//		auto a = std::make_pair(item.first, item.second);
+//		std::cout << item.first << "\t" << item.second << "\t" << a.first << "\t" << a.second <<std::endl;
+	}
+//
+//	std::cout << "New count:\t" << condense_genotype.size() << std::endl;
+//	for (auto item : condense_genotype) {
+//		std::cout << item.first << "\t" << item.second <<std::endl;
+//	}
+
 
 }
 
@@ -219,4 +239,23 @@ void SequenceProb::printReadData(ReadData read_data) {
 void SequenceProb::PrintReads(ReadData data) {
 	printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);
 
+}
+
+ReadData SequenceProb::GetDescendantReadData(int descent_index) {
+	return all_descendant_data[descent_index];
+}
+ReadDataVector SequenceProb::GetDescendantReadData() {
+	return all_descendant_data;
+}
+
+ReadDataVector const & SequenceProb::GetDescendantReadData2() {
+	return all_descendant_data;
+}
+
+ReadDataVector const * SequenceProb::GetDescendantReadData3() {
+	return &all_descendant_data;
+}
+
+void SequenceProb::GetDescendantReadDataCOPY(ReadDataVector &all_descendant_data2) {
+	all_descendant_data2 = all_descendant_data;
 }

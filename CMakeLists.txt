@@ -99,6 +99,8 @@ set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src ${Boost_INCLUDE_DIR} ${Ba
 
 include_directories("/usr/include/")
 include_directories("/usr/include/google")
+include_directories("/usr/include/sparsehash")
+
 include_directories("${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
 include_directories(${INCLUDE_DIR})
 

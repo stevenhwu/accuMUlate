@@ -1,6 +1,6 @@
 #include "em_algorithm_mutation.h"
 
-
+//data_count: 41321 ite:33  Total EM Time: 296.134882
 //std::vector<std::unique_ptr<EmData>>
 EmAlgorithmMutation::EmAlgorithmMutation(int num_category0,
         std::vector<std::unique_ptr<EmData>> &d_ptr, EmModelMutation &m)
@@ -162,6 +162,16 @@ em_stat_local_single->print();
     }
 
 }
+
+void EmAlgorithmMutation::ExpectationStepCustom(size_t data_index, size_t category_index,
+        double &sum_prob, std::vector<double> &temp_stat) {
+
+    em_data_ptr->at(data_index)->UpdateEmModel( em_model[category_index].get() );
+    em_data_ptr->at(data_index)->UpdateSummaryStat(sum_prob, temp_stat);
+
+
+}
+
 
 
 void EmAlgorithmMutation::Run2() {

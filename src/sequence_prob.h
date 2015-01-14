@@ -25,7 +25,8 @@
 #include "distributions/DirichletMultinomialDistribution.h"
 #include "evolution_models/EvolutionModel.h"
 #include "lookup.h"
-
+#include <set>
+#include <unordered_map>
 
 extern const int ANCESTOR_COUNT;
 extern const int BASE_COUNT;
@@ -49,9 +50,18 @@ public:
     HaploidProbs GetDescendantGenotypes(int descent_index);
     std::vector<HaploidProbs> GetDescendantGenotypes();
 
+    ReadData GetDescendantReadData(int descent_index);
+
     void PrintReads(ReadData data);
 //    double GetLikelihood();
 
+    ReadDataVector GetDescendantReadData();
+    ReadDataVector const & GetDescendantReadData2();
+    ReadDataVector const * GetDescendantReadData3();
+    void GetDescendantReadDataCOPY(ReadDataVector &all_descendant_data);
+
+    std::unordered_map<uint64_t, int> temp_map;
+    std::vector<std::pair<uint64_t, int>> condense_genotype;
 protected:
     DiploidProbs DiploidPopulation(int ref_allele);
 
@@ -76,12 +86,11 @@ private:
     std::vector<double> frequency_prior;
     Array10D ancestor_prior;
 
-    int descendant_count;
+    size_t descendant_count;
     double phi_haploid;
     double phi_diploid;
     double error_prob;
     double theta;
-
 
 
 };

@@ -25,6 +25,8 @@ public:
     virtual EvolutionModel *Clone2() const;
     virtual void UpdateExpBeta(double exp_beta);
 
+    double m1();
+    double m2();
 protected:
 
 
@@ -36,6 +38,8 @@ private:
     double exp_beta;
     double beta0;
     Array4D freqs;
+
+    Eigen::Matrix4d m;
 
 
 

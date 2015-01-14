@@ -11,7 +11,13 @@
 #include <algorithm/em_data_binomial.h>
 #include <algorithm/em_algorithm_binomial.h>
 #include <stdint.h>
+#include <stddef.h>
 //#include <sys/socket.h>
+
+#include <sparsehash/dense_hash_map> // or sparse_hash_set, dense_hash_map, ...
+#include <sparsehash/sparse_hash_map> // or sparse_hash_set, dense_hash_map, ...
+//#include <google/dense_hash_map>
+//        google::sparse_hash_set<int, int> number_mapper;
 
 
 #include "api/BamReader.h"
@@ -32,6 +38,7 @@
 
 #include "boost_input_utils.h"
 #include "pileup_utils.h"
+#include "mutation_model.h"
 
 using namespace std;
 using namespace BamTools;
@@ -42,13 +49,28 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params);
 
 void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp);
 
+void TimeTrialWithCache(std::vector<SequenceProb> &vector, ModelParams &params);
+void TimeTrialWithCache2(std::vector<SequenceProb> &vector, ModelParams &params);
+
+void AddSimulatedData(ModelParams &params, std::vector<SequenceProb> &sp, int descendant_count, size_t fake_sample_count, double fake_prop);
+
 std::set<double> allD;
 std::set<HaploidProbs> allHap;
 std::set<std::array<double, 4>> allHapArray;
 //std::set<std::array<double, 4>> allHapArray;
 std::unordered_map<double, double> allDMaps;
 std::unordered_map<double, array<double, 4>> allDMaps4;
+std::unordered_map<double, Std2DArray> allCacheMapsProbs;
 
+
+std::unordered_map<uint64_t, array<double, 10>> all_cache_read_to_prob;
+std::unordered_map<uint64_t, array<double, 10>> all_cache_read_to_stat;
+std::unordered_map<uint64_t, std::pair<std::array<double, 10>, std::array<double, 10> > > all_cache_read_to_all;
+//std::unordered_map<uint64_t, std::array<std::pair<double, double>, 10> > all_cache_read_to_all_2;
+std::unordered_map<uint64_t, std::array<std::array<double, 2>, 10> > all_cache_read_to_all_2;
+
+google::dense_hash_map<double, array<double, 4>> allDMaps4V2;
+//google::sparse_hash_map<double, array<double, 4>> allDMaps4V2;
 void SummariseReadsData(GenomeData base_counts) {
     size_t site_count = base_counts.size();
     for (size_t i = 0; i < site_count; ++i) {
@@ -103,29 +125,171 @@ void SummariseReadsData(GenomeData base_counts) {
 
 }
 
-void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
+std::vector<HaploidProbs> unique_halpoid_probs;
+std::unordered_map<uint64_t, HaploidProbs> map_rd_key_to_haploid;
+void PreprocessSequenceProb2(std::vector<SequenceProb> &sp, ModelParams &params, F81 &evo_model) {
 
-    MutationProb mutation_prob = MutationProb(params);
-    size_t site_count = base_counts.size();
-    std::vector<SequenceProb> sp;
-//    site_count = 5000;
-    cout << "init: site_count: " << site_count << endl;
-    for (size_t i = 0; i < site_count; ++i) {
-        SequenceProb ss = SequenceProb(base_counts[ i], params);
-        sp.push_back(ss);
+    auto transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
+//    allDMaps4V2.set_empty_key(NULL);
+    vector<double> frequency_prior = params.nuc_freq;//{0.25, 0.25, 0.25, 0.25};//
+
+    std::array<double, 4> temp_base_prob;
+    for (int b = 0; b < BASE_COUNT; ++b) {
+        temp_base_prob[b] = evo_model.GetMutationProb().mutation_rate.prob * frequency_prior[b];
     }
-    int i = 0;
+
+    if(all_cache_read_to_all_2.size() == 0) {
+//        for (auto item : sp) {
+        cout << "once" << endl;
+        for (size_t i = 0; i < sp.size(); ++i) {
+            auto item = sp[i];
+
+            for (int j = 0; j < item.GetDescendantCount(); ++j) {
+                ReadData rd = item.GetDescendantReadData(j);
+                auto rd_key = rd.key;
+                auto find1 = all_cache_read_to_prob.find(rd_key);
+//
+                if(find1 == all_cache_read_to_prob.end()){
+                    HaploidProbs genotype = item.GetDescendantGenotypes(j);
+
+                    double summary_stat_diff = 0;
+                    for (int b = 0; b < BASE_COUNT; ++b) {
+//                    double p = genotype[b];
+                        summary_stat_diff += genotype[b] * temp_base_prob[b];//p * evo_model.GetMutationProb().mutation_rate.prob * frequency_prior[b];
+                    }
+
+//                    std::array<std::pair<double, double>, 10> cache_all;
+                    std::array<std::array<double, 2>, 10> cache_all;
+//                    auto cache_all = all_cache_read_to_all_2[rd_key];
+                    for (int k = 0; k < 10; ++k) {
+
+
+                        int index16 = LookupTable::index_converter_10_to_16[k];
+                        double prob_reads_d_given_a = 0;
+
+                        for (int b = 0; b < BASE_COUNT; ++b) {
+
+                            double p = genotype[b];
+                            //        double prob = transition_matrix_a_to_d(index16, b) * prob_reads_given_descent[b];
+                            double prob = transition_matrix_a_to_d(index16, b) * p;
+//                            cout << transition_matrix_a_to_d(index16, b) << "\t" ;
+                            //        double prob = cache_data_transition[t][anc_index10][b];
+                            prob_reads_d_given_a += prob;
+                        }
+//                        cout << endl;
+
+//                    cache_prob[k] = prob_reads_d_given_a;
+//                    cache_stat[k] = summary_stat_diff/prob_reads_d_given_a;
+//                        cache_all[k] = std::make_pair(prob_reads_d_given_a, summary_stat_diff / prob_reads_d_given_a);
+                        cache_all[k] = {{ prob_reads_d_given_a, summary_stat_diff / prob_reads_d_given_a }};
+                    };
+//                    exit(-1);
+
+//                all_cache_read_to_prob.emplace(rd_key, cache_prob); // All possible values
+//                all_cache_read_to_stat[rd_key] = cache_stat; // All possible values
+//                all_cache_read_to_all[rd_key] = std::make_pair(cache_prob, cache_stat);
+                    all_cache_read_to_all_2[rd_key] = cache_all;
+                    map_rd_key_to_haploid[rd_key]=genotype;
+                }
+                else{
+//                all_cache_read_to_prob[rd_key]++;
+
+                }
+            }
+
+
+        }
+    }
+    else{
+
+        for (auto item : map_rd_key_to_haploid) {
+            auto rd_key = item.first;
+            auto genotype = item.second;
+            double summary_stat_diff = 0;
+
+            for (int b = 0; b < BASE_COUNT; ++b) {
+                summary_stat_diff += genotype[b] * temp_base_prob[b];//p * evo_model.GetMutationProb().mutation_rate.prob * frequency_prior[b];
+
+            }
+//            std::array<std::pair<double, double>, 10> cache_all;
+//            std::array<std::array<double, 2>, 10> cache_all;
+            auto cache_all = all_cache_read_to_all_2[rd_key];
+            for (int k = 0; k < 10; ++k) {
+//                double stat_same = 0;
+                int index16 = LookupTable::index_converter_10_to_16[k];
+                double prob_reads_d_given_a = 0;
+
+                for (int b = 0; b < BASE_COUNT; ++b) {
+                    double prob = transition_matrix_a_to_d(index16, b) * genotype[b];
+                    prob_reads_d_given_a += prob;
+
+//                    stat_same += genotype[b] * evo_model.GetMutationProb().mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[k][b];
+                }
+
+//                cache_all[k] = std::make_pair(prob_reads_d_given_a, summary_stat_diff / prob_reads_d_given_a);
+//                cache_all[k].first = prob_reads_d_given_a;
+//                cache_all[k].second =  summary_stat_diff / prob_reads_d_given_a;
+//                cache_all[k] = {{prob_reads_d_given_a, summary_stat_diff / prob_reads_d_given_a}};
+//                double test = (summary_stat_diff + stat_same )/prob_reads_d_given_a;
+//                if( (test - 1) > 1e-6 ) {
+//                    cout << test << "\t" <<
+//                            (summary_stat_diff / prob_reads_d_given_a) << "b\tc" << (stat_same / prob_reads_d_given_a) << "\t" << endl;
+//                }
+
+                cache_all[k][0] = prob_reads_d_given_a;
+                cache_all[k][1] = summary_stat_diff / prob_reads_d_given_a;
+            };
+
+            all_cache_read_to_all_2[rd_key] = cache_all;
+        }
+    }
+//    cout << "END: " << sp.size() << "\t" << i << "\t" << k << "\t" <<   sp.size()*11 << "\t" << sp.size()*4*11 <<  endl;
+//    cout << "Set: " << allD.size() << endl; // TODO: cache * mutationProb.(1-p)
+//    cout << "MapProbsCount: " << all_cache_read_to_prob.size() <<  endl;
+
+
+
+}
+
+
+void PreprocessSequenceProb(std::vector<SequenceProb> sp, ModelParams params, F81 evo_model) {
+
+    auto transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
+    allDMaps4V2.set_empty_key(0);
+    vector<double> frequency_prior = params.nuc_freq;//{0.25, 0.25, 0.25, 0.25};//
+//    frequency_prior = model_params.nuc_freq;
+    int i = 0, m=0;
     int count_one = 0;
     for (auto item : sp) {
         for (HaploidProbs item2 : item.GetDescendantGenotypes()) {
-            cout << item2.format(nice_row) << endl;
+//            cout << item2.format(nice_row) << endl;
 
             for (int j = 0; j < 4; ++j) {
                 allD.insert(item2[j]);
 
                 auto find1 = allDMaps.find(item2[j]);
                 if(find1 == allDMaps.end()){
-                    allDMaps.emplace(item2[j], 1);
+                    allDMaps.emplace(item2[j], 1); // All possible values
+                    array<double, 4> a4 = {{item2[j]*frequency_prior[0], item2[j]*frequency_prior[1], item2[j]*frequency_prior[2], item2[j]*frequency_prior[3] }};
+
+                    Std2DArray cache;
+                    for (int k = 0; k < 10; ++k) {
+                        for (int b = 0; b < 4; ++b) {
+
+                            int index16 = LookupTable::index_converter_10_to_16[k];
+                            double prob = transition_matrix_a_to_d(index16, b) * item2[j];
+//                    double prob = transition_matrix_a_to_d(index16, b) * prob_reads_given_descent[b];
+                            cache[k][b] = prob;
+                        }
+                    }
+
+                    allCacheMapsProbs.emplace(item2[j], cache);
+
+                    allDMaps4.emplace(item2[j], a4);
+
+                    allDMaps4V2[item2[j]]= a4;
+
+//                    cout << item2[j] << endl;
                 }
                 else{
                     allDMaps[item2[j] ]++;
@@ -134,80 +298,85 @@ void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
 
                     count_one++;
                 }
+                m++;
             }
-            array<double, 4> aa {{item2[0], item2[1], item2[2], item2[3]}};
+            array<double, 4> aa {{item2[0], item2[1], item2[2], item2[3]}}; //ALl possible values for each base
             allHapArray.insert(aa);
+
+
 //            allHap.insert(item2);//TODO eigen vs array??
 //            HaploidProbs hh = item2;
             //allHap.insert(item2.);
         };
-        cout << i << endl;
+//        cout << i << endl;
         i++;
     }
-    cout << "END: " << sp.size() << "\t" << sp.size()*11 << "\t" << sp.size()*4*11 <<  endl;
+    cout << "END: " << sp.size() << "\t" << i << "\t" << m << "\t" <<   sp.size()*11 << "\t" << sp.size()*4*11 <<  endl;
     cout << "Set: " << allD.size() << endl; // TODO: cache * mutationProb.(1-p)
-    cout << "MapProbsCount: " << allDMaps.size() << endl;
+    cout << "MapProbsCount: " << allDMaps.size() <<  endl;
     cout << "Count==1 " << count_one << endl;
     cout << "ArraySet: " << allHapArray.size() << endl;
+//    cout << "MapProbs4: " << allDMaps4.size() << "\t" << allDMaps4.load_factor() << "\t" << allDMaps4.bucket_count() <<  endl;
 //TODO: Calculet 2130 reads values, then merge that into 4462 patterns. All possible lookup for descendant
-    for (auto allDMap : allDMaps) {
-//        cout << allDMap.first << "\t" << allDMap.second << endl;
 
-    }
-    exit(32);
+//    i = 0;
+//    for (auto data: allDMaps4) {
+//        cout << i << "\t" <<  allDMaps4.bucket_size(i) << endl;
+//        i++;
+//    }
+//    for (auto allDMap : allDMaps) {
+//        cout << allDMap.first << "\t" << allDMap.second endl;
+//    }
 
+
+//    exit(32);
+
+}
+
+void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
+
+    MutationProb mutation_prob = MutationProb(params);
     F81 evo_model0(mutation_prob);
 
-    std::vector<SiteProb> site_prob;
-    std::vector<EmData*> em_site_prob;
 
-    std::vector<std::unique_ptr<EmData>> em_site_data;
-//    stuff.reserve(site_count);
-//    for( int i = 0; i < 10; ++i )
+    size_t site_count = base_counts.size();
+    std::vector<SequenceProb> sp;
+//    site_count = 5000;
+    cout << "init: site_count: " << site_count << endl;
+    for (size_t i = 0; i < site_count; ++i) {
+        SequenceProb ss = SequenceProb(base_counts[ i], params);
+        sp.push_back(ss);
+    }
+    int descendant_count = sp[0].GetDescendantCount();
+
+//    size_t fake_sample_count = 10000;
+//    double fake_prop = 0.25;
+//    AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
+
+//    TimeTrialWithCache(sp, params);//TODO: Time trial, cache is slower!?!
+//    TimeTrialWithCache2(sp, params);//
+
+    cout << "Done preprocess. Final site count: " << sp.size() << endl;
+
     cout << "======================== Setup EmData:" << endl;
 
-    for (size_t s = 0; s < site_count; ++s) {
-        em_site_data.emplace_back(  new EmDataMutation(sp[s], evo_model0)  );
 
-        SiteProb site  (sp[s], evo_model0 );
-        site_prob.push_back(site);
+//    std::vector<SiteProb> site_prob;
+    std::vector<EmData*> em_site_prob;
+    std::vector<std::unique_ptr<EmData>> em_site_data;
+//    for (size_t s = 0; s < site_count; ++s) {
+    for (auto seq_prob: sp) {
+
+
+        em_site_data.emplace_back(  new EmDataMutation(seq_prob, evo_model0)  );
+//        SiteProb site  (seq_prob, evo_model0 );
+//        site_prob.push_back(site);
 
     }
 
-
-    cout << "========= Add diff data" << endl;
-    std::random_device rd;
-    std::mt19937 e2(rd());
-    std::uniform_int_distribution<int> uniform_dist(0, 5);
-    int total_sample_count = 12;
-    size_t fake_count = 000;
-    double fake_prop = 0.1;
-    size_t fake_diff_count = fake_count * fake_prop;
-    for (size_t s = 0; s < fake_count; ++s) {
-
-        ReadDataVector bcalls(total_sample_count, ReadData{0});
-//        ModelInput base_custom = base_counts[s];
-//        base_custom.reference = 0;
-        for (int i = 0; i < total_sample_count; ++i) {
-            bcalls[i].key=0;
-            for (int j = 0; j < 4; ++j) {
-                bcalls[i].reads[j] = (uint16_t) uniform_dist(e2);
-            }
-            bcalls[i].reads[0] = (uint16_t) 100 + uniform_dist(e2);
-        }
-//        int i=0;
-        if(s < fake_diff_count){ //diff
-            bcalls[0].reads[0] = (uint16_t) uniform_dist(e2);
-            bcalls[0].reads[3] = (uint16_t) 100 + uniform_dist(e2);
-            for (int i = 1; i < total_sample_count; ++i) {
-                bcalls[i].reads[i%3] = (uint16_t) 100 + uniform_dist(e2);
-            }
-
-        }
-        uint16_t ref_index = 0;
-        SequenceProb sp1 = SequenceProb( ModelInput{ref_index, bcalls} , params);
-        em_site_data.emplace_back(  new EmDataMutation(sp1, evo_model0)  );
-    }
+//    size_t fake_sample_count = 1000;
+//    double fake_prop = 0.25;
+//    AddSimulatedData(params, sp, fake_sample_count, fake_prop);
 
 
     cout << "\n========================\nStart em_algorithm:" << endl;
@@ -245,6 +414,224 @@ void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
 
 }
 
+void AddSimulatedData(ModelParams &params, std::vector<SequenceProb> &sp, int descendant_count, size_t fake_sample_count, double fake_prop) {
+    cout << "========= Add simulated data:" << fake_sample_count << endl;
+
+    random_device rd;
+    mt19937 e2(rd());
+    uniform_int_distribution<uint16_t> uniform_dist(0, 5);
+
+    size_t fake_diff_count = fake_sample_count * fake_prop;
+    for (size_t s = 0; s < fake_sample_count; ++s) {
+
+        ReadDataVector bcalls(descendant_count, ReadData{0});
+        for (int i = 0; i < descendant_count; ++i) {
+            bcalls[i].key=0;
+            for (int j = 0; j < 4; ++j) {
+                bcalls[i].reads[j] = uniform_dist(e2);
+            }
+            bcalls[i].reads[0] = 20 + uniform_dist(e2);
+        }
+
+        if(s < fake_diff_count){ //diff
+//            bcalls[0].reads[0] = uniform_dist(e2);
+            bcalls[0].reads[3] = 10 + uniform_dist(e2);
+            for (int i = 1; i < descendant_count; ++i) {
+                bcalls[i].reads[i%3] = 10 + uniform_dist(e2);
+            }
+
+        }
+        uint16_t ref_index = 0;
+        SequenceProb sp1 = SequenceProb( ModelInput{ref_index, bcalls} , params);
+        sp.emplace_back(SequenceProb( ModelInput{ref_index, bcalls} , params) );
+    }
+
+}
+
+void TimeTrialWithCache(std::vector<SequenceProb> &sp, ModelParams &params) {
+/* time:
+28171789: original
+26676395: diff only
+21478513	21: remove all same
+44602738	44:cache!?
+
+calculate 11344531 <50k
+unord_map 3492     350k?
+END: 1031321	1031321	45378124	11344531	45378124
+Set: 3492
+MapProbsCount: 3492
+
+
+
+init: site_count: 31321
+========= Add simulated data:100000
+No Cache:37462144	37	8.04099e+08
+Cache map:32189722	32	8.04099e+08
+Cache des:31368162	31	8.04099e+08
+*/
+    MutationProb mutation_prob = MutationProb(params);
+    F81 evo_model0(mutation_prob);
+    PreprocessSequenceProb(sp, params, evo_model0);
+
+    MutationModel model = MutationModel( mutation_prob, evo_model0);
+
+    model.AddCache(allDMaps4, allCacheMapsProbs);
+    double a, b, c = 0;
+    clock_t t;
+    int count = 0;
+    t = clock();
+    double total = 0;
+    for (int k = 0; k < 100; ++k) {
+        mutation_prob.mutation_rate.prob = (k+1)/100.0;
+
+        for (size_t i = 0; i < sp.size(); ++i) {
+//            mm.CalculateLikelihood(sp[i], a, b, c);
+            for (int j = 0; j < sp[i].GetDescendantCount(); ++j) {
+                auto des = sp[i].GetDescendantGenotypes(j);
+                for (int b = 0; b < 4; ++b) {
+                    count++;
+
+                    double x = des[b] * mutation_prob.mutation_rate.prob * mutation_prob.frequency_prior[b];
+//                    total += x;
+//                        double x = fabs(des[b]);x=sqrt(des[b]);
+
+//                    auto y = allDMaps4[des[b]][b] * mutation_prob.mutation_rate.prob;;
+//                    total += y;
+
+//                    auto y = allDMaps4V2[des[b]][b];
+                }
+            }
+        }
+    }
+    clock_t t2 = clock();
+    std::cout << (t2 - t) << "\t" << ((t2-t)/CLOCKS_PER_SEC) << "\t" << total << std::endl;
+    cout << count << endl;
+}
+
+
+
+void TimeTrialWithCache2(std::vector<SequenceProb> &sp, ModelParams &params) {
+/* time:
+same mu, no recalculate
+No Cache:11895140	11	1.96443e+08
+Cache map:9951850	9	1.96443e+08
+Cache des:9237851	9	1.96443e+08
+
+change mu, recalculate cache
+No Cache:9635469	9	2.50272e+08
+Cache map:17471742	17	2.50272e+08
+Cache des:19156947	19	2.50272e+08
+*/
+
+    bool updateModel = true;
+    MutationProb mutation_prob = MutationProb(params);
+    F81 evo_model0(mutation_prob);
+    MutationModel model = MutationModel( mutation_prob, evo_model0);
+
+
+    PreprocessSequenceProb2(sp, params, evo_model0);
+    model.AddCache2(all_cache_read_to_all_2);
+
+    double prob = 0, same = 0, diff=0, total=0, count = 0;
+    int test_size = 100;
+    cout << "Test_size: " << test_size << endl;
+    clock_t t2 = clock();
+    clock_t t = clock();
+
+
+//    for (int k = 0; k < test_size; ++k) {
+//        if(updateModel) {
+//            evo_model0.UpdateMu(k/100.0);
+//            model.UpdateModel(evo_model0);
+//        }
+//        for (size_t i = 0; i < sp.size(); ++i) {
+//            model.CalculateLikelihood(sp[i]);
+//            for (int a = 0; a < 10; ++a) {
+//                model.NoCacheCalculateDes(a, prob, diff);
+//                total += prob;
+//                total += diff;
+//            }
+//        }
+//    }
+//    t2 = clock();
+//    std::cout << "No Cache:" << (t2 - t) << "\t" << ((t2-t)/CLOCKS_PER_SEC) << "\t" << total << std::endl;
+
+
+//    t = clock();
+//    total = 0;
+//    for (int k = 0; k < test_size; ++k) {
+//        if(updateModel) {
+//            evo_model0.UpdateMu(k / 100.0);
+//            PreprocessSequenceProb2(sp, params, evo_model0);
+//            model.AddCache2(all_cache_read_to_all_2);
+//        }
+//        for (size_t i = 0; i < sp.size(); ++i) {
+//            model.CalculateLikelihood(sp[i]);
+//            for (int a = 0; a < 10; ++a) {
+//                model.CacheLoopMap(a, prob, diff);
+//                total += prob;
+//                total += diff;
+//            }
+//        }
+//    }
+//    t2 = clock();
+//    std::cout << "Cache map:" << (t2 - t) << "\t" << ((t2-t)/CLOCKS_PER_SEC) << "\t" << total << std::endl;
+
+
+    t = clock();
+    total = 0;
+    for (int k = 0; k < test_size; ++k) {
+        if(updateModel) {
+            evo_model0.UpdateMu(k / 100.0);
+            PreprocessSequenceProb2(sp, params, evo_model0);
+            model.AddCache2(all_cache_read_to_all_2);
+        }
+        for (size_t i = 0; i < sp.size(); ++i) {
+            model.CalculateLikelihood(sp[i]);
+            for (int a = 0; a < 10; ++a) {
+                model.CacheLoopDes(a, prob, diff);
+                total += prob;
+                total += diff;
+            }
+        }
+    }
+
+    t2 = clock();
+    std::cout << "Cache des:" << (t2 - t) << "\t" << ((t2-t)/CLOCKS_PER_SEC) << "\t" << total << std::endl;
+
+
+
+
+    t = clock();
+    total = 0;
+    model.CalculateLikelihoodAll(sp);
+    for (int k = 0; k < test_size; ++k) {
+        if(updateModel) {
+            evo_model0.UpdateMu(k / 100.0);
+            PreprocessSequenceProb2(sp, params, evo_model0);
+            model.AddCache2(all_cache_read_to_all_2);
+        }
+        for (size_t i = 0; i < sp.size(); ++i) {
+            for (int a = 0; a < 10; ++a) {
+                model.CacheLoopDesAll(i, a, prob, diff);
+                total += prob;
+                total += diff;
+            }
+        }
+    }
+
+    t2 = clock();
+    std::cout << "Cache2 des:" << (t2 - t) << "\t" << ((t2-t)/CLOCKS_PER_SEC) << "\t" << total << std::endl;
+    t = clock();
+    cout << count << endl;
+
+    t = clock();
+    cout << count << endl;
+
+
+    exit(31);
+
+}
 int main(int argc, char** argv){
 //using namespace BoostUtils;
     boost::program_options::variables_map variable_map;

@@ -42,39 +42,65 @@ F81::F81(F81 const &self) : EvolutionModel(self.GetMutationProb()) {
 //}
 
 
+
 void F81::UpdateTransitionMatrix() {
 
     exp_beta = mu_prob.GetExpBeta();
-//cout << "F81:\t" << mu << "\t" << exp_beta << endl;
 
-    Eigen::Matrix4d m;
-    for (int i : { 0, 1, 2, 3 }) {
-        double prob = freqs[i] * (1.0 - exp_beta);
-        for (int j : { 0, 1, 2, 3 }) {
-            m(j, i) = prob;
-			//MatrixXd::Constant(3,3,1.2)) replace with
-        }
-        m(i, i) += exp_beta;
-    }
+	double one_minus_exp_beta_half = (1.0 - exp_beta)*0.5;
 
-    //TODO: use col row to assign them
-    transition_matrix_a_to_d = MutationMatrix::Zero();
-    for (int i : { 0, 1, 2, 3 }) {
-        for (int j : { 0, 1, 2, 3 }) {
-            int index16 = LookupTable::index_converter_4_4_to_16[i][j];
-            for (int k : { 0, 1, 2, 3 }) {
-                transition_matrix_a_to_d(index16, k) += 0.5 * m(i, k);
-                transition_matrix_a_to_d(index16, k) += 0.5 * m(j, k);
-            }
-        }
-    }
+	for (int i : { 0, 1, 2, 3 }) {
+		double prob = freqs[i] * one_minus_exp_beta_half;
+		m.col(i) = Eigen::Vector4d::Constant(prob);
+	}
+	m.diagonal() += Eigen::Vector4d::Constant (exp_beta*0.5);//moved  *0.5 here
+
+
+	for (int l = 0; l < 16; ++l) {
+		auto index4_4 = LookupTable::index_converter_16_to_4_4[l];
+		for (int k : { 0, 1, 2, 3 }) {
+			transition_matrix_a_to_d(l, k) = (m(index4_4[0], k)+ m(index4_4[1], k));
+		}
+	}
+
+//	std::cout << "F81:\t" << mu << "\t" << exp_beta << std::endl;
+
+//    Eigen::Matrix4d m;
+//	for (int i : { 0, 1, 2, 3 }) {
+//        double prob = freqs[i] * one_minus_exp_beta;
+//        for (int j : { 0, 1, 2, 3 }) {
+//            m(j, i) = prob;
+//			//MatrixXd::Constant(3,3,1.2)) replace with
+//        }
+//        m(i, i) += exp_beta;
+//    }
+
+//
+//	Eigen::Matrix4d m;
+//	for (int i : { 0, 1, 2, 3 }) {
+//		double prob = freqs[i] * one_minus_exp_beta;
+//		m.col(i) = Eigen::Vector4d::Constant(prob);
+//	}
+//	m.diagonal() += Eigen::Vector4d::Constant (exp_beta);;
+//
+//
+//	//TODO: use col row to assign them
+//    transition_matrix_a_to_d = MutationMatrix::Zero();
+//    for (int i : { 0, 1, 2, 3 }) {
+//        for (int j : { 0, 1, 2, 3 }) {
+//            int index16 = LookupTable::index_converter_4_4_to_16[i][j];
+//            for (int k : { 0, 1, 2, 3 }) {
+//                transition_matrix_a_to_d(index16, k) += 0.5 * m(i, k);
+//                transition_matrix_a_to_d(index16, k) += 0.5 * m(j, k);
+//            }
+//        }
+//    }
     
 //    std::cout << "Calculate F81:\n" << mu <<  "\t" << beta0 << "\t" << exp_beta << "\n" <<
 //             freqs[0] << freqs[1] << "\n" << m << "\n========================\n" << transition_matrix_a_to_d <<
 //            "\n============================\n" << endl;
 
 }
-
 
 
 void F81::UpdateExpBeta(double exp_beta) {
@@ -197,4 +223,109 @@ std::unique_ptr<EvolutionModel> F81::Clone() const {
 EvolutionModel* F81::Clone2() const {
 //	printf("call F81 clone function raw pointer\n");
 	return new F81(*this) ;
+}
+
+double F81::m1() {
+
+//	Eigen::Matrix4d m;
+	double one_minus_exp_beta_half = (1.0 - exp_beta)*0.5;
+//	for (int i : { 0, 1, 2, 3 }) {
+//		double prob = freqs[i] * one_minus_exp_beta;
+//		for (int j : { 0, 1, 2, 3 }) {
+//			m(j, i) = prob;
+//			//MatrixXd::Constant(3,3,1.2)) replace with
+//		}
+//		m(i, i) += exp_beta;
+//	}
+
+	for (int i : { 0, 1, 2, 3 }) {
+		double prob = freqs[i] * one_minus_exp_beta_half;
+		m.col(i) = Eigen::Vector4d::Constant(prob);
+//		m.col(i) = std::move(Eigen::Vector4d::Constant(prob));
+	}
+	m.diagonal() += Eigen::Vector4d::Constant (exp_beta*0.5);//moved  *0.5 here
+
+
+//	transition_matrix_a_to_d = MutationMatrix::Zero();
+//	for (int i : { 0, 1, 2, 3 }) {
+//		for (int j : { 0, 1, 2, 3 }) {
+//			int index16 = LookupTable::index_converter_4_4_to_16[i][j];
+//			for (int k : { 0, 1, 2, 3 }) {
+////				transition_matrix_a_to_d(index16, k) = 0;
+//				transition_matrix_a_to_d(index16, k) = (m(i, k)+ m(j, k))*0.5;
+////				transition_matrix_a_to_d(index16, k) *= 0.5;
+////				transition_matrix_a_to_d(index16, k) += 0.5 * m(i, k);
+////				transition_matrix_a_to_d(index16, k) += 0.5 * m(j, k);
+//			}
+//		}
+//	}
+
+	for (int l = 0; l < 16; ++l) {
+			auto index4_4 = LookupTable::index_converter_16_to_4_4[l];
+			for (int k : { 0, 1, 2, 3 }) {
+//				transition_matrix_a_to_d(index16, k) = 0;
+				transition_matrix_a_to_d(l, k) = (m(index4_4[0], k)+ m(index4_4[1], k));
+//				transition_matrix_a_to_d(index16, k) *= 0.5;
+//				transition_matrix_a_to_d(index16, k) += 0.5 * m(i, k);
+//				transition_matrix_a_to_d(index16, k) += 0.5 * m(j, k);
+		}
+	}
+
+
+
+//	transition_matrix_a_to_d *= 0.5;
+
+//	transition_matrix_a_to_d(index16, k) += 0.5 * m(j, k);
+
+
+	return transition_matrix_a_to_d.sum();
+
+}
+
+double F81::m2() {
+
+
+	double one_minus_exp_beta = 1.0 - exp_beta;
+
+//	for (int i : { 0, 1, 2, 3 }) {
+//		double prob = freqs[i] * one_minus_exp_beta;
+//		for (int j : { 0, 1, 2, 3 }) {
+//			m(j, i) = prob;
+//			//MatrixXd::Constant(3,3,1.2)) replace with
+//		}
+//		m(i, i) += exp_beta;
+//	}
+	for (int i : { 0, 1, 2, 3 }) {
+		double prob = freqs[i] * one_minus_exp_beta;
+		m.col(i) = Eigen::Vector4d::Constant(prob);
+	}
+	m.diagonal() += Eigen::Vector4d::Constant (exp_beta);;
+
+
+//	transition_matrix_a_to_d = MutationMatrix::Zero();
+//	for (int i : { 0, 1, 2, 3 }) {
+//		for (int j : { 0, 1, 2, 3 }) {
+//			int index16 = LookupTable::index_converter_4_4_to_16[i][j];
+//			for (int k : { 0, 1, 2, 3 }) {
+//				transition_matrix_a_to_d(index16, k) += 0.5 * m(i, k);
+//				transition_matrix_a_to_d(index16, k) += 0.5 * m(j, k);
+//			}
+//		}
+//	}
+
+
+	for (int i : { 0, 1, 2, 3 }) {
+		for (int j : { 0, 1, 2, 3 }) {
+			int index16 = LookupTable::index_converter_4_4_to_16[i][j];
+			for (int k : { 0, 1, 2, 3 }) {
+//				transition_matrix_a_to_d(index16, k) = 0;
+				transition_matrix_a_to_d(index16, k) = (m(i, k)+ m(j, k))*0.5;
+//				transition_matrix_a_to_d(index16, k) *= 0.5;
+//				transition_matrix_a_to_d(index16, k) += 0.5 * m(i, k);
+//				transition_matrix_a_to_d(index16, k) += 0.5 * m(j, k);
+			}
+		}
+	}
+
+	return transition_matrix_a_to_d.sum();
 }

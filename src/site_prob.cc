@@ -110,7 +110,8 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
     double summary_stat_diff_ancestor = 0;
     double prod_prob_ancestor = 1;
 
-        for (int a = 0; a < ANCESTOR_COUNT; ++a) {
+    for (int a = 0; a < ANCESTOR_COUNT; ++a) {
+
         int index10 = a;
         int index16 = LookupTable::index_converter_10_to_16[a];
 
