@@ -1,9 +1,9 @@
-#include "em_algorithm_mutation.h"
+#include "em_algorithm_mutation_v1.h"
 
 //data_count: 41321 ite:33  Total EM Time: 296.134882
 //std::vector<std::unique_ptr<EmData>>
-EmAlgorithmMutation::EmAlgorithmMutation(int num_category0,
-        std::vector<std::unique_ptr<EmData>> &d_ptr, EmModelMutation &m)
+EmAlgorithmMutationV1::EmAlgorithmMutationV1(int num_category0,
+        std::vector<std::unique_ptr<EmData>> &d_ptr, EmModelMutationV1 &m)
         : EmAlgorithm(num_category0, d_ptr, m)
 //          EmAlgorithm::em_data_ptr(&d_ptr), em_model(&m) {
 {
@@ -14,7 +14,7 @@ EmAlgorithmMutation::EmAlgorithmMutation(int num_category0,
     }
 
     for (size_t i = 0; i < num_category; ++i) {
-        em_model.emplace_back(new EmModelMutation(m));
+        em_model.emplace_back(new EmModelMutationV1(m));
     }
 
     em_count = 1000;
@@ -31,7 +31,7 @@ EmAlgorithmMutation::EmAlgorithmMutation(int num_category0,
 
 
 
-EmAlgorithmMutation::EmAlgorithmMutation(
+EmAlgorithmMutationV1::EmAlgorithmMutationV1(
         std::vector<std::unique_ptr<EmData>> &d_ptr, std::vector<std::unique_ptr<EmModel>> &m)
         : EmAlgorithm(d_ptr, m)
 //          EmAlgorithm::em_data_ptr(&d_ptr), em_model(&m) {
@@ -53,7 +53,7 @@ EmAlgorithmMutation::EmAlgorithmMutation(
 
 
 //std::vector<std::unique_ptr<EmData>>
-EmAlgorithmMutation::EmAlgorithmMutation(int num_category0, std::vector<SiteProb> &em_data0, EvolutionModel &em_model0,
+EmAlgorithmMutationV1::EmAlgorithmMutationV1(int num_category0, std::vector<SiteProb> &em_data0, EvolutionModel &em_model0,
         std::vector<std::unique_ptr<EmData>> &d_ptr, EmModel &m)
         : EmAlgorithm(num_category0, d_ptr, m), em_data_old(em_data0), em_model_old(&em_model0)
 //          EmAlgorithm::em_data_ptr(&d_ptr), em_model(&m) {
@@ -132,11 +132,11 @@ EmAlgorithmMutation::EmAlgorithmMutation(int num_category0, std::vector<SiteProb
 //}
 
 
-EmAlgorithmMutation::~EmAlgorithmMutation() {
+EmAlgorithmMutationV1::~EmAlgorithmMutationV1() {
 
 }
 
-void EmAlgorithmMutation::Run() {
+void EmAlgorithmMutationV1::Run() {
 em_stat_local_single->print();
     size_t i = 0;
     bool isConverged = true;
@@ -163,7 +163,7 @@ em_stat_local_single->print();
 
 }
 
-void EmAlgorithmMutation::ExpectationStepCustom(size_t data_index, size_t category_index,
+void EmAlgorithmMutationV1::ExpectationStepCustom(size_t data_index, size_t category_index,
         double &sum_prob, std::vector<double> &temp_stat) {
 
     em_data_ptr->at(data_index)->UpdateEmModel( em_model[category_index].get() );
@@ -174,7 +174,7 @@ void EmAlgorithmMutation::ExpectationStepCustom(size_t data_index, size_t catego
 
 
 
-void EmAlgorithmMutation::Run2() {
+void EmAlgorithmMutationV1::Run2() {
 
     for (size_t i = 0; i < em_count; ++i) {
         std::cout << "EM2 ite: " << i << std::endl;
@@ -185,7 +185,7 @@ void EmAlgorithmMutation::Run2() {
 
 
 
-void EmAlgorithmMutation::InitialiseParameters() {
+void EmAlgorithmMutationV1::InitialiseParameters() {
     double lower_bound = 1e-10;
     double upper_bound = 0.9;
 
@@ -202,21 +202,21 @@ void EmAlgorithmMutation::InitialiseParameters() {
 }
 
 
-void EmAlgorithmMutation::InitialiseSummaryStat() {
+void EmAlgorithmMutationV1::InitialiseSummaryStat() {
 
-    em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutation());
+    em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutationV1());
     em_stat_local_single->print();
 
     temp_stats = std::vector<std::vector<double>>(num_category);
     for (size_t i = 0; i < num_category; ++i) {
-        all_em_stats.emplace_back(new EmSummaryStatMutation());
-//        all_em_stats.emplace_back(new EmSummaryStatMutation());
+        all_em_stats.emplace_back(new EmSummaryStatMutationV1());
+//        all_em_stats.emplace_back(new EmSummaryStatMutationV1());
         temp_stats[i] = std::vector<double>(em_stat_local_single->GetStatCount());
     }
 
 
 //    for (size_t i = 0; i < num_category; ++i) {
-//        EmSummaryStatMutation a;
+//        EmSummaryStatMutationV1 a;
 //        all_em_stats_nonptr.push_back(a);
 ////        all_em_stats_nonptr[i]->SetStats(std::vector<double> {i+1.0, i+1.0});
 ////        all_em_stats_nonptr[i]->print();
@@ -231,7 +231,7 @@ void EmAlgorithmMutation::InitialiseSummaryStat() {
 
 
 
-void EmAlgorithmMutation::oldMStep() {
+void EmAlgorithmMutationV1::oldMStep() {
     MutationProb mutation_prob = em_model_old->GetMutationProb();//FIXME: What to do here?? maybe in EmSummayrStat??
 
     for (size_t r = 0; r < num_category; ++r) {
@@ -269,7 +269,7 @@ void EmAlgorithmMutation::oldMStep() {
 //        }
 }
 
-void EmAlgorithmMutation::oldEStep() {
+void EmAlgorithmMutationV1::oldEStep() {
     for (size_t r = 0; r < num_category; ++r) {
 
             em_model_old->UpdateMu(parameters_old[r]);

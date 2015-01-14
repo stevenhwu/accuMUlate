@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef EM_ALGORITHM_MUTATION_H_
-#define EM_ALGORITHM_MUTATION_H_
+#ifndef EM_ALGORITHM_MUTATION_V1_H_
+#define EM_ALGORITHM_MUTATION_V1_H_
 
 
 #include <bits/unique_ptr.h>
@@ -17,12 +17,12 @@
 
 #include "em_algorithm.h"
 
-#include "em_model_mutation.h"
-#include "em_data_mutation.h"
-#include "em_summary_stat_mutation.h"
+#include "em_model_mutation_v1.h"
+#include "em_data_mutation_v1.h"
+#include "em_summary_stat_mutation_v1.h"
 
 
-class EmAlgorithmMutation : public EmAlgorithm{
+class EmAlgorithmMutationV1 : public EmAlgorithm{
 
 public:
 
@@ -31,7 +31,7 @@ public:
 //    EM(int num_category, vector<SiteProb> em_data0, EvolutionModel &em_model0, EmModel &m);
 
 
-//    EM(vector<EmDataMutation> site_data, EmModelMutation &evo_model);
+//    EM(vector<EmDataMutationV1> site_data, EmModelMutationV1 &evo_model);
 
 //    EM(int num_category0, vector<EmData> em_data0, EmModel &em_model0);
 
@@ -39,17 +39,17 @@ public:
 
 //    EM(int num_category0, vector<SiteProb> em_data0);
 
-//    EM(int num_category0, vector<SiteProb> em_data0, EvolutionModel &em_model0, EmModelMutation &m);
+//    EM(int num_category0, vector<SiteProb> em_data0, EvolutionModel &em_model0, EmModelMutationV1 &m);
 
 //    EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<EmData*> &d, EmModel &m);
 
-    EmAlgorithmMutation(int num_category0, std::vector<SiteProb> &em_data0, EvolutionModel &em_model0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModel &em_model);
+    EmAlgorithmMutationV1(int num_category0, std::vector<SiteProb> &em_data0, EvolutionModel &em_model0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModel &em_model);
 
-    EmAlgorithmMutation(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &em_model_ptr);
+    EmAlgorithmMutationV1(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &em_model_ptr);
 
-    EmAlgorithmMutation(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModelMutation &em_model);
+    EmAlgorithmMutationV1(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModelMutationV1 &em_model);
 
-    virtual ~EmAlgorithmMutation();
+    virtual ~EmAlgorithmMutationV1();
 
     void Run();
 

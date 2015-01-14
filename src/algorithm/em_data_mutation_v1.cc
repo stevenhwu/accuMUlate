@@ -1,19 +1,19 @@
 
 
 #include <iostream>
-#include "em_data_mutation.h"
-#include "em_model_mutation.h"
+#include "em_data_mutation_v1.h"
+#include "em_model_mutation_v1.h"
 
 
-EmDataMutation::EmDataMutation(SequenceProb &sequence_prob, EvolutionModel &evo_model){
+EmDataMutationV1::EmDataMutationV1(SequenceProb &sequence_prob, EvolutionModel &evo_model){
     site = SiteProb(sequence_prob, evo_model);
 }
 
 
-EmDataMutation::~EmDataMutation() {}
+EmDataMutationV1::~EmDataMutationV1() {}
 
 
-void EmDataMutation::UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat) {
+void EmDataMutationV1::UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat) {
 
 
     summaryStat->print();
@@ -21,7 +21,7 @@ void EmDataMutation::UpdateSummaryStat(double &prob, std::unique_ptr<EmSummarySt
     double stat_same = 0;
     double stat_diff = 0;
     //relpace with
-//    EmSummaryStatMutation local;
+//    EmSummaryStatMutationV1 local;
 
 
     site.CalculateAncestorToDescendant(prob, stat_same, stat_diff);
@@ -34,35 +34,35 @@ void EmDataMutation::UpdateSummaryStat(double &prob, std::unique_ptr<EmSummarySt
 }
 
 
-void EmDataMutation::UpdateEmModel(EmModel *em_model) {
+void EmDataMutationV1::UpdateEmModel(EmModel *em_model) {
 
-//    cout << "In EmDataMutation, UpdateModel: " << endl;
-//    EmModelMutation *em = dynamic_cast<EmModelMutation*> (em_model);
-    EmModelMutation *em_model_mutation = static_cast<EmModelMutation*> (em_model);
+//    cout << "In EmDataMutationV1, UpdateModel: " << endl;
+//    EmModelMutationV1 *em = dynamic_cast<EmModelMutationV1*> (em_model);
+    EmModelMutationV1 *em_model_mutation = static_cast<EmModelMutationV1 *> (em_model);
     EvolutionModel *evo_model = em_model_mutation->GetEvoModel();
     site.UpdateModel(*evo_model);
     //TODO: redo static_cast with visitor??? ?typeid?
 
 }
 //
-//void EmDataMutation::UpdateEmModel(std::unique_ptr<EmModelMutation> &em_model) {
+//void EmDataMutationV1::UpdateEmModel(std::unique_ptr<EmModelMutationV1> &em_model) {
 //
 ////    default_delete<EmModel> &deleter = em_model.get_deleter();
-////    std::unique_ptr<EmDataMutation> em_model_mutation = static_unique_ptr_cast<EmModelMutation, EmModel, default_delete<EmModel> >(em_model);
+////    std::unique_ptr<EmDataMutationV1> em_model_mutation = static_unique_ptr_cast<EmModelMutationV1, EmModel, default_delete<EmModel> >(em_model);
 //    EvolutionModel *evo_model = em_model->GetEvoModel();
 //    site.UpdateModel(*evo_model);
 //}
 //
 //
-//void EmDataMutation::UpdateEmModel(unique_ptr<EmModel> &em_model) {
+//void EmDataMutationV1::UpdateEmModel(unique_ptr<EmModel> &em_model) {
 //    std::cout << "deal with unqiue pointer at update\n";
-//    EmModelMutation *em_model_mutation = static_cast<EmModelMutation*> (em_model.get());
-////    EmModelMutation *em_model_mutation2 = em_model->GetModel();
+//    EmModelMutationV1 *em_model_mutation = static_cast<EmModelMutationV1*> (em_model.get());
+////    EmModelMutationV1 *em_model_mutation2 = em_model->GetModel();
 //    EvolutionModel *evo_model = em_model_mutation->GetEvoModel();
 //    site.UpdateModel(*evo_model);
 //}
 
-void EmDataMutation::UpdateSummaryStat(double &prob, std::vector<double> &temp_stat) {
+void EmDataMutationV1::UpdateSummaryStat(double &prob, std::vector<double> &temp_stat) {
 
 
 //    summaryStat->print();
@@ -70,7 +70,7 @@ void EmDataMutation::UpdateSummaryStat(double &prob, std::vector<double> &temp_s
     double stat_same = 0;
     double stat_diff = 0;
     //relpace with
-//    EmSummaryStatMutation local;
+//    EmSummaryStatMutationV1 local;
 
 
     site.CalculateAncestorToDescendant(prob, stat_same, stat_diff);

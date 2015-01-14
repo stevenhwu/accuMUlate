@@ -26,8 +26,8 @@
 #include "evolution_models/JC69.h"
 #include "evolution_models/F81.h"
 #include "site_prob.h"
-#include "algorithm/em_algorithm_mutation.h"
-#include "algorithm/em_data_mutation.h"
+#include "em_algorithm_mutation_old.h"
+#include "em_data_mutation_v1.h"
 #include "genome_data_stream.h"
 
 #include "boost_input_utils.h"

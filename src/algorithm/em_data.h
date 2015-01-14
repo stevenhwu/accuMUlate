@@ -15,7 +15,7 @@
 //#include <unordered_map>
 #include "em_summary_stat.h"
 #include "em_model.h"
-#include "em_model_mutation.h"
+#include "em_model_mutation_v1.h"
 #include "em_model_binomial.h"
 
 class EmData {

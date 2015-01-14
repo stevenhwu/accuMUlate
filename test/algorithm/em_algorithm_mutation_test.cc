@@ -9,17 +9,17 @@
 #include <vector>
 #include "gtest/gtest.h"
 
-#include "algorithm/em_model_mutation.h"
+#include "em_model_mutation_v1.h"
 
-#include <algorithm/em_data_mutation.h>
-#include <algorithm/em_algorithm_mutation.h>
+#include "em_data_mutation_v1.h"
+#include "em_algorithm_mutation_old.h"
 #include <evolution_models/F81.h>
 
 
 class EmAlgorithmMutationTest : public ::testing::Test {
 protected:
 //
-//    EmModelMutation em_model_mutation;
+//    EmModelMutationV1 em_model_mutation;
     int total_sample_count = 12;
     ModelParams params_equal;
     ModelParams params_not_equal;
@@ -96,15 +96,15 @@ TEST_F(EmAlgorithmMutationTest, EmAlgorithmMutationTest1) {
             std::cout << item.format(nice_row) << std::endl;
         }
 //        exit(34);
-        em_site_data.emplace_back(new EmDataMutation(sp1, evo_model0));
+        em_site_data.emplace_back(new EmDataMutationV1(sp1, evo_model0));
     }
 
 
-    EmModelMutation em_model0(evo_model0);
+    EmModelMutationV1 em_model0(evo_model0);
 
 
 
-//    EmAlgorithmMutation em_alg (2, site_prob, model, em_site_data, em_model0);
+//    EmAlgorithmMutationV1 em_alg (2, site_prob, model, em_site_data, em_model0);
     EmAlgorithmMutation em_alg2(2, em_site_data, em_model0);
     em_alg2.Run();
 

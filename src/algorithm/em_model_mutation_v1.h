@@ -7,21 +7,21 @@
 
 
 #pragma once
-#ifndef EM_MODEL_MUTATION_H_
-#define EM_MODEL_MUTATION_H_
+#ifndef EM_MODEL_MUTATION_V1_H_
+#define EM_MODEL_MUTATION_V1_H_
 
 
 #include "evolution_models/EvolutionModel.h"
 #include "em_model.h"
 
-class EmModelMutation : public EmModel {
+class EmModelMutationV1 : public EmModel {
 
 public:
-    EmModelMutation(EvolutionModel &evo_model0);
+    EmModelMutationV1(EvolutionModel &evo_model0);
 
-    EmModelMutation(const EmModelMutation &em_model);
+    EmModelMutationV1(const EmModelMutationV1 &em_model);
 
-    virtual ~EmModelMutation() {
+    virtual ~EmModelMutationV1() {
     }
 
     virtual void UpdateParameter(double param);
@@ -37,11 +37,11 @@ protected:
 
 //
 //public:
-//    virtual EmModelMutation *GetModel();
+//    virtual EmModelMutationV1 *GetModel();
 //
 //    std::unique_ptr<EvolutionModel> CopyEvoModel() const;
 //    EvolutionModel* CopyEvoModel2()const ;
 };
 
 
-#endif //EM_MODEL_MUTATION_H_
+#endif //EM_MODEL_MUTATION_V1_H_

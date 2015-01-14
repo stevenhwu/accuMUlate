@@ -7,7 +7,7 @@
 
 
 #include "em_data_binomial.h"
-#include "em_model_mutation.h"
+#include "em_model_mutation_v1.h"
 
 
 EmDataBinomial::EmDataBinomial(std::vector<int> input){
@@ -55,7 +55,7 @@ void EmDataBinomial::UpdateSummaryStat(double &prob, std::unique_ptr<EmSummarySt
 void EmDataBinomial::UpdateEmModel(EmModel *em_model) {
 
 
-//    EmModelMutation *em = dynamic_cast<EmModelMutation*> (em_model);
+//    EmModelMutationV1 *em = dynamic_cast<EmModelMutationV1*> (em_model);
     EmModelBinomial *em_model_binomial = static_cast<EmModelBinomial*> (em_model);
     binomial_prob = em_model_binomial->GetParameter();
 
@@ -69,7 +69,7 @@ void EmDataBinomial::UpdateSummaryStat(double &prob, std::vector<double> &temp_s
     prob = 0;
 
     //relpace with
-//    EmSummaryStatMutation local;
+//    EmSummaryStatMutationV1 local;
 
     prob = pow(binomial_prob, count)*pow((1-binomial_prob), count_negative);
 //    std:: cout << "COUNT:" << count << "\t" << binomial_prob << "\t" << count_negative << std::endl;

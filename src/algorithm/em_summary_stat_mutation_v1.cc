@@ -6,10 +6,10 @@
  */
 
 
-#include "em_summary_stat_mutation.h"
+#include "em_summary_stat_mutation_v1.h"
 
 
-double EmSummaryStatMutation::MaximiseStats() {
+double EmSummaryStatMutationV1::MaximiseStats() {
 
     double sum_stat = stat[0] + stat[1];
     double new_exp_beta = stat[1] / sum_stat;

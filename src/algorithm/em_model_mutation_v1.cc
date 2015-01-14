@@ -1,5 +1,5 @@
 #include <iostream>
-#include "em_model_mutation.h"
+#include "em_model_mutation_v1.h"
 
 
 //EmModel(const EmModel &obj)
@@ -9,7 +9,7 @@
 //    *ptr = *obj.ptr; // copy the value
 //}
 
-EmModelMutation::EmModelMutation(const EmModelMutation &em_model) {
+EmModelMutationV1::EmModelMutationV1(const EmModelMutationV1 &em_model) {
 
     evo_model = em_model.evo_model->Clone().release();//get();
 //    evo_model = em_model.evo_model->Clone2(); //CHECK: initial test no memory leak, new without delete?
@@ -21,7 +21,7 @@ EmModelMutation::EmModelMutation(const EmModelMutation &em_model) {
 }
 
 
-EmModelMutation::EmModelMutation(EvolutionModel &evo_model0) : evo_model(&evo_model0){
+EmModelMutationV1::EmModelMutationV1(EvolutionModel &evo_model0) : evo_model(&evo_model0){
 
     MutationRate rate = evo_model->GetMutationRate();
     std::cout << rate.prob << "\t" << rate.one_minus_p << std::endl;
@@ -29,17 +29,17 @@ EmModelMutation::EmModelMutation(EvolutionModel &evo_model0) : evo_model(&evo_mo
 }
 
 
-void EmModelMutation::UpdateParameter(double param) {
+void EmModelMutationV1::UpdateParameter(double param) {
 
 //    MutationRate mutation_rate = evo_model->GetMutationRate();
-//    cout << "IN EmModelMutation: updateing: " << param << "\t" << mutation_rate.prob << "\t" << mutation_rate.one_minus_p << endl;
+//    cout << "IN EmModelMutationV1: updateing: " << param << "\t" << mutation_rate.prob << "\t" << mutation_rate.one_minus_p << endl;
     evo_model->UpdateExpBeta(param);
 
 
 }
 
 
-void EmModelMutation::GetParameterInfo(){
+void EmModelMutationV1::GetParameterInfo(){
 
     MutationMatrix transition_matrix_a_to_d = evo_model->GetTranstionMatirxAToD();
     MutationRate mutation_rate = evo_model->GetMutationRate();
@@ -48,23 +48,23 @@ void EmModelMutation::GetParameterInfo(){
 }
 
 
-EvolutionModel * EmModelMutation::GetEvoModel() {
+EvolutionModel *EmModelMutationV1::GetEvoModel() {
     return evo_model;
 }
-//EvolutionModel * EmModelMutation::GetEvoModel() const {
+//EvolutionModel * EmModelMutationV1::GetEvoModel() const {
 //    return evo_model;
 //}
 //
-//std::unique_ptr<EvolutionModel> EmModelMutation::CopyEvoModel()const {
+//std::unique_ptr<EvolutionModel> EmModelMutationV1::CopyEvoModel()const {
 //    std::unique_ptr<EvolutionModel> e = evo_model->Clone();
 //    return e;
 //}
 //
-//EvolutionModel* EmModelMutation::CopyEvoModel2()const {
+//EvolutionModel* EmModelMutationV1::CopyEvoModel2()const {
 //    EvolutionModel* e = evo_model->Clone2();
 //    return e;
 //}
 //
-//EmModelMutation* EmModelMutation::GetModel() {
+//EmModelMutationV1* EmModelMutationV1::GetModel() {
 //    return this;
 //}

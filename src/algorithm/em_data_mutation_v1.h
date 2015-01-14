@@ -11,26 +11,26 @@
 #include "sequence_prob.h"
 #include "site_prob.h"
 #include "em_model.h"
-#include "em_model_mutation.h"
+#include "em_model_mutation_v1.h"
 #include "em_model_binomial.h"
 
 
-#ifndef EM_DATA_MUTATION_H
-#define EM_DATA_MUTATION_H_
+#ifndef EM_DATA_MUTATION_V1_H
+#define EM_DATA_MUTATION_V1_H_
 
 
 
 
-class EmDataMutation : public EmData {
+class EmDataMutationV1 : public EmData {
 protected:
 //    SiteProb site;
 
 public:
     SiteProb site;
 
-    EmDataMutation() {};
-    EmDataMutation(SequenceProb &sequence_prob, EvolutionModel &evo_model);
-    virtual  ~EmDataMutation();
+    EmDataMutationV1() {};
+    EmDataMutationV1(SequenceProb &sequence_prob, EvolutionModel &evo_model);
+    virtual  ~EmDataMutationV1();
 
     virtual void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat);
 
@@ -47,4 +47,4 @@ public:
 };
 
 
-#endif //EM_DATA_MUTATION_H
+#endif //EM_DATA_MUTATION_V1_H

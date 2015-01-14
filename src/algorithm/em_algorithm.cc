@@ -7,10 +7,10 @@
 
 
 
-#include "em_algorithm_mutation.h"
+#include "em_algorithm_mutation_v1.h"
 #include "em_algorithm_binomial.h"
 #include "em_algorithm.h"
-#include "em_summary_stat_mutation.h"
+#include "em_summary_stat_mutation_v1.h"
 
 #include <iostream>
 #include <stddef.h>

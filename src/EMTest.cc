@@ -7,9 +7,6 @@
 
 #include <boost/program_options.hpp>
 #include <time.h>
-#include <algorithm/em_model_binomial.h>
-#include <algorithm/em_data_binomial.h>
-#include <algorithm/em_algorithm_binomial.h>
 #include <stdint.h>
 #include <stddef.h>
 //#include <sys/socket.h>
@@ -24,6 +21,14 @@
 #include "utils/bamtools_pileup_engine.h"
 #include "utils/bamtools_fasta.h"
 
+
+#include "algorithm/em_algorithm_mutation_v1.h"
+#include "algorithm/em_data_mutation_v1.h"
+#include "algorithm/em_model_binomial.h"
+#include "algorithm/em_data_binomial.h"
+#include "algorithm/em_algorithm_binomial.h"
+
+
 #include "model.h"
 #include "parsers.h"
 #include "sequence_prob.h"
@@ -32,8 +37,7 @@
 #include "evolution_models/JC69.h"
 #include "evolution_models/F81.h"
 #include "site_prob.h"
-#include "algorithm/em_algorithm_mutation.h"
-#include "algorithm/em_data_mutation.h"
+
 #include "genome_data_stream.h"
 
 #include "boost_input_utils.h"
@@ -368,7 +372,7 @@ void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
     for (auto seq_prob: sp) {
 
 
-        em_site_data.emplace_back(  new EmDataMutation(seq_prob, evo_model0)  );
+        em_site_data.emplace_back(  new EmDataMutationV1(seq_prob, evo_model0)  );
 //        SiteProb site  (seq_prob, evo_model0 );
 //        site_prob.push_back(site);
 
@@ -387,9 +391,9 @@ void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
 //    F81 evo_model0(mutation_prob);
 //    F81 evo_model1(mutation_prob);
 //    F81 evo_model1 = evo_model0;
-    EmModelMutation em_model0 (evo_model0);
-//    EmModelMutation em_model1 (em_model0);
-//    EmModelMutation em_model1 (evo_model1);
+    EmModelMutationV1 em_model0 (evo_model0);
+//    EmModelMutationV1 em_model1 (em_model0);
+//    EmModelMutationV1 em_model1 (evo_model1);
 
 //    em_model0.GetParameterInfo();
 //    em_model1.GetParameterInfo();
@@ -397,17 +401,17 @@ void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
 //    em_model1.UpdateParameter(0.1);
 //    em_model0.UpdateParameter(0.01);
 //    std::vector<std::unique_ptr<EmModel>> em_model;
-//    em_model.emplace_back(new EmModelMutation(evo_model0));
-//    em_model.emplace_back(new EmModelMutation(em_model0));
+//    em_model.emplace_back(new EmModelMutationV1(evo_model0));
+//    em_model.emplace_back(new EmModelMutationV1(em_model0));
 
 
 
-//    EmAlgorithmMutation em_alg (2, site_prob, model, em_site_data, em_model0);
-    EmAlgorithmMutation em_alg2 (2, em_site_data, em_model0);
+//    EmAlgorithmMutationV1 em_alg (2, site_prob, model, em_site_data, em_model0);
+    EmAlgorithmMutationV1 em_alg2 (2, em_site_data, em_model0);
     em_alg2.Run();
 
     em_alg2.PrintSummary();
-//    EmAlgorithmMutation em_alg3 (em_site_data, em_model);
+//    EmAlgorithmMutationV1 em_alg3 (em_site_data, em_model);
 //    em_alg3.Run2();
 
 //
@@ -756,14 +760,14 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
     cout << "Start\n\n";
 
 
-//    EmDataMutation ed2 = EmDataMutation();
+//    EmDataMutationV1 ed2 = EmDataMutationV1();
 //    EmData *ed =  &ed2;
 //    EmData &ed0 =  ed2;
 //
 //    EmSummaryStat es;
 //    es.stat = 100;
 //
-//    EmSummaryStatMutation es2;
+//    EmSummaryStatMutationV1 es2;
 //    es2.stat = 200;
 //    es2.stat_diff = 210;
 //
@@ -836,55 +840,55 @@ void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp)
         SiteProb site  (sp[s], model );
         site_prob.push_back(site);
 
-//        std::unique_ptr<EmData> e ( new EmDataMutation(sp[s], model) );
+//        std::unique_ptr<EmData> e ( new EmDataMutationV1(sp[s], model) );
 //        unique_ptr<EmData> e = std::unique_ptr<EmData>  ( );
-//        em_site_data.emplace_back(  new EmDataMutation(sp[s], model)  );
-//        EmDataMutation em_site = EmDataMutation(sp[s], model);
+//        em_site_data.emplace_back(  new EmDataMutationV1(sp[s], model)  );
+//        EmDataMutationV1 em_site = EmDataMutationV1(sp[s], model);
 ////        EmData *p = &em_site;
 //        em_site_prob.push_back(em_site);
 
     }
 
-    em_site_data.emplace_back(  new EmDataMutation(sp[0], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[1], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[2], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[3], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[4], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[0], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[1], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[2], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[3], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[4], model)  );
 
-    em_site_data.emplace_back(  new EmDataMutation(sp[0], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[1], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[2], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[3], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[4], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[0], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[1], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[2], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[3], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[4], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[0], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[1], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[2], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[3], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[4], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[0], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[1], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[2], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[3], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[4], model)  );
 
-//    em_site_data.emplace_back(  new EmDataMutation(sp[95], model)  );
-//    em_site_data.emplace_back(  new EmDataMutation(sp[96], model)  );
-//    em_site_data.emplace_back(  new EmDataMutation(sp[97], model)  );
-//    em_site_data.emplace_back(  new EmDataMutation(sp[98], model)  );
-//    em_site_data.emplace_back(  new EmDataMutation(sp[99], model)  );
-//    em_site_data.emplace_back(  new EmDataMutation(sp[95], model)  );
-//    em_site_data.emplace_back(  new EmDataMutation(sp[96], model)  );
-//    em_site_data.emplace_back(  new EmDataMutation(sp[97], model)  );
-//    em_site_data.emplace_back(  new EmDataMutation(sp[98], model)  );
-//    em_site_data.emplace_back(  new EmDataMutation(sp[99], model)  );
+//    em_site_data.emplace_back(  new EmDataMutationV1(sp[95], model)  );
+//    em_site_data.emplace_back(  new EmDataMutationV1(sp[96], model)  );
+//    em_site_data.emplace_back(  new EmDataMutationV1(sp[97], model)  );
+//    em_site_data.emplace_back(  new EmDataMutationV1(sp[98], model)  );
+//    em_site_data.emplace_back(  new EmDataMutationV1(sp[99], model)  );
+//    em_site_data.emplace_back(  new EmDataMutationV1(sp[95], model)  );
+//    em_site_data.emplace_back(  new EmDataMutationV1(sp[96], model)  );
+//    em_site_data.emplace_back(  new EmDataMutationV1(sp[97], model)  );
+//    em_site_data.emplace_back(  new EmDataMutationV1(sp[98], model)  );
+//    em_site_data.emplace_back(  new EmDataMutationV1(sp[99], model)  );
 
-    em_site_data.emplace_back(  new EmDataMutation(sp[95], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[96], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[97], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[98], model)  );
-    em_site_data.emplace_back(  new EmDataMutation(sp[99], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[95], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[96], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[97], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[98], model)  );
+    em_site_data.emplace_back(  new EmDataMutationV1(sp[99], model)  );
 
     /*
 
     //Doesn't work, need new
-    EmDataMutation em_site = EmDataMutation(sp[0], model);
+    EmDataMutationV1 em_site = EmDataMutationV1(sp[0], model);
     em_site_prob[0] =(&em_site);
-    em_site = EmDataMutation(sp[1], model);
+    em_site = EmDataMutationV1(sp[1], model);
     em_site_prob[1] = (&em_site);
 */
     size_t em_count = 50;
@@ -901,13 +905,13 @@ void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp)
     cout <<"\n\n";
     unique_ptr<EmData> &e = em_site_data[0];
 //    EmData *ed= e.get();
-    EmDataMutation *eeem = static_cast<EmDataMutation*>(e.get());
+    EmDataMutationV1 *eeem = static_cast<EmDataMutationV1 *>(e.get());
     eeem->site.CalculateAncestorToDescendant(a,b,c);
 
 
     unique_ptr<EmData> &e2 = em_site_data[1];
 
-    EmDataMutation *eeem2 = static_cast<EmDataMutation*>(e2.get());
+    EmDataMutationV1 *eeem2 = static_cast<EmDataMutationV1 *>(e2.get());
     eeem2->site.CalculateAncestorToDescendant(a,b,c);
 
 
@@ -916,9 +920,9 @@ void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp)
     F81 evo_model0(mutation_prob);
 //    F81 evo_model1(mutation_prob);
     F81 evo_model1 = evo_model0;
-    EmModelMutation em_model0 (evo_model0);
-    EmModelMutation em_model1 (em_model0);
-//    EmModelMutation em_model1 (evo_model1);
+    EmModelMutationV1 em_model0 (evo_model0);
+    EmModelMutationV1 em_model1 (em_model0);
+//    EmModelMutationV1 em_model1 (evo_model1);
 
     em_model0.GetParameterInfo();
     em_model1.GetParameterInfo();
@@ -926,11 +930,11 @@ void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp)
 //    em_model1.UpdateParameter(0.1);
 //    em_model0.UpdateParameter(0.01);
     std::vector<std::unique_ptr<EmModel>> em_model;
-    em_model.emplace_back(new EmModelMutation(evo_model0));
-    em_model.emplace_back(new EmModelMutation(em_model0));
+    em_model.emplace_back(new EmModelMutationV1(evo_model0));
+    em_model.emplace_back(new EmModelMutationV1(em_model0));
 
 //    std::vector<EmModel*> em_model;
-//    EmModelMutation em_model1 (em_model0);
+//    EmModelMutationV1 em_model1 (em_model0);
 //    em_model.push_back(&em_model0);
 //    em_model.push_back(&em_model1);
 
@@ -943,7 +947,7 @@ void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp)
 
 //    EmModel *em_base_model = &em_model;
 //    EM em (2, site_prob, model, em_site_prob, em_model);
-//    EmModelMutation em_model2 = em_model;
+//    EmModelMutationV1 em_model2 = em_model;
 
     em_model[0]->GetParameterInfo();
     em_model[1]->GetParameterInfo();
@@ -962,12 +966,12 @@ void testCalWeighting(MutationProb &mutation_prob, std::vector<SequenceProb> sp)
     printf("H3\n");
 
 
-//    EmAlgorithmMutation em_alg (2, site_prob, model, em_site_data, em_model0);
-    EmAlgorithmMutation em_alg2 (2, em_site_data, em_model0);
+//    EmAlgorithmMutationV1 em_alg (2, site_prob, model, em_site_data, em_model0);
+    EmAlgorithmMutationV1 em_alg2 (2, em_site_data, em_model0);
     em_alg2.Run();
 
     em_alg2.PrintSummary();
-//    EmAlgorithmMutation em_alg3 (em_site_data, em_model);
+//    EmAlgorithmMutationV1 em_alg3 (em_site_data, em_model);
 //    em_alg3.Run2();
 
 //
