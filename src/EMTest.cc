@@ -9,6 +9,7 @@
 #include <time.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <algorithm/em_algorithm_mutation.h>
 //#include <sys/socket.h>
 
 #include <sparsehash/dense_hash_map> // or sparse_hash_set, dense_hash_map, ...
@@ -362,6 +363,35 @@ void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
 
     cout << "Done preprocess. Final site count: " << sp.size() << endl;
 
+
+
+    MutationModel model = MutationModel(evo_model0);
+    PreprocessSequenceProb2(sp, params, evo_model0);
+    model.AddSequenceProb(sp);
+    double prob, diff, total1, total2;
+    model.cache_read_data_to_all = all_cache_read_to_all_2;
+    for (size_t i = 0; i < sp.size(); ++i) {
+        for (int a = 0; a < 10; ++a) {
+            model.CacheLoopDesAll(i, a, prob, diff);
+            total1 += prob;
+            total2 += diff;
+        }
+        model.CalculateAncestorToDescendant(i, prob, diff);
+        cout << prob << "\t" << diff<< endl;
+    }
+cout << total1 << "\t" << total2 << endl;
+    exit(11);
+    MutationModel model2 = MutationModel(evo_model0);
+    model2.AddSequenceProb(sp);
+    total1 = 0; total2 = 0;
+    for (size_t i = 0; i < sp.size(); ++i) {
+        for (int a = 0; a < 10; ++a) {
+            model2.CacheLoopDesAll(i, a, prob, diff);
+            total1 += prob;
+            total2 += diff;
+        }
+    }
+    cout << total1 << "\t" << total2 << endl;
     cout << "======================== Setup EmData:" << endl;
 
 
@@ -400,17 +430,26 @@ void RunEmWithRealData(GenomeData base_counts, ModelParams params) {
 
 //    em_model1.UpdateParameter(0.1);
 //    em_model0.UpdateParameter(0.01);
-//    std::vector<std::unique_ptr<EmModel>> em_model;
-//    em_model.emplace_back(new EmModelMutationV1(evo_model0));
-//    em_model.emplace_back(new EmModelMutationV1(em_model0));
+    std::vector<std::unique_ptr<EmModel>> em_model;
+    em_model.emplace_back(new EmModelMutationV1(evo_model0));
+    em_model.emplace_back(new EmModelMutationV1(em_model0));
 
+    MutationModel mutation_model = MutationModel(evo_model0);
+    mutation_model.AddSequenceProb(sp);
+    std::vector<std::unique_ptr<EmModel>> em_model2;
+    em_model2.emplace_back(new EmModelMutation(mutation_model));
+    em_model2.emplace_back(new EmModelMutation(mutation_model));
+//    MutationModel
+    EmAlgorithmMutation em_alg0 (em_model2);
 
-
+    em_alg0.Run2();
 //    EmAlgorithmMutationV1 em_alg (2, site_prob, model, em_site_data, em_model0);
-    EmAlgorithmMutationV1 em_alg2 (2, em_site_data, em_model0);
-    em_alg2.Run();
+//    EmAlgorithmMutationV1 em_alg2 (2, em_site_data, em_model0);
 
-    em_alg2.PrintSummary();
+
+//    em_alg2.Run();
+
+    em_alg0.PrintSummary();
 //    EmAlgorithmMutationV1 em_alg3 (em_site_data, em_model);
 //    em_alg3.Run2();
 
@@ -452,190 +491,8 @@ void AddSimulatedData(ModelParams &params, std::vector<SequenceProb> &sp, int de
 
 }
 
-void TimeTrialWithCache(std::vector<SequenceProb> &sp, ModelParams &params) {
-/* time:
-28171789: original
-26676395: diff only
-21478513	21: remove all same
-44602738	44:cache!?
-
-calculate 11344531 <50k
-unord_map 3492     350k?
-END: 1031321	1031321	45378124	11344531	45378124
-Set: 3492
-MapProbsCount: 3492
 
 
-
-init: site_count: 31321
-========= Add simulated data:100000
-No Cache:37462144	37	8.04099e+08
-Cache map:32189722	32	8.04099e+08
-Cache des:31368162	31	8.04099e+08
-*/
-    MutationProb mutation_prob = MutationProb(params);
-    F81 evo_model0(mutation_prob);
-    PreprocessSequenceProb(sp, params, evo_model0);
-
-    MutationModel model = MutationModel( mutation_prob, evo_model0);
-
-    model.AddCache(allDMaps4, allCacheMapsProbs);
-    double a, b, c = 0;
-    clock_t t;
-    int count = 0;
-    t = clock();
-    double total = 0;
-    for (int k = 0; k < 100; ++k) {
-        mutation_prob.mutation_rate.prob = (k+1)/100.0;
-
-        for (size_t i = 0; i < sp.size(); ++i) {
-//            mm.CalculateLikelihood(sp[i], a, b, c);
-            for (int j = 0; j < sp[i].GetDescendantCount(); ++j) {
-                auto des = sp[i].GetDescendantGenotypes(j);
-                for (int b = 0; b < 4; ++b) {
-                    count++;
-
-                    double x = des[b] * mutation_prob.mutation_rate.prob * mutation_prob.frequency_prior[b];
-//                    total += x;
-//                        double x = fabs(des[b]);x=sqrt(des[b]);
-
-//                    auto y = allDMaps4[des[b]][b] * mutation_prob.mutation_rate.prob;;
-//                    total += y;
-
-//                    auto y = allDMaps4V2[des[b]][b];
-                }
-            }
-        }
-    }
-    clock_t t2 = clock();
-    std::cout << (t2 - t) << "\t" << ((t2-t)/CLOCKS_PER_SEC) << "\t" << total << std::endl;
-    cout << count << endl;
-}
-
-
-
-void TimeTrialWithCache2(std::vector<SequenceProb> &sp, ModelParams &params) {
-/* time:
-same mu, no recalculate
-No Cache:11895140	11	1.96443e+08
-Cache map:9951850	9	1.96443e+08
-Cache des:9237851	9	1.96443e+08
-
-change mu, recalculate cache
-No Cache:9635469	9	2.50272e+08
-Cache map:17471742	17	2.50272e+08
-Cache des:19156947	19	2.50272e+08
-*/
-
-    bool updateModel = true;
-    MutationProb mutation_prob = MutationProb(params);
-    F81 evo_model0(mutation_prob);
-    MutationModel model = MutationModel( mutation_prob, evo_model0);
-
-
-    PreprocessSequenceProb2(sp, params, evo_model0);
-    model.AddCache2(all_cache_read_to_all_2);
-
-    double prob = 0, same = 0, diff=0, total=0, count = 0;
-    int test_size = 100;
-    cout << "Test_size: " << test_size << endl;
-    clock_t t2 = clock();
-    clock_t t = clock();
-
-
-//    for (int k = 0; k < test_size; ++k) {
-//        if(updateModel) {
-//            evo_model0.UpdateMu(k/100.0);
-//            model.UpdateModel(evo_model0);
-//        }
-//        for (size_t i = 0; i < sp.size(); ++i) {
-//            model.CalculateLikelihood(sp[i]);
-//            for (int a = 0; a < 10; ++a) {
-//                model.NoCacheCalculateDes(a, prob, diff);
-//                total += prob;
-//                total += diff;
-//            }
-//        }
-//    }
-//    t2 = clock();
-//    std::cout << "No Cache:" << (t2 - t) << "\t" << ((t2-t)/CLOCKS_PER_SEC) << "\t" << total << std::endl;
-
-
-//    t = clock();
-//    total = 0;
-//    for (int k = 0; k < test_size; ++k) {
-//        if(updateModel) {
-//            evo_model0.UpdateMu(k / 100.0);
-//            PreprocessSequenceProb2(sp, params, evo_model0);
-//            model.AddCache2(all_cache_read_to_all_2);
-//        }
-//        for (size_t i = 0; i < sp.size(); ++i) {
-//            model.CalculateLikelihood(sp[i]);
-//            for (int a = 0; a < 10; ++a) {
-//                model.CacheLoopMap(a, prob, diff);
-//                total += prob;
-//                total += diff;
-//            }
-//        }
-//    }
-//    t2 = clock();
-//    std::cout << "Cache map:" << (t2 - t) << "\t" << ((t2-t)/CLOCKS_PER_SEC) << "\t" << total << std::endl;
-
-
-    t = clock();
-    total = 0;
-    for (int k = 0; k < test_size; ++k) {
-        if(updateModel) {
-            evo_model0.UpdateMu(k / 100.0);
-            PreprocessSequenceProb2(sp, params, evo_model0);
-            model.AddCache2(all_cache_read_to_all_2);
-        }
-        for (size_t i = 0; i < sp.size(); ++i) {
-            model.CalculateLikelihood(sp[i]);
-            for (int a = 0; a < 10; ++a) {
-                model.CacheLoopDes(a, prob, diff);
-                total += prob;
-                total += diff;
-            }
-        }
-    }
-
-    t2 = clock();
-    std::cout << "Cache des:" << (t2 - t) << "\t" << ((t2-t)/CLOCKS_PER_SEC) << "\t" << total << std::endl;
-
-
-
-
-    t = clock();
-    total = 0;
-    model.CalculateLikelihoodAll(sp);
-    for (int k = 0; k < test_size; ++k) {
-        if(updateModel) {
-            evo_model0.UpdateMu(k / 100.0);
-            PreprocessSequenceProb2(sp, params, evo_model0);
-            model.AddCache2(all_cache_read_to_all_2);
-        }
-        for (size_t i = 0; i < sp.size(); ++i) {
-            for (int a = 0; a < 10; ++a) {
-                model.CacheLoopDesAll(i, a, prob, diff);
-                total += prob;
-                total += diff;
-            }
-        }
-    }
-
-    t2 = clock();
-    std::cout << "Cache2 des:" << (t2 - t) << "\t" << ((t2-t)/CLOCKS_PER_SEC) << "\t" << total << std::endl;
-    t = clock();
-    cout << count << endl;
-
-    t = clock();
-    cout << count << endl;
-
-
-    exit(31);
-
-}
 int main(int argc, char** argv){
 //using namespace BoostUtils;
     boost::program_options::variables_map variable_map;

@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 /*
  * em_model_binary.cc.h
  *
@@ -6,10 +8,14 @@
  */
 
 
+
 #include <iostream>
 #include "em_model_binomial.h"
 
 
+size_t EmModelBinomial::GetDataCount() {
+    return 0;
+}
 
 EmModelBinomial::EmModelBinomial(int n0, double prob0) : n(n0), prob(prob0){
 

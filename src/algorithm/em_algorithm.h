@@ -7,7 +7,7 @@
 
 
 #pragma once
-
+#include <iostream>
 #include <memory>
 #include <vector>
 #include <stddef.h>
@@ -33,6 +33,8 @@ public:
 //    EmAlgorithm() ;
 
 //    EmAlgorithm(int category_count);
+
+    EmAlgorithm(std::vector<std::unique_ptr<EmModel>> &model_ptr);
 
     virtual ~EmAlgorithm() {
     }
@@ -99,6 +101,8 @@ protected:
     bool EmStoppingCriteria(int ite);
 
     std::vector<double> cache_parameters;
+
+    void InitModelOnly();
 
 };
 

@@ -10,6 +10,7 @@
 #ifndef EM_MODEL_BINARY_H_
 #define EM_MODEL_BINARY_H_
 
+#include <stddef.h>
 #include "em_model.h"
 
 
@@ -31,6 +32,7 @@ public:
     int n;
     double prob;
 
+    virtual size_t GetDataCount();
 };
 
 

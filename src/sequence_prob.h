@@ -51,6 +51,7 @@ public:
     std::vector<HaploidProbs> GetDescendantGenotypes();
 
     ReadData GetDescendantReadData(int descent_index);
+    uint64_t GetDescendantReadDataKey(int descent_index);
 
     void PrintReads(ReadData data);
 //    double GetLikelihood();

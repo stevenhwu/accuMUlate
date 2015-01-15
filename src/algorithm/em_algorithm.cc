@@ -6,13 +6,13 @@
  */
 
 
-
+#include <iostream>
 #include "em_algorithm_mutation_v1.h"
 #include "em_algorithm_binomial.h"
 #include "em_algorithm.h"
 #include "em_summary_stat_mutation_v1.h"
 
-#include <iostream>
+
 #include <stddef.h>
 
 const double EM_CONVERGE_THRESHOLD = 1e-5;
@@ -31,8 +31,56 @@ EmAlgorithm::EmAlgorithm(std::vector<std::unique_ptr<EmData>> &data_ptr, std::ve
 }
 
 
+EmAlgorithm::EmAlgorithm(std::vector<std::unique_ptr<EmModel>> &model_ptr):
+        em_model_ptr(&model_ptr) {
+    num_category = em_model_ptr->size();
+    std::cout << "New Construct model noly: " << num_category << std::endl;
+
+    if (num_category != 2) {
+        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
+        exit(222);
+    }
+
+}
+
+void EmAlgorithm::InitModelOnly() {
+
+    if (num_category != 2) {
+        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
+        exit(222);
+    }
+
+//    site_count = em_data_ptr->size();
+    std::vector<int> temp_data_count(num_category);
+    for (int i = 0; i < num_category; ++i) {
+        temp_data_count[i] = (*em_model_ptr)[i]->GetDataCount();
+    }
+    for (int i = 1; i < num_category; ++i) {
+        if(temp_data_count[i] != temp_data_count[i-1]){
+            std::cout << "ERROR: Data count not equal\n" << temp_data_count[i] << "\t" << temp_data_count[i-1] << std::endl;
+            exit(210);
+        }
+    }
+    site_count = temp_data_count[0];
+    all_probs = Eigen::ArrayXXd::Zero(num_category, site_count);
+    parameters = std::vector<double>(num_category);
+    cache_parameters = std::vector<double>(num_category, 0);
+
+    InitialiseProportion();
+
+    InitialiseParameters();
+
+    InitialiseSummaryStat();
+
+}
+
 
 void EmAlgorithm::Init() {
+
+    if (num_category != 2) {
+        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
+        exit(222);
+    }
 
     site_count = em_data_ptr->size();
     all_probs = Eigen::ArrayXXd::Zero(num_category, site_count);
@@ -195,10 +243,10 @@ void EmAlgorithm::PrintSummary(){
 
 
 void EmAlgorithm::ExpectationStep2() {
-    printf("here\n");
+    std::cout << "E2" << std::endl;
     std::vector<std::vector<double>> temp_stat = std::vector<std::vector<double>>(num_category);
     for (size_t r = 0; r < num_category; ++r) {
-        temp_stat[r] = std::vector<double> (2);
+//        temp_stat[r] = std::vector<double> (2);
         all_em_stats[r]->Reset();
         em_model_ptr->at(r)->UpdateParameter(parameters[r]); //exp_beta
     }
@@ -208,13 +256,13 @@ void EmAlgorithm::ExpectationStep2() {
         double sum_prob = 0;
 
         for (size_t r = 0; r < num_category; ++r) {
-            std::cout << "em_count: " << " num_category: " << r << " site: " << s << std::endl;
+//            std::cout << "em_count: " << " num_category: " << r << " site: " << s << std::endl;
 
 //            em_model0->UpdateParameter(parameters[r]); //exp_beta
-
-            (*em_data_ptr)[s]->UpdateEmModel(em_model_ptr->at(r).get());
-
-            (*em_data_ptr)[s]->UpdateSummaryStat(sum_prob, temp_stat[r]);
+//            (*em_data_ptr)[s]->UpdateSummaryStat(<#(double&)prob#>, <#(std::unique_ptr<EmSummaryStat>&)summaryStat#>)
+//            (*em_data_ptr)[s]->UpdateEmModel(em_model_ptr->at(r).get());
+//
+            (*em_model_ptr)[r]->UpdateSummaryStat(s, sum_prob, temp_stats[r]);
             //TODO: Should make model take the data, lot's of refactor required to do this for mutation model.
 
 //            all_em_stats[r]->UpdateSumWithProportion(proportion[r], em_stat_local_single);
@@ -235,7 +283,7 @@ void EmAlgorithm::ExpectationStep2() {
 
             double prob = all_probs(r,s) / sum;
 //            std::cout << "===============nem prob: "<< prob << std::endl;
-            all_em_stats[r]->UpdateSumWithProportion(prob, temp_stat[r]);
+            all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
         }
 
     }

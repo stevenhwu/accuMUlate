@@ -68,3 +68,6 @@ EvolutionModel *EmModelMutationV1::GetEvoModel() {
 //EmModelMutationV1* EmModelMutationV1::GetModel() {
 //    return this;
 //}
+size_t EmModelMutationV1::GetDataCount() {
+    return 0;
+}

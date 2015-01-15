@@ -17,6 +17,8 @@
 class EmModelMutationV1 : public EmModel {
 
 public:
+    virtual size_t GetDataCount();
+
     EmModelMutationV1(EvolutionModel &evo_model0);
 
     EmModelMutationV1(const EmModelMutationV1 &em_model);

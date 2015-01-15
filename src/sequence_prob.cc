@@ -5,6 +5,7 @@
  *      Author: Steven Wu
  */
 #include <iostream>
+#include <stdint.h>
 #include "sequence_prob.h"
 
 
@@ -42,28 +43,36 @@ SequenceProb::SequenceProb(ModelInput const site_data,  ModelParams const model_
         HaploidProbs p = HaploidSequencing(data);
         all_descendant_genotypes.push_back(p);
 
-		auto find1 = temp_map.find(data.key);
-		if(find1 == temp_map.end()){
-			temp_map.emplace(data.key, 1);
-		}
-		else{
-			temp_map[data.key]++;
-		}
+//		auto find1 = temp_map.find(data.key);
+//		if(find1 == temp_map.end()){
+//			temp_map.emplace(data.key, 1);
+//		}
+//		else{
+//			temp_map[data.key]++;
+//		}
     }
 
-//	std::cout << "==================="<< std::endl;
+//	for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+//		int index16 = LookupTable::index_converter_10_to_16[index10];
 //
-	for (auto item : temp_map) {
+//		double prob_reads_given_a = ancestor_genotypes[index16] * ancestor_prior[index10] *  prod_prob_ancestor;
+//		all_sequence_prob[site_index].GetAncestorGenotypesMultiplyPrior(index10);
+//		prob_reads += prob_reads_given_a;
 
-		condense_genotype.emplace_back(std::make_pair(item.first, item.second));
-//		auto a = std::make_pair(item.first, item.second);
-//		std::cout << item.first << "\t" << item.second << "\t" << a.first << "\t" << a.second <<std::endl;
-	}
+
+////	std::cout << "==================="<< std::endl;
+////
+//	for (auto item : temp_map) {
 //
-//	std::cout << "New count:\t" << condense_genotype.size() << std::endl;
-//	for (auto item : condense_genotype) {
-//		std::cout << item.first << "\t" << item.second <<std::endl;
+//		condense_genotype.emplace_back(std::make_pair(item.first, item.second));
+////		auto a = std::make_pair(item.first, item.second);
+////		std::cout << item.first << "\t" << item.second << "\t" << a.first << "\t" << a.second <<std::endl;
 //	}
+////
+////	std::cout << "New count:\t" << condense_genotype.size() << std::endl;
+////	for (auto item : condense_genotype) {
+////		std::cout << item.first << "\t" << item.second <<std::endl;
+////	}
 
 
 }
@@ -258,4 +267,8 @@ ReadDataVector const * SequenceProb::GetDescendantReadData3() {
 
 void SequenceProb::GetDescendantReadDataCOPY(ReadDataVector &all_descendant_data2) {
 	all_descendant_data2 = all_descendant_data;
+}
+
+uint64_t SequenceProb::GetDescendantReadDataKey(int descent_index) {
+	return all_descendant_data[descent_index].key;
 }

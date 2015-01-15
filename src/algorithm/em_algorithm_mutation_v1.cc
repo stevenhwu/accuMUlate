@@ -8,17 +8,13 @@ EmAlgorithmMutationV1::EmAlgorithmMutationV1(int num_category0,
 //          EmAlgorithm::em_data_ptr(&d_ptr), em_model(&m) {
 {
 
-    if (num_category != 2) {
-        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
-        exit(222);
-    }
-
     for (size_t i = 0; i < num_category; ++i) {
         em_model.emplace_back(new EmModelMutationV1(m));
     }
 
     em_count = 1000;
     std::cout << "data_count: " << em_data_ptr->size() << std::endl;
+    std::cout << "=========== Done Constructor with smart pointer and copy constructor\n";
     Init();
 
 //    em_model_ptr->at(0)->GetParameterInfo();
@@ -37,14 +33,10 @@ EmAlgorithmMutationV1::EmAlgorithmMutationV1(
 //          EmAlgorithm::em_data_ptr(&d_ptr), em_model(&m) {
 {
 
-    if (num_category != 2) {
-        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
-        exit(222);
-    }
+
     em_count = 10;
 
     Init();
-
 
     std::cout << "=========== Done Constructor smart pointer x 2\n";
 
