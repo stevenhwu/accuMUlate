@@ -66,7 +66,7 @@ TEST_F(SiteProbTest, TestCalculateOneDescendantGivenAncestor){
 
     //Anc = AA
     int anc_index = 0; //AA
-    site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
+    site.CalculateOneDescendantGivenAncestor(anc_index, 0, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
 
     double expected_prob = 0;
     MutationMatrix matrix = evo_model.GetTranstionMatirxAToD();
@@ -86,7 +86,7 @@ TEST_F(SiteProbTest, TestCalculateOneDescendantGivenAncestor){
 
     //Anc = AC
     anc_index = 1; //AC
-    site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
+    site.CalculateOneDescendantGivenAncestor(anc_index, 0, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
 
     expected_prob = 0;
     for (int b = 0; b < 4; ++b) {
@@ -104,7 +104,7 @@ TEST_F(SiteProbTest, TestCalculateOneDescendantGivenAncestor){
 
     //Anc = AT
     anc_index = 3; //AT
-    site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
+    site.CalculateOneDescendantGivenAncestor(anc_index, 0, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
 
     expected_prob = 0;
     for (int b = 0; b < 4; ++b) {
@@ -149,7 +149,7 @@ TEST_F(SiteProbTest, TestCalculateOneDescendantGivenAncestor2)
 
     //Anc = AA
     int anc_index = 0; //AA
-    site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
+    site.CalculateOneDescendantGivenAncestor(anc_index, 0, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
 
     double expected_prob = 0;
     for (int b = 0; b < 4; ++b) {
@@ -167,7 +167,7 @@ TEST_F(SiteProbTest, TestCalculateOneDescendantGivenAncestor2)
 
     //Anc = AG
     anc_index = 2; //AG
-    site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
+    site.CalculateOneDescendantGivenAncestor(anc_index, 0, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
 
     expected_prob = 0;
     for (int b = 0; b < 4; ++b) {
@@ -214,7 +214,7 @@ TEST_F(SiteProbTest, TestCalculateOneDescendantGivenAncestor3) {
 
     //Anc = AA
     int anc_index = 0; //AA
-    site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
+    site.CalculateOneDescendantGivenAncestor(anc_index, 0, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
 
     double expected_prob = 0;
     for (int b = 0; b < 4; ++b) {
@@ -233,7 +233,7 @@ TEST_F(SiteProbTest, TestCalculateOneDescendantGivenAncestor3) {
 
     //Anc = AT
     anc_index = 3; //AT
-    site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
+    site.CalculateOneDescendantGivenAncestor(anc_index, 0, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
 
     expected_prob = 0;
     for (int b = 0; b < 4; ++b) {
@@ -251,7 +251,7 @@ TEST_F(SiteProbTest, TestCalculateOneDescendantGivenAncestor3) {
 
     //Anc = CG
     anc_index = 5; //CG index10 = 5, index16=6
-    site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
+    site.CalculateOneDescendantGivenAncestor(anc_index, 0, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
 
     expected_prob = 0;
     for (int b = 0; b < 4; ++b) {
@@ -304,7 +304,7 @@ TEST_F(SiteProbTest, TestCalculateAllDescendantGivenAncestor) {
     double expected_diff = 0;
     for (int i = 0; i < sp.GetDescendantCount(); ++i) {
         HaploidProbs prob_reads_given_descent = sp.GetDescendantGenotypes(i);
-        site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
+        site.CalculateOneDescendantGivenAncestor(anc_index, 0, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
         expected_prob *= prob_reads_d_given_a;
         expected_same += summary_stat_same;
         expected_diff += summary_stat_diff;
@@ -348,7 +348,7 @@ TEST_F(SiteProbTest, TestCalculateAncestorToDescendant) {
     DiploidProbs ancestor_genotypes = sp.GetAncestorGenotypes();
     for (int anc_index = 0; anc_index < 10; ++anc_index) {
         site.CalculateAllDescendantGivenAncestor(anc_index, sum_prob_ancestor, summary_stat_same_ancestor, summary_stat_diff_ancestor);
-        site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
+        site.CalculateOneDescendantGivenAncestor(anc_index, 0, prob_reads_d_given_a, summary_stat_same, summary_stat_diff);
         ASSERT_DOUBLE_EQ(prob_reads_d_given_a, sum_prob_ancestor);
         ASSERT_DOUBLE_EQ(summary_stat_same, summary_stat_same_ancestor);
         ASSERT_DOUBLE_EQ(summary_stat_diff, summary_stat_diff_ancestor);
@@ -414,7 +414,7 @@ TEST_F(SiteProbTest, TestCalculateAncestorToDescendant3) {
         double prob_reads_d_given_a = 1;
         for (int d = 0; d < sp.GetDescendantCount(); ++d) {
             HaploidProbs prob_reads_given_descent = sp.GetDescendantGenotypes(d);
-            site.CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, sum_prob_descendant, summary_stat_same_descendant, summary_stat_diff_descendant);
+            site.CalculateOneDescendantGivenAncestor(anc_index, 0, sum_prob_descendant, summary_stat_same_descendant, summary_stat_diff_descendant);
             prob_reads_d_given_a *= sum_prob_descendant;
             summary_stat_same += summary_stat_same_descendant;
             summary_stat_diff += summary_stat_diff_descendant;

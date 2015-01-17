@@ -34,14 +34,7 @@ public:
 
     virtual void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat);
 
-//    virtual void UpdateEmModel(EmModel &em_model);
-
-
-
-
-
     virtual void UpdateEmModel(EmModel *em_model);
-
 
     virtual void UpdateSummaryStat(double &prob, std::vector<double> &temp_stat);
 };

@@ -15,14 +15,12 @@ EmDataMutationV1::~EmDataMutationV1() {}
 
 void EmDataMutationV1::UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat) {
 
-
     summaryStat->print();
     prob = 0;
     double stat_same = 0;
     double stat_diff = 0;
     //relpace with
 //    EmSummaryStatMutationV1 local;
-
 
     site.CalculateAncestorToDescendant(prob, stat_same, stat_diff);
 
@@ -64,19 +62,15 @@ void EmDataMutationV1::UpdateEmModel(EmModel *em_model) {
 
 void EmDataMutationV1::UpdateSummaryStat(double &prob, std::vector<double> &temp_stat) {
 
-
 //    summaryStat->print();
     prob = 0;
     double stat_same = 0;
     double stat_diff = 0;
-    //relpace with
-//    EmSummaryStatMutationV1 local;
-
 
     site.CalculateAncestorToDescendant(prob, stat_same, stat_diff);
     temp_stat[0] = stat_same;
     temp_stat[1] = stat_diff;
 //    cout << "update with vector " << temp_stat[0] << "\t" << temp_stat[1] << std::endl;
 
-//    summaryStat->SetStats(vector<double> {stat_same, stat_diff});
+
 }

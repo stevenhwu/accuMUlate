@@ -43,6 +43,8 @@ protected:
 //
 //    std::unique_ptr<EvolutionModel> CopyEvoModel() const;
 //    EvolutionModel* CopyEvoModel2()const ;
+public:
+    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat);
 };
 
 

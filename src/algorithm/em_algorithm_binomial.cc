@@ -18,8 +18,7 @@ EmAlgorithmBinomial::EmAlgorithmBinomial(int num_category0, std::vector<std::uni
         em_model.emplace_back(new EmModelBinomial(em_model0));
     }
 
-    Init();
-    em_count = 100;
+    InitWithData();
 }
 
 void EmAlgorithmBinomial::InitialiseSummaryStat() {
@@ -38,9 +37,9 @@ void EmAlgorithmBinomial::Run() {
 
     size_t i = 0;
     bool isConverged = true;
-    while(isConverged & (i< em_count) ){
+    while(isConverged){
 
-        ExpectationStep();
+        ExpectationStepModel();
         MaximizationStep();
 
         isConverged = EmStoppingCriteria(i);

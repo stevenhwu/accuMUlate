@@ -272,3 +272,4 @@ void SequenceProb::GetDescendantReadDataCOPY(ReadDataVector &all_descendant_data
 uint64_t SequenceProb::GetDescendantReadDataKey(int descent_index) {
 	return all_descendant_data[descent_index].key;
 }
+

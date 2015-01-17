@@ -22,11 +22,7 @@ public:
     virtual size_t GetDataCount() = 0;
 
 
-    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat){
-        site_index = 0;
-        prob = 0;
-        int a = temp_stat.size();
-    };
+    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat) =0;
 };
 
 

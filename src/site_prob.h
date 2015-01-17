@@ -32,7 +32,6 @@ public:
     SiteProb() {
     }
 
-    int thisCount = 0;
     SiteProb(SequenceProb sequence_prob, MutationProb const mutation_prob, EvolutionModel const evo_model);
 
 //    SiteProb(ModelInput const site_data, ModelParams const model_params, MutationProb const mutation_prob, EvolutionModel const evo_model);
@@ -47,12 +46,11 @@ public:
 
     void UpdateTransitionMatrix(EvolutionModel evo_model);
 
-
     void CalculateAncestorToDescendant(double &prob_reads, double &all_stats_same, double &all_stats_diff);
 
-    void CalculateAllDescendantGivenAncestor(int a, double &sum_prob_d, double &summary_stat_same_ancestor, double &summary_stat_diff_ancestor);
+    void CalculateAllDescendantGivenAncestor(int index16, double &sum_prob_d, double &summary_stat_same_ancestor, double &summary_stat_diff_ancestor);
 
-    void CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs prob_reads_given_descent, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff);
+    void CalculateOneDescendantGivenAncestor(int index16, int des_index, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff);
 
 
     void UpdateModel(EvolutionModel &evo_model);
@@ -66,6 +64,8 @@ private:
 
     DiploidProbs ancestor_genotypes;
     std::vector<HaploidProbs> all_descendant_genotypes;
+    std::vector<std::array<double, 4>> all_descendant_diff_stats;
+    std::array<double, 4> frequency_prior_mutation_rate;
 
     MutationRate mutation_rate;
     MutationMatrix transition_matrix_a_to_d;
@@ -74,6 +74,7 @@ private:
     Array10D ancestor_prior;
 
     int descendant_count;
+
 
 };
 

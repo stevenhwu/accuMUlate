@@ -33,6 +33,8 @@ public:
     double prob;
 
     virtual size_t GetDataCount();
+
+    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat);
 };
 
 

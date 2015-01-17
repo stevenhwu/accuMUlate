@@ -55,17 +55,15 @@ public:
     double GetMu0();
     double GetBeta0();
 
-    double beta0;
-    MutationRate mutation_rate;
-    Array4D frequency_prior;
+
 private:
 
-
+    MutationRate mutation_rate;
+    Array4D frequency_prior;
     Array10D ancestor_prior;
 
-
     double mu0;
-
+    double beta0;
     double exp_beta; //exp_beta = exp(-beta0*mu0)
 
     double CalculateExpBeta();

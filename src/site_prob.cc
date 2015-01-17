@@ -4,44 +4,16 @@
  *  Created on: Dec 1, 2014
  *      Author: Steven Wu
  */
+
 #include <iostream>
+
 #include "site_prob.h"
 
 
-//
-//double TetMAProbability(const ModelParams &params, const ModelInput site_data) {
-//	MutationMatrix m = MutationAccumulation(params, false);
-//	MutationMatrix mt = MutationAccumulation(params, true);
-//
-//	MutationMatrix mn = m - mt;
-//	DiploidProbs pop_genotypes = DiploidPopulation(params, site_data.reference);
-//
-//	auto data = site_data.all_reads.begin();
-//	DiploidProbs ancestor_genotypes = DiploidSequencing(params, site_data.reference,
-//			*data);
-//	ancestor_genotypes *= pop_genotypes;
-//	DiploidProbs num_genotypes = ancestor_genotypes;
-//	for (++data; data != site_data.all_reads.end(); ++data) {
-//		HaploidProbs p = HaploidSequencing(params, site_data.reference, *data);
-//
-//		ancestor_genotypes *= (m.matrix() * p.matrix()).array();
-//		num_genotypes *= (mn.matrix() * p.matrix()).array();
-//		exit(-1);
-//	}
-//
-//	//cerr << "\n" << ancestor_genotypes/ancestor_genotypes.sum() << endl;
-//
-//	return 1.0 - num_genotypes.sum() / ancestor_genotypes.sum();
-//}
-
 const int DEBUG = 0;
-
-
 
 SiteProb::SiteProb(SequenceProb sequence_prob,
 		 MutationProb mutation_prob, EvolutionModel evo_model) {
-
-
 
     ancestor_prior = mutation_prob.GetAncestorPrior();
     frequency_prior = mutation_prob.GetFrequencyPrior();
@@ -51,14 +23,13 @@ SiteProb::SiteProb(SequenceProb sequence_prob,
     ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
     all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
     descendant_count = all_descendant_genotypes.size();
-
+    std::cout << "fail" << std::endl;
 }
 
 
 SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
 
     counter++;
-    thisCount = counter;
 
     MutationProb mutation_prob = evo_model.GetMutationProb() ;
     ancestor_prior = mutation_prob.GetAncestorPrior();
@@ -70,6 +41,12 @@ SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
     all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
     descendant_count = all_descendant_genotypes.size();
 
+    all_descendant_diff_stats.resize(descendant_count);
+    for (int i = 0; i < descendant_count; ++i) {
+        for (int b = 0; b < BASE_COUNT; ++b) {
+            all_descendant_diff_stats[i][b] = all_descendant_genotypes[i][b] * frequency_prior_mutation_rate[b];
+        }
+    }
 //    double a,b,c;
 //    CalculateAncestorToDescendant(a,b,c);
 }
@@ -84,13 +61,26 @@ void SiteProb::UpdateModel(EvolutionModel &evo_model) {
     mutation_rate = evo_model.GetMutationRate();
 //    cout << "new mutation rate: " << mutation_rate.prob  << "\t" << mutation_rate.one_minus_p <<
 //            "\t" << thisCount << endl;
+    for (int b = 0; b < BASE_COUNT; ++b) {
+        frequency_prior_mutation_rate[b] = mutation_rate.prob * frequency_prior[b];
+    }
+
+    for (int i = 0; i < descendant_count; ++i) {
+//        auto cache_genotype = all_descendant_genotypes[i];
+        for (int b = 0; b < BASE_COUNT; ++b) {
+            all_descendant_diff_stats[i][b] = all_descendant_genotypes[i][b] * frequency_prior_mutation_rate[b];
+        }
+    }
+
 
 }
 
 void SiteProb::UpdateMuProb(MutationProb mutation_prob){
 
     mutation_rate = mutation_prob.GetMutationRate();
-
+    for (int b = 0; b < BASE_COUNT; ++b) {
+        frequency_prior_mutation_rate[b] = mutation_rate.prob * frequency_prior[b];
+    }
 }
 
 void SiteProb::UpdateTransitionMatrix(EvolutionModel evo_model) {
@@ -110,29 +100,22 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
     double summary_stat_diff_ancestor = 0;
     double prod_prob_ancestor = 1;
 
-    for (int a = 0; a < ANCESTOR_COUNT; ++a) {
+    for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
 
-        int index10 = a;
-        int index16 = LookupTable::index_converter_10_to_16[a];
+        int index16 = LookupTable::index_converter_10_to_16[index10];
 
-        CalculateAllDescendantGivenAncestor(a, prod_prob_ancestor, summary_stat_same_ancestor, summary_stat_diff_ancestor);
+        CalculateAllDescendantGivenAncestor(index16, prod_prob_ancestor, summary_stat_same_ancestor, summary_stat_diff_ancestor);
 
         double prob_reads_given_a = ancestor_genotypes[index16] * ancestor_prior[index10] *  prod_prob_ancestor;
             //TODO: IF need speed, cache this
-//            prob_reads_given_a = log(ancestor_genotypes(index16)) + log( ancestor_prior[index10]) + prod_prob_ancestor[a];
         prob_reads += prob_reads_given_a;
 
-//        summary_stat_same_ancestor[a] *= prob_reads_given_a;
-//        summary_stat_diff_ancestor[a] *= prob_reads_given_a;
-
-        all_stats_same += summary_stat_same_ancestor*prob_reads_given_a;
+//        all_stats_same += summary_stat_same_ancestor*prob_reads_given_a;
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
-        //            sum_all_stats += prob_reads_given_a * summary_stat_ancestor[a];
 
-        //        prod_prob_ancestor[a] = sum(sum_prob_d);
-        //        summary_stat_ancestor[a] =
+
         if (DEBUG>1) {
-            std::cout << "==A: " << a << " " << index16 << " " << LookupTable::genotype_lookup_10[a] << " " <<
+            std::cout << "==A: " << index10 << " " << index16 << " " << LookupTable::genotype_lookup_10[index10] << " " <<
                     ancestor_genotypes[index16] << "\t";
             std::cout << "Same: " << all_stats_same << "\tDiff:" << all_stats_diff <<
             "\t" << summary_stat_same_ancestor << "\t" <<summary_stat_diff_ancestor <<
@@ -141,9 +124,9 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
 
     }
 
-    all_stats_same /= prob_reads;
+//    all_stats_same /= prob_reads;
     all_stats_diff /= prob_reads;
-
+    all_stats_same = descendant_count - all_stats_diff;
     if(DEBUG>0){
         std::cout << "summaryALL\tSame:" << all_stats_same << "\tDiff:" << all_stats_diff << "\t" << (all_stats_diff + all_stats_same) << std::endl;
         std::cout << "total_sum2: "<< total_sum2 << "\tProb: " << prob_reads <<std::endl;
@@ -153,30 +136,28 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
 }
 
 
-void SiteProb::CalculateAllDescendantGivenAncestor(int a, double &product_prob_given_ancestor,
+void SiteProb::CalculateAllDescendantGivenAncestor(int index16, double &product_prob_given_ancestor,
         double &summary_stat_same_ancestor, double &summary_stat_diff_ancestor) {
 
 
     product_prob_given_ancestor = 1;
     summary_stat_diff_ancestor = 0;
     summary_stat_same_ancestor = 0;
-//    descendant_count = 1; // FIXME:
+
     for (int d = 0; d < descendant_count; ++d) {//TODO: Check descendant info, merge some of them together
         double summary_stat_same = 0;
         double summary_stat_diff = 0;
         double sum_over_probs = 0;
-        HaploidProbs prob_reads_given_descent = all_descendant_genotypes[d]; //Fixed value for now
+//        HaploidProbs prob_reads_given_descent = all_descendant_genotypes[d]; //Fixed value for now
+//        std::array<double, 4> all_diff_stats = all_descendant_diff_stats[d];
+        CalculateOneDescendantGivenAncestor(index16, d, sum_over_probs, summary_stat_same, summary_stat_diff);
 
-//        CalculateOneDescendantGivenAncestor(a, prob_reads_given_descent, sum_prob_d[d], summary_stat_same_d[d], summary_stat_diff_d[d]);
+        summary_stat_diff_ancestor += summary_stat_diff;
+//        summary_stat_same_ancestor += summary_stat_same;
 
-        CalculateOneDescendantGivenAncestor(a, prob_reads_given_descent, sum_over_probs, summary_stat_same, summary_stat_diff);
-
-        summary_stat_diff_ancestor += summary_stat_diff;//_d[d];
-        summary_stat_same_ancestor += summary_stat_same;//_d[d];
-
-//        sum_prob_ancestor[a] += log(sum_over_probs);
         product_prob_given_ancestor *= sum_over_probs;
         if (DEBUG>0) {
+            HaploidProbs prob_reads_given_descent = all_descendant_genotypes[d]; //Fixed value for now
             std::cout << "====D: " << d << "\t Sum:" <<
                     sum_over_probs << "\t" << product_prob_given_ancestor << "\t" <<
                     "\tSame:" << summary_stat_same << "\tDiff:" << summary_stat_diff << "\t" <<
@@ -184,14 +165,12 @@ void SiteProb::CalculateAllDescendantGivenAncestor(int a, double &product_prob_g
         }
 
     }
-//    sum_prob_ancestor[a] = exp(sum_prob_ancestor[a]);
+
 
 }
+//void SiteProb::CalculateOneDescendantGivenAncestor(int index16, int des_index, HaploidProbs &prob_reads_given_descent, std::array<double, 4> &all_diff_stats, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff) {
+void SiteProb::CalculateOneDescendantGivenAncestor(int index16, int des_index, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff) {
 
-void SiteProb::CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs prob_reads_given_descent,
-        double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff) {
-
-    int index16 = LookupTable::index_converter_10_to_16[anc_index10];
     prob_reads_d_given_a = 0;
     summary_stat_same = 0;
     summary_stat_diff = 0;
@@ -203,32 +182,27 @@ void SiteProb::CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs
 
     for (int b = 0; b < BASE_COUNT; ++b) {
 
-        double prob = transition_matrix_a_to_d(index16, b) * prob_reads_given_descent[b];
+        double prob = transition_matrix_a_to_d(index16, b) * all_descendant_genotypes[des_index][b];
         prob_reads_d_given_a += prob;
 
-        summary_stat_same += prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
-        summary_stat_diff += prob_reads_given_descent[b] * mutation_rate.prob * frequency_prior[b];
+//        summary_stat_same += prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
+//        summary_stat_diff += prob_reads_given_descent[b] * frequency_prior_mutation_rate[b];
+        summary_stat_diff += all_descendant_diff_stats[des_index][b];
         //TODO: Cache these as lookup as well
-//
-//        summary_stat_same += prob * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[a][b];
-//        summary_stat_diff += prob * mutation_rate.mu * frequency_prior[b];
-
-//        summary_stat_same += prob_reads_given_descent[b]; //* mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[a][b];
-//        summary_stat_diff += prob_reads_given_descent[b]; //* mutation_rate.mu * frequency_prior[b];
 
 //        total_sum2 += summary_stat_diff + summary_stat_same;
-//        total_sum2 += mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b] + mutation_rate.prob * frequency_prior[b];
+//        total_sum2 += mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[index16][b] + mutation_rate.prob * frequency_prior[b];
         if (DEBUG>3) {
-            double t1 = prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
-            double t2 = prob_reads_given_descent[b] * mutation_rate.prob * frequency_prior[b];
-            std::cout << "======Loop base: " << b << "\t" << "\tP:" << prob <<"\tReadGivenD:"<< prob_reads_given_descent[b] << "\t T1:" << t1 << "\t T2:" << t2 <<"\t SAME:"<<summary_stat_same << "\t" << summary_stat_diff << std::endl;//t1 << "\t" << t2 <<std::endl;
+//            double t1 = prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[index16][b];
+//            double t2 = prob_reads_given_descent[b] * mutation_rate.prob * frequency_prior[b];
+//            std::cout << "======Loop base: " << b << "\t" << "\tP:" << prob <<"\tReadGivenD:"<< prob_reads_given_descent[b] << "\t T1:" << t1 << "\t T2:" << t2 <<"\t SAME:"<<summary_stat_same << "\t" << summary_stat_diff << std::endl;//t1 << "\t" << t2 <<std::endl;
         }
     }
-    summary_stat_same /= prob_reads_d_given_a;
+//    summary_stat_same /= prob_reads_d_given_a;
     summary_stat_diff /= prob_reads_d_given_a;
 
     if (DEBUG>2) {
-        std::cout << anc_index10 << "\t" <<summary_stat_same << "\t" << summary_stat_diff << std::endl;
+        std::cout << index16 << "\t" <<summary_stat_same << "\t" << summary_stat_diff << std::endl;
     }
 }
 

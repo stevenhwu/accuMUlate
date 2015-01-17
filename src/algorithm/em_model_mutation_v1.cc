@@ -15,7 +15,7 @@ EmModelMutationV1::EmModelMutationV1(const EmModelMutationV1 &em_model) {
 //    evo_model = em_model.evo_model->Clone2(); //CHECK: initial test no memory leak, new without delete?
 
     MutationRate rate = evo_model->GetMutationRate();
-    std::cout << "Copy Constructor EmModelEvolution: "<< rate.prob << "\t" << rate.one_minus_p << std::endl;
+    std::cout << "Copy Constructor EmModelEvolutionV1: "<< rate.prob << "\t" << rate.one_minus_p << std::endl;
 //FIXME: Implemente rule of three,   Copy assignment operator!!
 
 }
@@ -24,14 +24,13 @@ EmModelMutationV1::EmModelMutationV1(const EmModelMutationV1 &em_model) {
 EmModelMutationV1::EmModelMutationV1(EvolutionModel &evo_model0) : evo_model(&evo_model0){
 
     MutationRate rate = evo_model->GetMutationRate();
-    std::cout << rate.prob << "\t" << rate.one_minus_p << std::endl;
+    std::cout << "Constructor EmModelEvolutionV1: " << rate.prob << "\t" << rate.one_minus_p << std::endl;
 
 }
 
 
 void EmModelMutationV1::UpdateParameter(double param) {
 
-//    MutationRate mutation_rate = evo_model->GetMutationRate();
 //    cout << "IN EmModelMutationV1: updateing: " << param << "\t" << mutation_rate.prob << "\t" << mutation_rate.one_minus_p << endl;
     evo_model->UpdateExpBeta(param);
 
@@ -51,6 +50,17 @@ void EmModelMutationV1::GetParameterInfo(){
 EvolutionModel *EmModelMutationV1::GetEvoModel() {
     return evo_model;
 }
+
+void EmModelMutationV1::UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat) {
+    std::cout << "Error!! Not yet implemented" << std::endl;
+    exit(41);
+}
+
+size_t EmModelMutationV1::GetDataCount() {
+    std::cout << "Error!! Not yet implemented" << std::endl;
+    exit(41);
+}
+
 //EvolutionModel * EmModelMutationV1::GetEvoModel() const {
 //    return evo_model;
 //}
@@ -68,6 +78,3 @@ EvolutionModel *EmModelMutationV1::GetEvoModel() {
 //EmModelMutationV1* EmModelMutationV1::GetModel() {
 //    return this;
 //}
-size_t EmModelMutationV1::GetDataCount() {
-    return 0;
-}

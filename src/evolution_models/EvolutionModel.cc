@@ -31,8 +31,6 @@ MutationMatrix EvolutionModel::GetTranstionMatirxAToD() {
 MutationRate EvolutionModel::GetMutationRate() {
 //    cout << mu_prob.beta0 << endl;
 //    cout << mu_prob.GetExpBeta() << endl;
-////    cout << mu_prob.beta0 << endl;
-////    cout << mu_prob.beta0 << endl;
     return mu_prob.GetMutationRate();
 
 }

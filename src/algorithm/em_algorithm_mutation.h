@@ -25,19 +25,12 @@ class EmAlgorithmMutation : public EmAlgorithm{
 
 public:
 
-//    EmAlgorithmMutationV1(int num_category0, std::vector<SiteProb> &em_data0, EvolutionModel &em_model0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModel &em_model);
-
-//    EmAlgorithmMutationV1(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &em_model_ptr);
-
     EmAlgorithmMutation(int num_category0,  EmModelMutation &em_model);
 
     EmAlgorithmMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr);
     virtual ~EmAlgorithmMutation();
 
     void Run();
-
-
-    void Run2();
 
 private:
 
@@ -62,9 +55,6 @@ private:
     Eigen::ArrayXXd all_probs_old;
 
 
-    void oldEStep();
-
-    void oldMStep();
 
 
 };

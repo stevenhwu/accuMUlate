@@ -30,7 +30,6 @@ public:
 
 //    EM(int num_category, vector<SiteProb> em_data0, EvolutionModel &em_model0, EmModel &m);
 
-
 //    EM(vector<EmDataMutationV1> site_data, EmModelMutationV1 &evo_model);
 
 //    EM(int num_category0, vector<EmData> em_data0, EmModel &em_model0);
@@ -75,14 +74,9 @@ private:
 
     std::vector<SiteProb> em_data_old;
     EvolutionModel *em_model_old;
+
     std::vector<double> parameters_old;
-
     Eigen::ArrayXXd all_probs_old;
-
-
-    void oldEStep();
-
-    void oldMStep();
 
 
 

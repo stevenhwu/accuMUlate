@@ -25,6 +25,11 @@ EmModelBinomial::EmModelBinomial(int n0, double prob0) : n(n0), prob(prob0){
 }
 
 
+void EmModelBinomial::UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat) {
+    std::cout << "Error!! Not yet implemented" << std::endl;
+    exit(41);
+}
+
 void EmModelBinomial::UpdateParameter(double param) {
 //    evo_model->UpdateMu(param);
 //    evo_model->UpdateExpBeta(param);

@@ -13,24 +13,6 @@
 
 int DEBUG = 0;
 
-
-//MutationModel::MutationModel(
-//        MutationProb mutation_prob, EvolutionModel evo_model0) {
-//
-//    ancestor_prior = mutation_prob.GetAncestorPrior();
-//    frequency_prior = mutation_prob.GetFrequencyPrior();
-//    evo_model = &evo_model0;
-//
-////    UpdateMuProb(mutation_prob);
-////    UpdateTransitionMatrix(*evo_model);
-//
-////    ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
-////    all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
-////    descendant_count = all_descendant_genotypes.size();
-////descendant_count = 7;
-//}
-
-
 MutationModel::MutationModel(EvolutionModel &evo_model0) {
 
     MutationProb mutation_prob = evo_model0.GetMutationProb();
@@ -40,21 +22,22 @@ MutationModel::MutationModel(EvolutionModel &evo_model0) {
 
     transition_matrix_a_to_d = evo_model->GetTranstionMatirxAToD();
     mutation_rate = evo_model->GetMutationRate();
-//    UpdateCache();
 
-//    ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
-//    all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
-//    descendant_count = all_descendant_genotypes.size();
-//descendant_count = 7;
 }
+
+int MutationModel::GetSiteCount() const {
+    return site_count;
+}
+
 
 void MutationModel::AddSequenceProb(std::vector<SequenceProb> &all) {
     all_sequence_prob = all;
     site_count = all.size();
     descendant_count = all_sequence_prob[0].GetDescendantCount();
+    std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
     all_ancestor_genotype_prior.resize(all_sequence_prob.size());
 
-    for (int i = 0; i < all_sequence_prob.size(); ++i) {
+    for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
         auto ancestor_genotypes = all_sequence_prob[i].GetAncestorGenotypes();
 
         std::array<double, 10> ancestor_genotype_prior;
@@ -76,30 +59,11 @@ void MutationModel::UpdateExpBeta(double expBeta) {
     mutation_rate = evo_model->GetMutationRate();
 
     UpdateCache();
-//    cout << "new mutation rate: " << mutation_rate.prob  << "\t" << mutation_rate.one_minus_p <<
-//            "\t" << thisCount << endl;
 
 }
 
-//void MutationModel::UpdateMuProb(MutationProb mutation_prob){
-//
-//    mutation_rate = mutation_prob.GetMutationRate();
-//
-//}
-//
-//void MutationModel::UpdateTransitionMatrix(EvolutionModel evo_model) {
-//    transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
-//}
-
-
 
 void MutationModel::InitCache() {
-
-//    std::array<double, 4> temp_base_prob;
-//    for (int b = 0; b < BASE_COUNT; ++b) {
-//        temp_base_prob[b] = mutation_rate.prob * frequency_prior[b];
-//    }
-
 
     for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
         auto item = all_sequence_prob[i];
@@ -111,30 +75,6 @@ void MutationModel::InitCache() {
 
             if(find_key == cache_read_data_to_all.end()){
                 HaploidProbs genotype = item.GetDescendantGenotypes(j);
-
-                double summary_stat_diff = 0;
-//                for (int b = 0; b < BASE_COUNT; ++b) {
-//                    summary_stat_diff += genotype[b] * temp_base_prob[b];//p * evo_model.GetMutationProb().mutation_rate.prob * frequency_prior[b];
-//                }
-
-                std::array<std::array<double, 2>, 10> cache_all;
-                for (int k = 0; k < 10; ++k) {
-//                    int index16 = LookupTable::index_converter_10_to_16[k];
-                    double prob_reads_d_given_a = 0;
-
-//                    for (int b = 0; b < BASE_COUNT; ++b) {
-//
-//                        double p = genotype[b];
-//                        //        double prob = transition_matrix_a_to_d(index16, b) * prob_reads_given_descent[b];
-//                        double prob = transition_matrix_a_to_d(index16, b) * p;
-////                            cout << transition_matrix_a_to_d(index16, b) << "\t" ;
-//                        //        double prob = cache_data_transition[t][anc_index10][b];
-//                        prob_reads_d_given_a += prob;
-//                    }
-                    cache_all[k] = {{ prob_reads_d_given_a, summary_stat_diff / prob_reads_d_given_a }};
-                };
-
-                cache_read_data_to_all[rd_key] = cache_all;
                 map_rd_key_to_haploid[rd_key]=genotype;
             }
         }
@@ -160,14 +100,13 @@ void MutationModel::UpdateCache() {
 
         auto cache_all = cache_read_data_to_all[rd_key];
         for (int k = 0; k < 10; ++k) {
-//                double stat_same = 0;
             int index16 = LookupTable::index_converter_10_to_16[k];
             double prob_reads_d_given_a = 0;
 
             for (int b = 0; b < BASE_COUNT; ++b) {
                 double prob = transition_matrix_a_to_d(index16, b) * genotype[b];
                 prob_reads_d_given_a += prob;
-//                stat_same += genotype[b] * evo_model.GetMutationProb().mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[k][b];
+//                //stat_same += genotype[b] * evo_model.GetMutationProb().mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[k][b];
             }
 
             cache_all[k][0] = prob_reads_d_given_a;
@@ -178,16 +117,6 @@ void MutationModel::UpdateCache() {
     }
 }
 
-//void MutationModel::CalculateStats(double &prob_reads, double &all_stats_diff) {
-//
-//
-//    for (int i = 0; i < all_sequence_prob.size(); ++i) {
-//
-//    }
-//
-//}
-
-
 void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff) {
 
     prob_reads = 0;
@@ -196,8 +125,6 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
     double summary_stat_diff_ancestor = 0;
     double prod_prob_ancestor = 1;
 
-    double stat_same = 0;
-    double all_stats_same = 0;
     for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
 //        int index16 = LookupTable::index_converter_10_to_16[index10];
 //        CalculateAllDescendantGivenAncestor(index10, prod_prob_ancestor, summary_stat_diff_ancestor);
@@ -207,27 +134,39 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
         double prob_reads_given_a = all_ancestor_genotype_prior[site_index][index10] * prod_prob_ancestor;
         prob_reads += prob_reads_given_a;
 
-//        all_stats_same += summary_stat_same_ancestor*prob_reads_given_a;
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
 
-//        if (DEBUG>1) {
-//            std::cout << "==A: " << index10 << " " << index16 << " " << LookupTable::genotype_lookup_10[index10] << " " <<
-//                    ancestor_genotypes[index16] << "\t";
-//            std::cout << "Same: " << all_stats_same << "\tDiff:" << all_stats_diff <<
-//                    "\t" << summary_stat_same_ancestor << "\t" <<summary_stat_diff_ancestor <<
-//                    "\tProb:" << prod_prob_ancestor  << "\t" << prob_reads_given_a << std::endl ;
-//        }
+        if (DEBUG>1) {
+            std::cout << "==A: " << index10 << " " << all_ancestor_genotype_prior[site_index][index10] << "\t" << "Diff:" <<
+                    all_stats_diff << "\t" << summary_stat_diff_ancestor << "\tProb:" << prod_prob_ancestor  << "\t" << prob_reads_given_a << std::endl ;
+        }
 
-        NoCacheCalculateDes(site_index, index10, prod_prob_ancestor, stat_same, summary_stat_diff_ancestor);
-        std::cout << "Stat same diff:" << (stat_same + summary_stat_diff_ancestor) << "\t" <<  stat_same << "\t" << summary_stat_diff_ancestor << std::endl;
-        all_stats_same += stat_same*prob_reads_given_a;
+    }
+    all_stats_diff /= prob_reads;
+    all_stats_diff /= descendant_count;
+
+    if (DEBUG > 5 ){
+        double stat_same = 0;
+        double all_stats_same = 0;
+
+//        std::cout << all_stats_diff << "\t" << prob_reads << std::endl;
+        prob_reads = 0;
+        all_stats_diff = 0;
+        for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+            NoCacheCalculateDes(site_index, index10, prod_prob_ancestor, stat_same, summary_stat_diff_ancestor);
+            double prob_reads_given_a = all_ancestor_genotype_prior[site_index][index10] * prod_prob_ancestor;
+            prob_reads += prob_reads_given_a;
+            all_stats_same += stat_same*prob_reads_given_a;
+            all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
+//            std::cout << "Stat same diff:" << (stat_same + summary_stat_diff_ancestor) << "\t" <<  stat_same << "\t" << summary_stat_diff_ancestor << std::endl;
+        }
+        all_stats_diff /= prob_reads * descendant_count;
+        all_stats_same /= prob_reads * descendant_count;
+//
+//        std::cout << all_stats_diff << "\t" << prob_reads << "\t" <<  all_stats_same << std::endl;
+//        std::cout << "Stat ALL same diff:" << (all_stats_same+all_stats_diff ) << "\t" <<  all_stats_same << "\t" << all_stats_diff << std::endl;
     }
 
-
-    all_stats_same /= prob_reads;
-    all_stats_diff /= prob_reads;
-
-    std::cout << "Stat ALL same diff:" << (all_stats_same+all_stats_diff ) << "\t" <<  all_stats_same << "\t" << all_stats_diff << std::endl;
 }
 
 //
@@ -299,22 +238,21 @@ void MutationModel::NoCacheCalculateDes(int site_index, int a, double &product_p
 
 
 void MutationModel::CacheLoopDesAll(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
+
     product_prob_given_ancestor = 1;
     summary_stat_diff_ancestor = 0;
-//    auto read = all_sequence_prob[index].GetDescendantReadData();
     for (int d = 0; d < descendant_count; ++d) {
-//        auto key = read[d].key;
+
         auto key = all_sequence_prob[site_index].GetDescendantReadDataKey(d);
         auto cache = cache_read_data_to_all[key][anc_index];
-//        sum_over_probs = cache.first;
-//        summary_stat_diff = cache.second;
+
         product_prob_given_ancestor *= cache[0];
         summary_stat_diff_ancestor += cache[1];
-//        std::cout << cache[0] << "\t" << cache[1] << std::endl;
+
     }
 }
 
-void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs prob_reads_given_descent,
+void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs &prob_reads_given_descent,
         double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff) {
 
     int index16 = LookupTable::index_converter_10_to_16[anc_index10];
@@ -330,13 +268,11 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
         prob_reads_d_given_a += prob;
 
         summary_stat_same += prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
-//        summary_stat_diff += prob_reads_given_descent[b] * mutation_rate.prob * frequency_prior[b];
         summary_stat_diff += p * mutation_rate.prob * frequency_prior[b];
-//        summary_stat_diff += cache_data[p][b] * mutation_rate.prob;
 
+//        summary_stat_diff += cache_data[p][b] * mutation_rate.prob;
 //        auto o1 =  p * mutation_rate.prob * frequency_prior[b];
 //        auto c1 =  cache_data[p][b] * mutation_rate.prob;
-//
 //        auto c2 = cache_data_transition[p][anc_index10][b];
 //        if( (o1 - c1) > (o1/100000000.0)){
 //            std::cout << "NOT equal stat: " << b << "\t" << o1 << "\t" << c1 << std::endl;
@@ -344,7 +280,6 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
 //        if(prob != c2){
 //            std::cout << "NOT equal prob: " << b << "\t" << prob << "\t" << c2 << std::endl;
 //        }
-//        TODO: Cache these as lookup as well
 //
         if (DEBUG>3) {
             double t1 = prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
@@ -592,7 +527,8 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
 //
 //}
 
-void MutationModel::AddCache2(std::unordered_map<uint64_t, std::array<std::array<double, 2>, 10> > &all_2) {
-    cache_read_data_to_all = all_2;
+//void MutationModel::AddCache2(std::unordered_map<uint64_t, std::array<std::array<double, 2>, 10> > &all_2) {
+//    cache_read_data_to_all = all_2;
+//
+//}
 
-}
