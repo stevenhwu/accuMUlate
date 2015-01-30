@@ -101,7 +101,7 @@ void AddSimulatedData(ModelParams &params, std::vector<SequenceProb> &sp, int de
 
     random_device rd;
     mt19937 e2(rd());
-    uniform_int_distribution<uint16_t> uniform_dist(0, 10);
+    uniform_int_distribution<uint16_t> uniform_dist(0, 5);
     uniform_int_distribution<uint16_t> uniform3(0, 3);
 
     size_t fake_diff_count = fake_sample_count * fake_prop;

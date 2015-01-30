@@ -6,18 +6,13 @@ EmModelMutation::EmModelMutation(MutationModel &model) : mutation_model(model) {
 
 
 void EmModelMutation::UpdateParameter(double param) {
-
-//    std::cout << "IN EmModelMutation: updateing: " << param << std::endl;
     mutation_model.UpdateExpBeta(param);
-
-
 }
 
 
 void EmModelMutation::UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat) {
 
     prob = 0;
-    double stat_same = 0;
     double stat_diff = 0;
 
     mutation_model.CalculateAncestorToDescendant(site_index, prob, stat_diff);

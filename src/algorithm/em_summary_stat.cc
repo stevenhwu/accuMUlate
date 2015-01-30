@@ -61,7 +61,7 @@ void EmSummaryStat::SetStats(std::vector<double> stats0) {
 }
 
 double EmSummaryStat::MaximiseStats() {
-    //TODO: What is the default here?? Or make this abstract class
+    //TODO: What is the default here?? Or make this a abstract class
     exit(-100);
 }
 

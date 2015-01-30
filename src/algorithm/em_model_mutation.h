@@ -26,6 +26,10 @@ public:
 
     virtual void UpdateParameter(double param);
 
+    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat);
+
+    virtual size_t GetDataCount();
+
     void GetParameterInfo();
 
 //    EvolutionModel * GetEvoModel();
@@ -36,10 +40,6 @@ protected:
     MutationModel mutation_model;
 
 
-public:
-    virtual size_t GetDataCount();
-
-    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat);
 };
 
 
