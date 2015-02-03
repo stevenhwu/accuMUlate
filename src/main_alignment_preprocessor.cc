@@ -1,34 +1,5 @@
 
 #include <iostream>
-#include <map>
-#include <vector>
-
-#include <google/profiler.h>
-
-#include <boost/program_options.hpp>
-#include <time.h>
-#include <algorithm/em_model_binomial.h>
-#include <algorithm/em_data_binomial.h>
-#include <algorithm/em_algorithm_binomial.h>
-#include <stdint.h>
-//#include <sys/socket.h>
-
-
-#include "api/BamReader.h"
-#include "utils/bamtools_pileup_engine.h"
-#include "utils/bamtools_fasta.h"
-
-#include "model.h"
-#include "parsers.h"
-#include "sequence_prob.h"
-#include "VariantVisitor.h"
-#include "variant_visitor_two.h"
-#include "evolution_models/JC69.h"
-#include "evolution_models/F81.h"
-#include "site_prob.h"
-#include "em_algorithm_mutation_old.h"
-#include "em_data_mutation_v1.h"
-#include "genome_data_stream.h"
 
 #include "boost_input_utils.h"
 #include "pileup_utils.h"
