@@ -113,7 +113,7 @@ ADD_SUBDIRECTORY(src)
 #1
 ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/include/googletest-trunk/")
 #SET(GTEST_ROOT "${CMAKE_SOURCE_DIR}/include/googletest-trunk")
-ADD_SUBDIRECTORY(test)
+#ADD_SUBDIRECTORY(test)
 
 
 #2 Some link error??

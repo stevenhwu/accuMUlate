@@ -12,8 +12,8 @@
 
 const int DEBUG = 0;
 
-SiteProb::SiteProb(SequenceProb sequence_prob,
-		 MutationProb mutation_prob, EvolutionModel evo_model) {
+SiteProb::SiteProb(SequenceProb &sequence_prob,
+		 MutationProb &mutation_prob, EvolutionModel &evo_model) {
 
     ancestor_prior = mutation_prob.GetAncestorPrior();
     frequency_prior = mutation_prob.GetFrequencyPrior();
@@ -83,7 +83,7 @@ void SiteProb::UpdateMuProb(MutationProb mutation_prob){
     }
 }
 
-void SiteProb::UpdateTransitionMatrix(EvolutionModel evo_model) {
+void SiteProb::UpdateTransitionMatrix(EvolutionModel &evo_model) {
     transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
 }
 
