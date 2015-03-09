@@ -36,6 +36,11 @@ ADD_SUBDIRECTORY(distributions)
 ADD_SUBDIRECTORY(evolution_models)
 ADD_SUBDIRECTORY(algorithm)
 
+if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+  message("Using /usr/local/lib/ on ${CMAKE_SYSTEM_NAME}")
+  link_directories(/usr/local/lib)
+endif()
+
 
 #message("C: ${SOURCE_FILES} ")
 
@@ -45,7 +50,6 @@ target_link_libraries(accuMUlate ${LIBS} )
 add_executable(EMTest EMTest.cc ${SOURCE_FILES})
 target_link_libraries(EMTest ${LIBS} )
 target_link_libraries(EMTest profiler)
-
 
 add_executable(AlignmentPreprocessor main_alignment_preprocessor.cc ${SOURCE_FILES})
 target_link_libraries(AlignmentPreprocessor ${LIBS} )

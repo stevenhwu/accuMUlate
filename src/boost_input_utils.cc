@@ -18,7 +18,7 @@ namespace BoostUtils {
 
     static bool file_exists_test1(const std::string &name) {
         ifstream ifile(name.c_str());
-        return ifile;
+        return ifile.good();
 
 //    ifstream f(name.c_str());
 //    if (f.good()) {
