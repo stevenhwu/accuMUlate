@@ -73,7 +73,7 @@ private:
     Array4D frequency_prior;
     Array10D ancestor_prior;
 
-    int descendant_count;
+    int descendant_count = 0;
 
 
 };
