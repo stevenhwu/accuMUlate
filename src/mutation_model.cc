@@ -86,7 +86,7 @@ void MutationModel::UpdateCache() {
 
     std::array<double, 4> temp_base_prob;
     for (int b = 0; b < BASE_COUNT; ++b) {
-        temp_base_prob[b] = mutation_rate.prob * frequency_prior[b];
+        temp_base_prob[b] = mutation_rate * frequency_prior[b];
     }
 
     for (auto item : map_rd_key_to_haploid) {
@@ -267,8 +267,8 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
 //        double prob = cache_data_transition[t][anc_index10][b];
         prob_reads_d_given_a += prob;
 
-        summary_stat_same += prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
-        summary_stat_diff += p * mutation_rate.prob * frequency_prior[b];
+        summary_stat_same += prob_reads_given_descent[b] * (1.0-mutation_rate) * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
+        summary_stat_diff += p * mutation_rate * frequency_prior[b];
 
 //        summary_stat_diff += cache_data[p][b] * mutation_rate.prob;
 //        auto o1 =  p * mutation_rate.prob * frequency_prior[b];
@@ -281,9 +281,11 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
 //            std::cout << "NOT equal prob: " << b << "\t" << prob << "\t" << c2 << std::endl;
 //        }
 //
-        if (DEBUG>3) {
-            double t1 = prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
-            double t2 = prob_reads_given_descent[b] * mutation_rate.prob * frequency_prior[b];
+
+        if (DEBUG>3)
+        {
+            double t1 = prob_reads_given_descent[b] * (1.0-mutation_rate) * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
+            double t2 = prob_reads_given_descent[b] * mutation_rate * frequency_prior[b];
             std::cout << "======Loop base: " << b << "\t" << "\tP:" << prob <<"\tReadGivenD:"<< prob_reads_given_descent[b] << "\t T1:" << t1 << "\t T2:" << t2 <<"\t SAME:"<<summary_stat_same << "\t" << summary_stat_diff << std::endl;//t1 << "\t" << t2 <<std::endl;
         }
     }

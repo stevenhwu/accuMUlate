@@ -62,7 +62,7 @@ void SiteProb::UpdateModel(EvolutionModel &evo_model) {
 //    cout << "new mutation rate: " << mutation_rate.prob  << "\t" << mutation_rate.one_minus_p <<
 //            "\t" << thisCount << endl;
     for (int b = 0; b < BASE_COUNT; ++b) {
-        frequency_prior_mutation_rate[b] = mutation_rate.prob * frequency_prior[b];
+        frequency_prior_mutation_rate[b] = mutation_rate * frequency_prior[b];
     }
 
     for (int i = 0; i < descendant_count; ++i) {
@@ -79,7 +79,7 @@ void SiteProb::UpdateMuProb(MutationProb mutation_prob){
 
     mutation_rate = mutation_prob.GetMutationRate();
     for (int b = 0; b < BASE_COUNT; ++b) {
-        frequency_prior_mutation_rate[b] = mutation_rate.prob * frequency_prior[b];
+        frequency_prior_mutation_rate[b] = mutation_rate * frequency_prior[b];
     }
 }
 

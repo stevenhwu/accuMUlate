@@ -67,7 +67,7 @@ private:
     std::vector<std::array<double, 4>> all_descendant_diff_stats;
     std::array<double, 4> frequency_prior_mutation_rate;
 
-    MutationRate mutation_rate;
+    double mutation_rate;
     MutationMatrix transition_matrix_a_to_d;
 
     Array4D frequency_prior;
