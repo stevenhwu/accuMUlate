@@ -144,15 +144,11 @@ void EmAlgorithm::ExpectationStepModelPtr() {
         }
 
         double sum = all_probs.col(s).sum();
-        double total_site = 0;
         for (size_t r = 0; r < num_category; ++r) {
             double prob = all_probs(r,s) / sum;
             all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
-            total_site += all_probs(r,s);
         }
-        total += log(total_site);
     }
-    fflush(stdout);
 }
 
 void EmAlgorithm::MaximizationStep() {
