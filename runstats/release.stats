@@ -1,0 +1,7 @@
+Mode: Release
+Machine: i7
+Data: zz_subset
+
+Date	Total Time	EM Time		Parameters1		Porportions		Notes
+====	=========	=======		===========		===========		=====
+3/17	25.673196	10.2		1.0,2.966e-5		1.108e-01,8.892e-01	Removed execution of old version em_alg2

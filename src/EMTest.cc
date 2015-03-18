@@ -62,7 +62,6 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 //        site_prob.push_back(site);
     }
 
-    EmModelMutationV1 em_model0 (evo_model0);
 
     MutationModel mutation_model = MutationModel(evo_model0);
     mutation_model.AddSequenceProb(sp);
@@ -80,19 +79,6 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     em_alg0.PrintSummary();
     t_end = clock();
     cout << "Time new: " << (t_end - t_start)/ CLOCKS_PER_SEC << "\t" << (t_end - t_start)  << endl << endl;
-
-    t_start = clock();
-    EmAlgorithmMutationV1 em_alg2 (2, em_site_data, em_model0);
-    em_alg2.Run();
-    em_alg2.PrintSummary();
-    t_end = clock();
-    cout << "Time old: " << (t_end - t_start)/CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
-
-
-//    EmAlgorithmMutationV1 em_alg (2, site_prob, model, em_site_data, em_model0);
-//    EmAlgorithmMutationV1 em_alg3 (em_site_data, em_model);
-//    em_alg3.Run2();
-
 }
 
 
