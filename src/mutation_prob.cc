@@ -109,7 +109,7 @@ double MutationProb::ConvertExpBetaToMu(double exp_beta, double beta0) {
     return log(1-exp_beta)/(-beta0);
 }
 
-double MutationProb::CalculateBeta0(Array4D freq) {
+double MutationProb::CalculateBeta0(Array4D &freq) {
 
     double beta0 = 1;
     for (size_t i = 0; i < freq.size(); ++i) {

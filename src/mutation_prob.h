@@ -33,7 +33,7 @@ struct MutationRate{
 
 class MutationProb {
 public:
-    static double CalculateBeta0(Array4D freq);
+    static double CalculateBeta0(Array4D &freq);
     static double CalculateExpBeta(double mu, double beta0);
     static double ConvertExpBetaToMu(double exp_beta, double beta0);
 
