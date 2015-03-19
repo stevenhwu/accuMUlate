@@ -34,12 +34,9 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     cout << "init: site_count: " << base_counts.size() << endl;
 
     std::vector<SequenceProb> sp;
-    for (size_t i = 0; i < base_counts.size(); ++i) {
-//    for (size_t i = 0; i < 10000; ++i) {
-        SequenceProb ss = SequenceProb(base_counts[i], params);
+    for (size_t i = 0; i < base_counts.size(); ++i){
+    	SequenceProb ss = SequenceProb(base_counts[i], params);
         sp.push_back(ss);
-//        sp.push_back(ss);
-//        sp.push_back(ss);
     }
 
     int descendant_count = sp[0].GetDescendantCount();
@@ -53,14 +50,6 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
     cout << "======================== Setup EmData:" << endl;
 
-//    std::vector<SiteProb> site_prob;
-    std::vector<EmData*> em_site_prob;
-    std::vector<std::unique_ptr<EmData>> em_site_data;
-    for (auto seq_prob: sp) {
-        em_site_data.emplace_back(  new EmDataMutationV1(seq_prob, evo_model0)  );
-//        SiteProb site  (seq_prob, evo_model0 );
-//        site_prob.push_back(site);
-    }
 
 
     MutationModel mutation_model = MutationModel(evo_model0);
@@ -68,7 +57,6 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     std::vector<std::unique_ptr<EmModel>> em_model2;
     em_model2.emplace_back(new EmModelMutation(mutation_model));
     em_model2.emplace_back(new EmModelMutation(mutation_model));
-//    MutationModel
 
     cout << "\n========================\nStart em_algorithm:" << endl;
     clock_t t_start, t_end;
