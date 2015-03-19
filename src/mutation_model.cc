@@ -111,7 +111,7 @@ void MutationModel::UpdateCache() {
 
             cache_all[k][0] = prob_reads_d_given_a;
             cache_all[k][1] = summary_stat_diff / prob_reads_d_given_a;
-        };
+        }
 
         cache_read_data_to_all[rd_key] = cache_all;
     }
@@ -136,36 +136,31 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
 
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
 
-        if (DEBUG>1) {
-            std::cout << "==A: " << index10 << " " << all_ancestor_genotype_prior[site_index][index10] << "\t" << "Diff:" <<
-                    all_stats_diff << "\t" << summary_stat_diff_ancestor << "\tProb:" << prod_prob_ancestor  << "\t" << prob_reads_given_a << std::endl ;
-        }
-
+#ifdef DEBUG1
+        std::cout << "==A: " << index10 << " " << all_ancestor_genotype_prior[site_index][index10] << "\t" << "Diff:" <<
+        		all_stats_diff << "\t" << summary_stat_diff_ancestor << "\tProb:" << prod_prob_ancestor  << "\t" << prob_reads_given_a << std::endl ;
+#endif
     }
     all_stats_diff /= prob_reads;
     all_stats_diff /= descendant_count;
 
-    if (DEBUG > 5 ){
-        double stat_same = 0;
+#ifdef DEBUG5
+    	double stat_same = 0;
         double all_stats_same = 0;
 
-//        std::cout << all_stats_diff << "\t" << prob_reads << std::endl;
         prob_reads = 0;
         all_stats_diff = 0;
-        for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+        for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10)
+        {
             NoCacheCalculateDes(site_index, index10, prod_prob_ancestor, stat_same, summary_stat_diff_ancestor);
             double prob_reads_given_a = all_ancestor_genotype_prior[site_index][index10] * prod_prob_ancestor;
             prob_reads += prob_reads_given_a;
             all_stats_same += stat_same*prob_reads_given_a;
             all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
-//            std::cout << "Stat same diff:" << (stat_same + summary_stat_diff_ancestor) << "\t" <<  stat_same << "\t" << summary_stat_diff_ancestor << std::endl;
-        }
+		}
         all_stats_diff /= prob_reads * descendant_count;
         all_stats_same /= prob_reads * descendant_count;
-//
-//        std::cout << all_stats_diff << "\t" << prob_reads << "\t" <<  all_stats_same << std::endl;
-//        std::cout << "Stat ALL same diff:" << (all_stats_same+all_stats_diff ) << "\t" <<  all_stats_same << "\t" << all_stats_diff << std::endl;
-    }
+#endif
 
 }
 
@@ -269,18 +264,6 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
 
         summary_stat_same += prob_reads_given_descent[b] * (1.0-mutation_rate) * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
         summary_stat_diff += p * mutation_rate * frequency_prior[b];
-
-//        summary_stat_diff += cache_data[p][b] * mutation_rate.prob;
-//        auto o1 =  p * mutation_rate.prob * frequency_prior[b];
-//        auto c1 =  cache_data[p][b] * mutation_rate.prob;
-//        auto c2 = cache_data_transition[p][anc_index10][b];
-//        if( (o1 - c1) > (o1/100000000.0)){
-//            std::cout << "NOT equal stat: " << b << "\t" << o1 << "\t" << c1 << std::endl;
-//        }
-//        if(prob != c2){
-//            std::cout << "NOT equal prob: " << b << "\t" << prob << "\t" << c2 << std::endl;
-//        }
-//
 
         if (DEBUG>3)
         {

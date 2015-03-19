@@ -28,9 +28,6 @@ SiteProb::SiteProb(SequenceProb &sequence_prob,
 
 
 SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
-
-    counter++;
-
     MutationProb mutation_prob = evo_model.GetMutationProb() ;
     ancestor_prior = mutation_prob.GetAncestorPrior();
     frequency_prior = mutation_prob.GetFrequencyPrior();

@@ -24,7 +24,6 @@ struct ProbTwoStats{
     double stat_same;
     double stat_diff;
 };
-static int counter = 0;
 class SiteProb {
 
 
