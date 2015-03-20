@@ -80,7 +80,7 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 //    std::vector<EmData*> em_site_prob;
     EmModelMutationV1 em_model0 (evo_model0);
     std::vector<std::unique_ptr<EmData>> em_site_data;
-    for (auto seq_prob: sp) {
+    for (auto &seq_prob: sp) {
 
         em_site_data.emplace_back(  new EmDataMutationV1(seq_prob, evo_model0)  );
 //        SiteProb site  (seq_prob, evo_model0 );
@@ -694,7 +694,7 @@ void TestingEMWithRandomThings(GenomeData base_counts, ModelParams params) {
     std::vector<EmData*> em_site_prob;
     std::vector<std::unique_ptr<EmData>> em_site_data;
 //    for (size_t s = 0; s < site_count; ++s) {
-    for (auto seq_prob: sp) {
+    for (auto &seq_prob: sp) {
         em_site_data.emplace_back(  new EmDataMutationV1(seq_prob, evo_model0)  );
 //        SiteProb site  (seq_prob, evo_model0 );
 //        site_prob.push_back(site);

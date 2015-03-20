@@ -237,12 +237,12 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 
 void EmAlgorithm::PrintSummary(){
     printf("========================\nEM Summary\nParameters: ");
-     for (auto item :parameters) {
+     for (auto &item :parameters) {
         printf("%.3e\t", item);
     }
 
     printf("\nProportions: ");
-    for (auto item :proportion) {
+    for (auto &item :proportion) {
         printf("%.3e\t", item);
     }
     printf("\n");

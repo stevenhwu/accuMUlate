@@ -300,7 +300,7 @@ void GenomeDataStream::WriteModelInput(ModelInput &input) {
 
 //    std::cout << input.reference << " : ";
     WriteReference(input.reference);
-    for (auto item : input.all_reads) {
+    for (auto &item : input.all_reads) {
 //        std::cout << item.key << " : ";
         WriteReadDataKey(item.key);
     }

@@ -66,6 +66,12 @@ void MutationModel::UpdateExpBeta(double expBeta) {
 
 void MutationModel::InitCache() {
 
+    std::cout << ULLONG_MAX << "\t" << UINT_MAX << "\t" << INT_MAX << "\t" << SIZE_MAX << std::endl;
+    std::unordered_map<uint64_t, int> count;
+
+//    cache_read_data_to_all.reserve(10000000);
+//    cache_read_data_to_all.rehash( 10000000);
+    int index = 0;
     for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
         auto item = all_sequence_prob[i];
 
@@ -73,30 +79,30 @@ void MutationModel::InitCache() {
             ReadData rd = item.GetDescendantReadData(j);
             auto rd_key = rd.key;
 //            auto rd_key = rd.reads[0];//+rd.reads[1]+rd.reads[2]+rd.reads[3];
-
+            count[rd_key]++;
             auto find_key = cache_read_data_to_all.find(rd_key);
 //            auto find_key = cache_read_data_to_all[rd_key];
 //            std::cout << rd_key << "\t" << std::endl;//(find_key == cache_read_data_to_all.end()) << "\t" <<  cache_read_data_to_all.size() <<std::endl;
             if(find_key == cache_read_data_to_all.end()){
-//            cache_read_data_to_all.f
-//            if(true){
 
-//                HaploidProbs genotype = item.GetDescendantGenotypes(j);
                 map_rd_key_to_haploid[rd_key]= item.GetDescendantGenotypes(j);
 
                 std::array<std::array<double, 2>, 10> temp;
+//                rd_key = hash_value(rd.reads);
+//                int k2 = 1
                 cache_read_data_to_all[rd_key] = temp;
-//                for (auto tt : cache_read_data_to_all2) {
-//                    std::array<double, 2> ta ;
-//                    tt[rd_key] = ta;
-//                }
+
 //                std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << std::endl;
-//                std::cout << rd_key << "\t" << genotype(0) << "\t" << genotype(1)<< "\t" << genotype[2]<< "\t" << genotype[3]<< std::endl;
+//                std::cout << "\t" << rd.reads[0] << "\t" << rd.reads[1] << "\t" <<rd.reads[2] << "\t" <<rd.reads[3] << "\t" << rd_key << std::endl;
             }
         }
 
     }
     std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << std::endl;
+//    for (auto item2 : count) {
+//        std::cout << item2.second << "\t" << item2.first << std::endl;
+//    }
+//    cache_read_data_to_all.rehash(100000);
     UpdateCache();
 
 }
@@ -277,13 +283,31 @@ void MutationModel::CacheLoopDesAll(int site_index, int anc_index, double &produ
 //        uint64_t  key = 0;
 
         auto key = all_sequence_prob[site_index].GetDescendantReadDataKey(d);
-        auto &cache = cache_read_data_to_all[key][anc_index];
+//        auto &cache = cache_read_data_to_all[key][anc_index];
+//        key = site_index;
+        std::array<double, 2> cache;
 
-//        auto key = all_sequence_prob[site_index].GetDescendantReadData(d).reads[0];
-//        auto &cache = aa[key];
+//        auto isExist = cache_read_data_to_all.find(key);
+//        if(isExist==cache_read_data_to_all.end())
 
+//        auto isC = cache_read_data_to_all.count(key);
+//        if(isC == 1)
+//        key = hash_value(all_sequence_prob[site_index].GetDescendantReadData(d).reads);
+        cache = cache_read_data_to_all[key][anc_index];
+
+
+
+//        {
+//            cache = {{0.12, 0.23}};
+//        }
+////        else{
+//            cache = {{0.01*d, 0.02*d}};
+////        }
         product_prob_given_ancestor *= cache[0];
         summary_stat_diff_ancestor += cache[1];
+
+//        product_prob_given_ancestor *= 0.12;
+//        summary_stat_diff_ancestor += 0.36;
 
     }
 }

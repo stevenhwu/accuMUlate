@@ -15,6 +15,7 @@
 union ReadData{
     uint64_t key;
     uint16_t reads[4];
+
 };
 
 typedef std::vector<ReadData> ReadDataVector;

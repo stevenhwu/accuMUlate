@@ -14,7 +14,7 @@ EmDataBinomial::EmDataBinomial(std::vector<int> input){
     total_count = input.size();
     data = input;
     int count  = 0;
-    for (auto item : input) {
+    for (auto &item : input) {
         if(item==true){
             count ++;
         }

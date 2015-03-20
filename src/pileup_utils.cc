@@ -171,7 +171,7 @@ namespace PileupUtils{
 
         gd_stream.WriteHeader(sequence_count);
 
-        for (auto baseCount : base_counts) {
+        for (auto &baseCount : base_counts) {
             gd_stream.WriteModelInput(baseCount);
         }
         gd_stream.close();
