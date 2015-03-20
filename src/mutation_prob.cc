@@ -54,10 +54,7 @@ void MutationProb::UpdateMu(double mu0) {
     this->mu0 = mu0;
     CalculateExpBeta();
 
-	mutation_rate.prob = 1-exp_beta;
-    mutation_rate.one_minus_p = 1-mutation_rate.prob;
-
-//    cout << "MuP:\t" << this->mu0 << "\t" << mutation_rate.prob << endl;
+    mutation_rate = 1 - exp_beta;
 }
 
 
@@ -71,7 +68,7 @@ double MutationProb::ConvertExpBetaToMu(double exp_beta) {
     return ConvertExpBetaToMu(exp_beta, beta0);
 }
 
-MutationRate MutationProb::GetMutationRate() {
+double MutationProb::GetMutationRate() {
     return mutation_rate;
 }
 
@@ -109,7 +106,7 @@ double MutationProb::ConvertExpBetaToMu(double exp_beta, double beta0) {
     return log(1-exp_beta)/(-beta0);
 }
 
-double MutationProb::CalculateBeta0(Array4D freq) {
+double MutationProb::CalculateBeta0(Array4D &freq) {
 
     double beta0 = 1;
     for (size_t i = 0; i < freq.size(); ++i) {

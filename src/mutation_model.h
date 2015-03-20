@@ -68,7 +68,7 @@ private:
 //    std::vector<HaploidProbs> all_descendant_genotypes;
 
     EvolutionModel *evo_model;
-    MutationRate mutation_rate;
+    double mutation_rate;
     MutationMatrix transition_matrix_a_to_d;
 
     Array4D frequency_prior;

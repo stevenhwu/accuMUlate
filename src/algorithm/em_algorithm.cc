@@ -17,7 +17,7 @@
 
 const double EM_CONVERGE_THRESHOLD = 1e-8;
 const double EM_CONVERGE_RATIO_THRESHOLD = 1e-8;
-const int EM_MAX_ITE = 1000;
+const int EM_MAX_ITE = 50;
 int VERBOSE_ITE = 100;
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
@@ -144,15 +144,11 @@ void EmAlgorithm::ExpectationStepModelPtr() {
         }
 
         double sum = all_probs.col(s).sum();
-        double total_site = 0;
         for (size_t r = 0; r < num_category; ++r) {
             double prob = all_probs(r,s) / sum;
             all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
-            total_site += all_probs(r,s);
         }
-        total += log(total_site);
     }
-    fflush(stdout);
 }
 
 void EmAlgorithm::MaximizationStep() {

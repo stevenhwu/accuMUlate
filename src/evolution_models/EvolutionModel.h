@@ -27,7 +27,7 @@ public:
 
     MutationMatrix GetTranstionMatirxAToD();
 
-    MutationRate GetMutationRate();
+    double GetMutationRate();
 
     MutationProb GetMutationProb();
     MutationProb GetMutationProb() const;

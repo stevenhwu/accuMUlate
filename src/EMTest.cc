@@ -37,7 +37,7 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
     clock_t t1 = clock();
     const int dup_count = 1;
-    for (size_t i = 0; i < base_counts.size(); ++i) {
+    for (size_t i = 0; i < base_counts.size(); ++i){
         for (size_t j = 0; j < dup_count; ++j) {
             SequenceProb ss = SequenceProb(base_counts[i], params);
             sp.push_back(ss);
@@ -55,27 +55,15 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     cout << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
     cout << "Done preprocess. Final site count: " << sp.size() << endl;
-
     cout << "======================== Setup EmData:" << endl;
 
-//    std::vector<SiteProb> site_prob;
-    std::vector<EmData*> em_site_prob;
-    std::vector<std::unique_ptr<EmData>> em_site_data;
-    for (auto seq_prob: sp) {
 
-        em_site_data.emplace_back(  new EmDataMutationV1(seq_prob, evo_model0)  );
-//        SiteProb site  (seq_prob, evo_model0 );
-//        site_prob.push_back(site);
-    }
-
-    EmModelMutationV1 em_model0 (evo_model0);
 
     MutationModel mutation_model = MutationModel(evo_model0);
     mutation_model.AddSequenceProb(sp);
     std::vector<std::unique_ptr<EmModel>> em_model2;
     em_model2.emplace_back(new EmModelMutation(mutation_model));
     em_model2.emplace_back(new EmModelMutation(mutation_model));
-//    MutationModel
 
     cout << "\n========================\nStart em_algorithm:" << endl;
     clock_t t_start, t_end;
@@ -86,7 +74,19 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     em_alg0.PrintSummary();
     t_end = clock();
     cout << "Time new: " << (t_end - t_start)/ CLOCKS_PER_SEC << "\t" << (t_end - t_start)  << endl << endl;
-exit(2);
+//exit(2);
+
+//    std::vector<SiteProb> site_prob;
+//    std::vector<EmData*> em_site_prob;
+    EmModelMutationV1 em_model0 (evo_model0);
+    std::vector<std::unique_ptr<EmData>> em_site_data;
+    for (auto seq_prob: sp) {
+
+        em_site_data.emplace_back(  new EmDataMutationV1(seq_prob, evo_model0)  );
+//        SiteProb site  (seq_prob, evo_model0 );
+//        site_prob.push_back(site);
+    }
+
     t_start = clock();
     EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
     em_alg2.Run();
