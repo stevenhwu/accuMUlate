@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <strings.h>
 
 #include "site_prob.h"
 
@@ -35,18 +36,36 @@ SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
     ancestor_prior = mutation_prob.GetAncestorPrior();
     frequency_prior = mutation_prob.GetFrequencyPrior();
 
-    UpdateModel(evo_model);
-
     ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
     all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
     descendant_count = all_descendant_genotypes.size();
 
-    all_descendant_diff_stats.resize(descendant_count);
-    for (int i = 0; i < descendant_count; ++i) {
-        for (int b = 0; b < BASE_COUNT; ++b) {
-            all_descendant_diff_stats[i][b] = all_descendant_genotypes[i][b] * frequency_prior_mutation_rate[b];
-        }
-    }
+
+//    all_descendant_diff_stats.resize(descendant_count);
+//    all_descendant_diff_stats2.resize(descendant_count, 0);
+    all_descendant_diff_stats2.assign(descendant_count, 0);
+//    master_prob.resize(16, std::vector<std::array<double, 4>>(descendant_count) );
+//    master_prob2.resize(16*descendant_count, std::array<double, 4> {{0,0,0,0,}} );
+
+    UpdateModel(evo_model);
+
+
+//    for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+//        int index16 = LookupTable::index_converter_10_to_16[index10];
+//        for (int d = 0; d < descendant_count; ++d) {
+//            int offset = index16*d;
+//            for (int b = 0; b < BASE_COUNT; ++b) {
+////                master_prob[index16][d][b] = transition_matrix_a_to_d(index16, b) * all_descendant_genotypes[d][b];
+//                master_prob2[offset+d][b] = transition_matrix_a_to_d(index16, b) * all_descendant_genotypes[d][b];
+//            }}}
+
+
+//    for (int i = 0; i < descendant_count; ++i) {
+//        for (int b = 0; b < BASE_COUNT; ++b) {
+//            all_descendant_diff_stats[i][b] = all_descendant_genotypes[i][b] * frequency_prior_mutation_rate[b];
+//        }
+//    }
+
 //    double a,b,c;
 //    CalculateAncestorToDescendant(a,b,c);
 }
@@ -55,25 +74,42 @@ SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
 SiteProb::~SiteProb() {
 }
 
-
+//int g_count = 0;
+//int g_count2 = 0;
 void SiteProb::UpdateModel(EvolutionModel &evo_model) {
     transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
     mutation_rate = evo_model.GetMutationRate();
-//    cout << "new mutation rate: " << mutation_rate.prob  << "\t" << mutation_rate.one_minus_p <<
-//            "\t" << thisCount << endl;
+
     for (int b = 0; b < BASE_COUNT; ++b) {
         frequency_prior_mutation_rate[b] = mutation_rate.prob * frequency_prior[b];
     }
-
+//TODO: time trial
+//    all_descendant_diff_stats2.resize(descendant_count,0);
+//    all_descendant_diff_stats2.assign(descendant_count,0);
+    std::fill(all_descendant_diff_stats2.begin(), all_descendant_diff_stats2.end(), 0);
     for (int i = 0; i < descendant_count; ++i) {
-//        auto cache_genotype = all_descendant_genotypes[i];
+
         for (int b = 0; b < BASE_COUNT; ++b) {
-            all_descendant_diff_stats[i][b] = all_descendant_genotypes[i][b] * frequency_prior_mutation_rate[b];
+//            all_descendant_diff_stats[i][b] = all_descendant_genotypes[i][b] * frequency_prior_mutation_rate[b];
+            all_descendant_diff_stats2[i] += all_descendant_genotypes[i][b] * frequency_prior_mutation_rate[b];
         }
     }
 
 
+
+//    for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+//        int index16 = LookupTable::index_converter_10_to_16[index10];
+//        int offset = index16*descendant_count;
+//        for (int d = 0; d < descendant_count; ++d) {
+//            int offset2 = offset+d;
+//            for (int b = 0; b < BASE_COUNT; ++b) {
+////                master_prob[index16][d][b] = transition_matrix_a_to_d(index16, b) * all_descendant_genotypes[d][b];
+//                master_prob2[offset2][b] = transition_matrix_a_to_d(index16, b) * all_descendant_genotypes[d][b];
+//            }
+//        }
+//    }
 }
+
 
 void SiteProb::UpdateMuProb(MutationProb mutation_prob){
 
@@ -135,7 +171,6 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
 
 }
 
-
 void SiteProb::CalculateAllDescendantGivenAncestor(int index16, double &product_prob_given_ancestor,
         double &summary_stat_same_ancestor, double &summary_stat_diff_ancestor) {
 
@@ -173,7 +208,7 @@ void SiteProb::CalculateOneDescendantGivenAncestor(int index16, int des_index, d
 
     prob_reads_d_given_a = 0;
     summary_stat_same = 0;
-    summary_stat_diff = 0;
+//    summary_stat_diff = 0;
 
 //prob_reads_given_descent = {0.4,0.1,0.1,0.4};
 //    prob_reads_given_descent = {0.03,0.03,0.04,0.9};
@@ -181,25 +216,31 @@ void SiteProb::CalculateOneDescendantGivenAncestor(int index16, int des_index, d
 //    prob_reads_given_descent = {0.3,0.2,0.2,0.3};
 
     for (int b = 0; b < BASE_COUNT; ++b) {
-
         double prob = transition_matrix_a_to_d(index16, b) * all_descendant_genotypes[des_index][b];
+//        double prob = master_prob2[index16][b];
         prob_reads_d_given_a += prob;
 
 //        summary_stat_same += prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
 //        summary_stat_diff += prob_reads_given_descent[b] * frequency_prior_mutation_rate[b];
-        summary_stat_diff += all_descendant_diff_stats[des_index][b];
+
+//        summary_stat_diff += all_descendant_diff_stats[des_index][b];
         //TODO: Cache these as lookup as well
 
 //        total_sum2 += summary_stat_diff + summary_stat_same;
 //        total_sum2 += mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[index16][b] + mutation_rate.prob * frequency_prior[b];
-        if (DEBUG>3) {
+        if (DEBUG > 3) {
 //            double t1 = prob_reads_given_descent[b] * mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[index16][b];
 //            double t2 = prob_reads_given_descent[b] * mutation_rate.prob * frequency_prior[b];
 //            std::cout << "======Loop base: " << b << "\t" << "\tP:" << prob <<"\tReadGivenD:"<< prob_reads_given_descent[b] << "\t T1:" << t1 << "\t T2:" << t2 <<"\t SAME:"<<summary_stat_same << "\t" << summary_stat_diff << std::endl;//t1 << "\t" << t2 <<std::endl;
         }
     }
 //    summary_stat_same /= prob_reads_d_given_a;
-    summary_stat_diff /= prob_reads_d_given_a;
+//    if (summary_stat_diff != all_descendant_diff_stats2[des_index]) {
+//       std::cout << summary_stat_diff << "\t" <<  all_descendant_diff_stats2[des_index] << std::endl;
+//    }
+
+    summary_stat_diff = all_descendant_diff_stats2[des_index] / prob_reads_d_given_a;
+//    summary_stat_diff /= prob_reads_d_given_a;
 
     if (DEBUG>2) {
         std::cout << index16 << "\t" <<summary_stat_same << "\t" << summary_stat_diff << std::endl;

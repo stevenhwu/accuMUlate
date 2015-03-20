@@ -17,8 +17,8 @@
 
 const double EM_CONVERGE_THRESHOLD = 1e-8;
 const double EM_CONVERGE_RATIO_THRESHOLD = 1e-8;
-const int EM_MAX_ITE = 20;
-
+const int EM_MAX_ITE = 1000;
+int VERBOSE_ITE = 100;
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
 
@@ -219,7 +219,7 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
         cache_parameters[r] = parameters[r];
     }
 
-    if ( (ite % 5) == 0) {
+    if ( (ite % VERBOSE_ITE) == 0) {
         std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << "\tsum_ratio: " << sum_ratio << std::endl;
 //        PrintSummary();
     }

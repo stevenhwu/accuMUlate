@@ -16,7 +16,7 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 
 set(CMAKE_CXX_FLAGS  "-std=c++11")
 set(CMAKE_CXX_FLAGS_RELEASE  "-std=c++11 -O3")
-set(CMAKE_CXX_FLAGS_RelWithDebInfo "-std=c++11 -O3 -Wall")
+set(CMAKE_CXX_FLAGS_RelWithDebInfo "-std=c++11 -O3 -Wall") #-d
 set(CMAKE_CXX_FLAGS_DEBUG  "-std=c++11 -g -O0 -Wvla -Wall  -Wextra -pedantic ")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} "-std=c++11 -g -Wvla -Wall  -Wextra -pedantic -Wno-unused-private-field -Wno-unused-variable")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wextra -Waggregate-return -Wcast-align") #-pedantic-errors
@@ -40,6 +40,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wunused-function  -Wunused
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wunused-value  -Wunused-variable  -Wvariadic-macros ")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wvolatile-register-var  -Wwrite-strings ")
 
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Weverything")
+##turn off some!
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-unused-private-field -Wno-unused-variable -Wno-unused-private-field")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-unreachable-code") #for debug
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-conversion -Wno-padded -Wno-missing-noreturn") #Way too many from Eigen/Boost

@@ -34,20 +34,25 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     cout << "init: site_count: " << base_counts.size() << endl;
 
     std::vector<SequenceProb> sp;
+
+    clock_t t1 = clock();
+    const int dup_count = 1;
     for (size_t i = 0; i < base_counts.size(); ++i) {
-//    for (size_t i = 0; i < 10000; ++i) {
-        SequenceProb ss = SequenceProb(base_counts[i], params);
-        sp.push_back(ss);
-//        sp.push_back(ss);
-//        sp.push_back(ss);
+        for (size_t j = 0; j < dup_count; ++j) {
+            SequenceProb ss = SequenceProb(base_counts[i], params);
+            sp.push_back(ss);
+//        sp.emplace_back(SequenceProb(base_counts[i], params));
+//        sp.emplace_back( base_counts[i], params);
+
+        }
     }
 
     int descendant_count = sp[0].GetDescendantCount();
-    size_t fake_sample_count = 68679;//68679
     double fake_prop = 0.2;//0.2;
-    clock_t t1 = clock();
-    AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
-    cout << ((clock() - t1)/ CLOCKS_PER_SEC) << endl;
+    size_t fake_sample_count = 68679;//68679
+//    t1 = clock();AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
+
+    cout << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
     cout << "Done preprocess. Final site count: " << sp.size() << endl;
 
@@ -57,6 +62,7 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     std::vector<EmData*> em_site_prob;
     std::vector<std::unique_ptr<EmData>> em_site_data;
     for (auto seq_prob: sp) {
+
         em_site_data.emplace_back(  new EmDataMutationV1(seq_prob, evo_model0)  );
 //        SiteProb site  (seq_prob, evo_model0 );
 //        site_prob.push_back(site);
@@ -80,14 +86,13 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     em_alg0.PrintSummary();
     t_end = clock();
     cout << "Time new: " << (t_end - t_start)/ CLOCKS_PER_SEC << "\t" << (t_end - t_start)  << endl << endl;
-
+exit(2);
     t_start = clock();
-    EmAlgorithmMutationV1 em_alg2 (2, em_site_data, em_model0);
+    EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
     em_alg2.Run();
     em_alg2.PrintSummary();
     t_end = clock();
-    cout << "Time old: " << (t_end - t_start)/CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
-
+    cout << "Time old: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
 
 //    EmAlgorithmMutationV1 em_alg (2, site_prob, model, em_site_data, em_model0);
 //    EmAlgorithmMutationV1 em_alg3 (em_site_data, em_model);
@@ -134,6 +139,8 @@ void AddSimulatedData(ModelParams &params, std::vector<SequenceProb> &sp, int de
 
 
 int main(int argc, char** argv){
+
+
 //using namespace BoostUtils;
     boost::program_options::variables_map variable_map;
     BoostUtils::ParseCommandLinkeInput(argc, argv, variable_map);
@@ -157,7 +164,6 @@ int main(int argc, char** argv){
 
     printf("Total ReadWrite Time: %f \n", ((double) (clock()-start0)/ CLOCKS_PER_SEC) );
 //    SummariseReadsData(genome_data);
-
 
     ModelParams params = {
             variable_map["theta"].as<double>(),

@@ -65,6 +65,7 @@ private:
     DiploidProbs ancestor_genotypes;
     std::vector<HaploidProbs> all_descendant_genotypes;
     std::vector<std::array<double, 4>> all_descendant_diff_stats;
+    std::vector<double> all_descendant_diff_stats2;
     std::array<double, 4> frequency_prior_mutation_rate;
 
     MutationRate mutation_rate;
@@ -73,8 +74,11 @@ private:
     Array4D frequency_prior;
     Array10D ancestor_prior;
 
-    int descendant_count;
+    int descendant_count = 0;
 
+
+//    std::vector<std::vector<std::array<double, 4>>> master_prob;
+    std::vector<std::array<double, 4>> master_prob2;
 
 };
 

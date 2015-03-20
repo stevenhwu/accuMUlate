@@ -8,6 +8,7 @@
 
 
 #include <stdint.h>
+
 #include "mutation_model.h"
 
 
@@ -53,11 +54,11 @@ void MutationModel::AddSequenceProb(std::vector<SequenceProb> &all) {
 
 
 void MutationModel::UpdateExpBeta(double expBeta) {
+
     evo_model->UpdateExpBeta(expBeta);
 
     transition_matrix_a_to_d = evo_model->GetTranstionMatirxAToD();
     mutation_rate = evo_model->GetMutationRate();
-
     UpdateCache();
 
 }
@@ -71,24 +72,42 @@ void MutationModel::InitCache() {
         for (int j = 0; j < item.GetDescendantCount(); ++j) {
             ReadData rd = item.GetDescendantReadData(j);
             auto rd_key = rd.key;
-            auto find_key = cache_read_data_to_all.find(rd_key);
+//            auto rd_key = rd.reads[0];//+rd.reads[1]+rd.reads[2]+rd.reads[3];
 
+            auto find_key = cache_read_data_to_all.find(rd_key);
+//            auto find_key = cache_read_data_to_all[rd_key];
+//            std::cout << rd_key << "\t" << std::endl;//(find_key == cache_read_data_to_all.end()) << "\t" <<  cache_read_data_to_all.size() <<std::endl;
             if(find_key == cache_read_data_to_all.end()){
-                HaploidProbs genotype = item.GetDescendantGenotypes(j);
-                map_rd_key_to_haploid[rd_key]=genotype;
+//            cache_read_data_to_all.f
+//            if(true){
+
+//                HaploidProbs genotype = item.GetDescendantGenotypes(j);
+                map_rd_key_to_haploid[rd_key]= item.GetDescendantGenotypes(j);
+
+                std::array<std::array<double, 2>, 10> temp;
+                cache_read_data_to_all[rd_key] = temp;
+//                for (auto tt : cache_read_data_to_all2) {
+//                    std::array<double, 2> ta ;
+//                    tt[rd_key] = ta;
+//                }
+//                std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << std::endl;
+//                std::cout << rd_key << "\t" << genotype(0) << "\t" << genotype(1)<< "\t" << genotype[2]<< "\t" << genotype[3]<< std::endl;
             }
         }
-    }
-    UpdateCache();
-}
 
+    }
+    std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << std::endl;
+    UpdateCache();
+
+}
 void MutationModel::UpdateCache() {
+
 
     std::array<double, 4> temp_base_prob;
     for (int b = 0; b < BASE_COUNT; ++b) {
         temp_base_prob[b] = mutation_rate.prob * frequency_prior[b];
     }
-
+//    cache_read_data_to_all
     for (auto item : map_rd_key_to_haploid) {
         auto rd_key = item.first;
         auto genotype = item.second;
@@ -98,8 +117,21 @@ void MutationModel::UpdateCache() {
             summary_stat_diff += genotype[b] * temp_base_prob[b];//p * evo_model.GetMutationProb().mutation_rate.prob * frequency_prior[b];
         }
 
+
+//        std::array<std::array<double, 2>, 10> &cache_all = cache_read_data_to_all[rd_key];
+//        auto fn = cache_read_data_to_all.hash_function();
+//        rd_key = hash_value(rd_key);
+//        std::cout << rd_key << "\t" << fn(rd_key)  << "\t" << fn(rd_key) << std::endl;
+//        for (size_t i = 8589934630; i < 8589934645; ++i) {
+//
+//            auto cache_all0 = cache_read_data_to_all[i];
+//            std::cout << i << "\t" << cache_all0[0][0] << std::endl;
+//        }
+
         auto cache_all = cache_read_data_to_all[rd_key];
-        for (int k = 0; k < 10; ++k) {
+//        std::cout << rd_key << "\t" << cache_read_data_to_all.size() << std::endl;
+//        std::cout << "aoeuaoeu" << std::endl;
+        for (int k = 0; k < ANCESTOR_COUNT; ++k) {
             int index16 = LookupTable::index_converter_10_to_16[k];
             double prob_reads_d_given_a = 0;
 
@@ -108,13 +140,27 @@ void MutationModel::UpdateCache() {
                 prob_reads_d_given_a += prob;
 //                //stat_same += genotype[b] * evo_model.GetMutationProb().mutation_rate.one_minus_p * LookupTable::summary_stat_same_lookup_table[k][b];
             }
-
+//            std::cout << cache_all[k][0] << "\t" << cache_all[k][1] << std::endl;
             cache_all[k][0] = prob_reads_d_given_a;
             cache_all[k][1] = summary_stat_diff / prob_reads_d_given_a;
+
+//            std::cout << cache_read_data_to_all[rd_key][k][0] << "\t" << cache_read_data_to_all[rd_key][k][1] << std::endl;
+//            std::exit(3);
+//            cache_read_data_to_all2[k][rd_key] = cache_all[k];
         };
 
-        cache_read_data_to_all[rd_key] = cache_all;
+
+        cache_read_data_to_all[rd_key] = std::move(cache_all);
     }
+//    std::cout << cache_read_data_to_all.load_factor() << "\t" << cache_read_data_to_all.bucket_count() << "\t" << cache_read_data_to_all.max_bucket_count()<< std::endl;
+//      for (unsigned i=0; i<cache_read_data_to_all.bucket_count(); ++i) {
+//    std::cout << "bucket #" << i << " has " << cache_read_data_to_all.bucket_size(i) << " elements.\n";
+//  }
+//     for (auto& x: cache_read_data_to_all) {
+//    std::cout << "Element [" << x.first << ":"<< "]";
+//    std::cout << " is in bucket #" << cache_read_data_to_all.bucket (x.first) << std::endl;
+//  }
+//    std::exit(3);
 }
 
 void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff) {
@@ -241,10 +287,20 @@ void MutationModel::CacheLoopDesAll(int site_index, int anc_index, double &produ
 
     product_prob_given_ancestor = 1;
     summary_stat_diff_ancestor = 0;
+
+//    std::array<double, 2> cache = {{0,1}};
+//    auto &t = all_sequence_prob[site_index];
+//    auto key = all_sequence_prob[site_index].GetDescendantReadDataKey(0);
+
+//    auto &aa = cache_read_data_to_all2[anc_index];
     for (int d = 0; d < descendant_count; ++d) {
+//        uint64_t  key = 0;
 
         auto key = all_sequence_prob[site_index].GetDescendantReadDataKey(d);
-        auto cache = cache_read_data_to_all[key][anc_index];
+        auto &cache = cache_read_data_to_all[key][anc_index];
+
+//        auto key = all_sequence_prob[site_index].GetDescendantReadData(d).reads[0];
+//        auto &cache = aa[key];
 
         product_prob_given_ancestor *= cache[0];
         summary_stat_diff_ancestor += cache[1];
