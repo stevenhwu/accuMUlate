@@ -24,7 +24,6 @@ struct ProbTwoStats{
     double stat_same;
     double stat_diff;
 };
-static int counter = 0;
 class SiteProb {
 
 
@@ -32,7 +31,7 @@ public:
     SiteProb() {
     }
 
-    SiteProb(SequenceProb sequence_prob, MutationProb const mutation_prob, EvolutionModel const evo_model);
+    SiteProb(SequenceProb &sequence_prob, MutationProb &mutation_prob, EvolutionModel &evo_model);
 
 //    SiteProb(ModelInput const site_data, ModelParams const model_params, MutationProb const mutation_prob, EvolutionModel const evo_model);
 //    SiteProb(const ModelParams &params, const ModelInput site_data, MutationProb muProb);
@@ -44,7 +43,7 @@ public:
 
     void UpdateMuProb(MutationProb muProb);
 
-    void UpdateTransitionMatrix(EvolutionModel evo_model);
+    void UpdateTransitionMatrix(EvolutionModel &evo_model);
 
     void CalculateAncestorToDescendant(double &prob_reads, double &all_stats_same, double &all_stats_diff);
 
@@ -67,13 +66,13 @@ private:
     std::vector<std::array<double, 4>> all_descendant_diff_stats;
     std::array<double, 4> frequency_prior_mutation_rate;
 
-    MutationRate mutation_rate;
+    double mutation_rate;
     MutationMatrix transition_matrix_a_to_d;
 
     Array4D frequency_prior;
     Array10D ancestor_prior;
 
-    int descendant_count;
+    int descendant_count = 0;
 
 
 };

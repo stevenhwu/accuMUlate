@@ -25,15 +25,10 @@
 typedef std::array<double, 10> Array10D;
 typedef std::array<double, 4> Array4D;
 
-struct MutationRate{
-    double prob;
-    double one_minus_p;
-};
-
 
 class MutationProb {
 public:
-    static double CalculateBeta0(Array4D freq);
+    static double CalculateBeta0(Array4D &freq);
     static double CalculateExpBeta(double mu, double beta0);
     static double ConvertExpBetaToMu(double exp_beta, double beta0);
 
@@ -48,7 +43,7 @@ public:
     void UpdateMu(double mu);
     double ConvertExpBetaToMu(double exp_beta);
 
-    MutationRate GetMutationRate();
+    double GetMutationRate();
     Array4D GetFrequencyPrior();
     Array10D GetAncestorPrior();
     double GetExpBeta();
@@ -57,11 +52,10 @@ public:
 
 
 private:
-
-    MutationRate mutation_rate;
     Array4D frequency_prior;
     Array10D ancestor_prior;
 
+    double mutation_rate;
     double mu0;
     double beta0;
     double exp_beta; //exp_beta = exp(-beta0*mu0)

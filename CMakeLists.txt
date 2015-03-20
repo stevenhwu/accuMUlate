@@ -17,7 +17,7 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 set(CMAKE_CXX_FLAGS  "-std=c++11")
 set(CMAKE_CXX_FLAGS_RELEASE  "-std=c++11 -O3")
 set(CMAKE_CXX_FLAGS_RelWithDebInfo "-std=c++11 -O3 -Wall")
-set(CMAKE_CXX_FLAGS_DEBUG  "-std=c++11 -g -O0 -Wvla -Wall  -Wextra -pedantic ")
+set(CMAKE_CXX_FLAGS_DEBUG  "-std=c++11 -g pg -O0 -Wvla -Wall  -Wextra -pedantic ")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} "-std=c++11 -g -Wvla -Wall  -Wextra -pedantic -Wno-unused-private-field -Wno-unused-variable")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wextra -Waggregate-return -Wcast-align") #-pedantic-errors
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wcast-qual  -Wchar-subscripts  -Wcomment " )
@@ -113,7 +113,7 @@ ADD_SUBDIRECTORY(src)
 #1
 ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/include/googletest-trunk/")
 #SET(GTEST_ROOT "${CMAKE_SOURCE_DIR}/include/googletest-trunk")
-ADD_SUBDIRECTORY(test)
+#ADD_SUBDIRECTORY(test)
 
 
 #2 Some link error??

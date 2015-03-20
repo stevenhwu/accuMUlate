@@ -6,6 +6,7 @@
 #pragma clang diagnostic ignored "-Wall"
 
 #include <stdint.h>
+#include <vector>
 #include "Eigen/Dense"
 #pragma clang diagnostic pop
 

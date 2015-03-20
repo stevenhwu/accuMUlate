@@ -32,7 +32,7 @@ public:
     virtual void print();
     virtual void Reset();
     virtual void UpdateSumWithProportion(double &d, std::unique_ptr<EmSummaryStat> &em_stat_local);
-    virtual void UpdateSumWithProportion(double &d, std::vector<double> temp_stats);
+    virtual void UpdateSumWithProportion(double d, std::vector<double> &temp_stats);
 
 
 

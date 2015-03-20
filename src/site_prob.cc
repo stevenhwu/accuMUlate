@@ -12,8 +12,8 @@
 
 const int DEBUG = 0;
 
-SiteProb::SiteProb(SequenceProb sequence_prob,
-		 MutationProb mutation_prob, EvolutionModel evo_model) {
+SiteProb::SiteProb(SequenceProb &sequence_prob,
+		 MutationProb &mutation_prob, EvolutionModel &evo_model) {
 
     ancestor_prior = mutation_prob.GetAncestorPrior();
     frequency_prior = mutation_prob.GetFrequencyPrior();
@@ -28,9 +28,6 @@ SiteProb::SiteProb(SequenceProb sequence_prob,
 
 
 SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
-
-    counter++;
-
     MutationProb mutation_prob = evo_model.GetMutationProb() ;
     ancestor_prior = mutation_prob.GetAncestorPrior();
     frequency_prior = mutation_prob.GetFrequencyPrior();
@@ -62,7 +59,7 @@ void SiteProb::UpdateModel(EvolutionModel &evo_model) {
 //    cout << "new mutation rate: " << mutation_rate.prob  << "\t" << mutation_rate.one_minus_p <<
 //            "\t" << thisCount << endl;
     for (int b = 0; b < BASE_COUNT; ++b) {
-        frequency_prior_mutation_rate[b] = mutation_rate.prob * frequency_prior[b];
+        frequency_prior_mutation_rate[b] = mutation_rate * frequency_prior[b];
     }
 
     for (int i = 0; i < descendant_count; ++i) {
@@ -79,11 +76,11 @@ void SiteProb::UpdateMuProb(MutationProb mutation_prob){
 
     mutation_rate = mutation_prob.GetMutationRate();
     for (int b = 0; b < BASE_COUNT; ++b) {
-        frequency_prior_mutation_rate[b] = mutation_rate.prob * frequency_prior[b];
+        frequency_prior_mutation_rate[b] = mutation_rate * frequency_prior[b];
     }
 }
 
-void SiteProb::UpdateTransitionMatrix(EvolutionModel evo_model) {
+void SiteProb::UpdateTransitionMatrix(EvolutionModel &evo_model) {
     transition_matrix_a_to_d = evo_model.GetTranstionMatirxAToD();
 }
 

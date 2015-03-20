@@ -28,7 +28,7 @@ MutationMatrix EvolutionModel::GetTranstionMatirxAToD() {
     return transition_matrix_a_to_d;
 }
 
-MutationRate EvolutionModel::GetMutationRate() {
+double EvolutionModel::GetMutationRate() {
 //    cout << mu_prob.beta0 << endl;
 //    cout << mu_prob.GetExpBeta() << endl;
     return mu_prob.GetMutationRate();
