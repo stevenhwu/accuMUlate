@@ -496,6 +496,7 @@ template<>
 inline bool BamAlignment::GetTag<std::string>(const std::string& tag,
                                               std::string& destination) const
 {
+
     // skip if alignment is core-only
     if ( SupportData.HasCoreOnly ) {
         // TODO: set error string?
@@ -512,19 +513,39 @@ inline bool BamAlignment::GetTag<std::string>(const std::string& tag,
     char* pTagData = (char*)TagData.data();
     const unsigned int tagDataLength = TagData.size();
     unsigned int numBytesParsed = 0;
-
+//    std::cout << tagDataLength << "\t" << numBytesParsed <<  "\t" << pTagData <<"\n";
     // return failure if tag not found
     if ( !FindTag(tag, pTagData, tagDataLength, numBytesParsed) ) {
         // TODO: set error string?
         return false;
     }
+//    {
+//        std::cout << "TTTTTAG::";
+//        while ( numBytesParsed < tagDataLength ) {
+//
+//            const char* pTagType        = pTagData;
+//            const char* pTagStorageType = pTagData + 2;
+//            pTagData       += 3;
+//            numBytesParsed += 3;
+//            std::cout << "TTTTTAG::\t" << pTagType << "\n\t" << pTagStorageType << "\t" << pTagData << "\t" << numBytesParsed << std::endl;
+//            // check the current tag, return true on match
+//            if ( strncmp(pTagType, tag.c_str(), 2) == 0 )
+//                return true;
+//
+//            // get the storage class and find the next tag
+//            if ( *pTagStorageType == '\0' ) return false;
+//            if ( !SkipToNextTag(*pTagStorageType, pTagData, numBytesParsed) ) return false;
+//            if ( *pTagData == '\0' ) return false;
+//            std::cout << numBytesParsed << std::endl;
+//        }
+//    }
 
     // otherwise copy data into destination
     const unsigned int dataLength = strlen(pTagData);
     destination.clear();
     destination.resize(dataLength);
     memcpy( (char*)destination.data(), pTagData, dataLength );
-
+//    std::cout << tagDataLength << "\t" << numBytesParsed << "\t" << dataLength << "\t" << pTagData <<"\n";
     // return success
     return true;
 }

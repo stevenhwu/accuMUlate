@@ -25,7 +25,7 @@ FastaReference::FastaReference(std::string ref_file_name){
         for (; L[i] !='\t'; i++){
             s_len.push_back(L[i]);
         }
-        uint32_t chrom_len = stoul(s_len);
+        uint32_t chrom_len = std::stoul(s_len);
         cummulative_len += chrom_len;
         chromosomes.push_back(FastaReferenceData{ chrom, 
                                                   chrom_len, 
