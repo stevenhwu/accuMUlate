@@ -50,7 +50,7 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     int descendant_count = sp[0].GetDescendantCount();
     double fake_prop = 0.3;//0.2;
     size_t fake_sample_count = 268679;//68679
-//    t1 = clock();AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
+    t1 = clock();AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
 
     cout << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
@@ -164,8 +164,10 @@ int main(int argc, char** argv){
 //    cout << "G0: " << global_count[0] << "\tG1: " << global_count[1] << "\tG2: " << global_count[2] << endl;
 //
 //
+
+//    std::exit(1);
     clock_t start0 = clock();
-    std::string file_name = "zz_test_GenomeData_binary_subset";
+    std::string file_name = variable_map["bam"].as<string>();// "zz_test_GenomeData_binary_subset";
 //    PileupUtils::WriteGenomeDataToBinary(file_name, genome_data);
     PileupUtils::ReadGenomeDataFromBinary(file_name, genome_data);
 
