@@ -49,7 +49,7 @@ namespace PileupUtils {
 
     void ReadGenomeDataFromBinary(std::string file_name, GenomeData &genome_data) ;
 
-    void VerboseAlignmentInfo(clock_t time_stored, uint64_t ali_counter);
+    void VerboseAlignmentInfo(clock_t &time_stored, uint64_t ali_counter);
 
     void SummariseReadsData(GenomeData base_counts);
 };

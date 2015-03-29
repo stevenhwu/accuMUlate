@@ -15,7 +15,7 @@
 
 namespace PileupUtils{
 
-    uint64_t print_count = 100000;
+    uint64_t print_count = 1000000;
     float fix_counter = 1e6;
     float time_scaler = fix_counter/print_count;
 
@@ -102,7 +102,7 @@ namespace PileupUtils{
 //        cout.rdbuf (old);
     }
 
-    void VerboseAlignmentInfo(clock_t time_stored, uint64_t ali_counter) {
+    void VerboseAlignmentInfo(clock_t &time_stored, uint64_t ali_counter) {
         if (ali_counter % print_count == 0){  //3800 => 67
             clock_t time_temp = clock() ;
             time_stored = time_temp - time_stored;

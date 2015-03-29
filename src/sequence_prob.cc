@@ -6,6 +6,7 @@
  */
 #include <iostream>
 #include <stdint.h>
+#include <strings.h>
 #include "sequence_prob.h"
 
 
@@ -36,6 +37,7 @@ SequenceProb::SequenceProb(ModelInput const site_data,  ModelParams const model_
 //	DiploidProbs num_genotypes = ancestor_genotypes;
 	descendant_count = site_data.all_reads.size() - 1;
 //	descendant_count = 3;
+	descendant_index.assign(descendant_count, -1);
     for (i = 1; i < (descendant_count+1); ++i) {
         ReadData data = site_data.all_reads[i];
         all_descendant_data.push_back(data);
@@ -273,3 +275,22 @@ uint64_t SequenceProb::GetDescendantReadDataKey(int descent_index) {
 	return all_descendant_data[descent_index].key;
 }
 
+void SequenceProb::SetDescendantIndex(int des, int index) {
+	descendant_index[des] = index;
+}
+
+int SequenceProb::GetDescendantIndex(int des) {
+	return descendant_index[des];
+
+}
+
+const std::vector<int>& SequenceProb::GetDescendantIndex() {
+	return descendant_index;
+}
+
+void SequenceProb::SortIndex() {
+//	descendant_index
+//	std::algorithm::sort
+	std::sort (descendant_index.begin(), descendant_index.end());
+
+}

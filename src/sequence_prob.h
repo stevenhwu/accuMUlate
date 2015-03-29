@@ -65,6 +65,15 @@ public:
 
     std::unordered_map<uint64_t, int> temp_map;
     std::vector<std::pair<uint64_t, int>> condense_genotype;
+
+    void SetDescendantIndex(int des, int index);
+    int GetDescendantIndex(int des);
+
+
+    const std::vector<int>& GetDescendantIndex();
+
+    void SortIndex();
+
 protected:
     DiploidProbs DiploidPopulation(int ref_allele);
 
@@ -76,6 +85,7 @@ protected:
 
     template<class T>
     T ScaleLogArray(T result);
+
 
 private:
 
@@ -95,6 +105,7 @@ private:
     double error_prob;
     double theta;
 
+    std::vector<int> descendant_index;
 
 };
 

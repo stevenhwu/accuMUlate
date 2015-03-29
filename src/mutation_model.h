@@ -88,8 +88,17 @@ private:
 //    google::sparse_hash_map<uint64_t, std::array<std::array<double, 2>, 10> > cache_read_data_to_all; //[key][anc_index]
 //    boost::unordered_map<uint64_t, std::array<std::array<double, 2>, 10> > cache_read_data_to_all_boost; //[key][anc_index]
 
+    std::unordered_map<uint64_t, int> map_rd_to_index;
+    std::vector<HaploidProbs> map_index_key_to_haploid;
 
 
+//    std::vector<std::array<std::array<double, 2>, 10> > cache_read_data_to_all_index;
+    std::vector<std::array<std::pair<double, double>, 10> > cache_read_data_to_all_index;
+
+    std::array<std::vector<std::pair<double, double>>, 10>  cache_read_data_to_all_index_rev;
+//    std::array<std::vector<std::array<double, 2>>, 10>  cache_read_data_to_all_index_rev;
+
+    std::vector<double> summary_stat_diff_vec ;
     int site_count;
     int descendant_count;
 
@@ -130,6 +139,10 @@ public:
 
 //    void AddCache(std::unordered_map<double, std::array<double, 4>> &allDMaps4,
 //            std::unordered_map<double,  Std2DArray>  &cache_data_transition);
+
+    void CacheLoopDesAll2(int anc_index, std::vector<int> const &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
+    void CacheLoopDesAll3(int anc_index, std::vector<int> const &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
+    void CacheLoopDesAll4(int anc_index, std::vector<std::array<std::array<double, 2>, 10>*> &cd, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) ;
 };
 
 

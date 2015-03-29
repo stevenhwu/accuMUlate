@@ -48,9 +48,9 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     }
 
     int descendant_count = sp[0].GetDescendantCount();
-    double fake_prop = 0.2;//0.2;
-    size_t fake_sample_count = 68679;//68679
-//    t1 = clock();AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
+    double fake_prop = 0.3;//0.2;
+    size_t fake_sample_count = 268679;//68679
+    t1 = clock();AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
 
     cout << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
@@ -68,32 +68,38 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     cout << "\n========================\nStart em_algorithm:" << endl;
     clock_t t_start, t_end;
 
-    t_start = clock();
-    EmAlgorithmMutation em_alg0 (em_model2);
-    em_alg0.Run();
-    em_alg0.PrintSummary();
-    t_end = clock();
-    cout << "Time new: " << (t_end - t_start)/ CLOCKS_PER_SEC << "\t" << (t_end - t_start)  << endl << endl;
-//exit(2);
+    int trial_time = 10;
+    for (int k = 0; k < trial_time; ++k) {
+
+
+        t_start = clock();
+        EmAlgorithmMutation em_alg0(em_model2);
+        em_alg0.Run();
+        em_alg0.PrintSummary();
+        t_end = clock();
+        cout << "Time new: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl << endl;
+
+//    exit(2);
 
 //    std::vector<SiteProb> site_prob;
 //    std::vector<EmData*> em_site_prob;
-    EmModelMutationV1 em_model0 (evo_model0);
-    std::vector<std::unique_ptr<EmData>> em_site_data;
-    for (auto &seq_prob: sp) {
+        EmModelMutationV1 em_model0(evo_model0);
+        std::vector<std::unique_ptr<EmData>> em_site_data;
+        for (auto &seq_prob: sp) {
 
-        em_site_data.emplace_back(  new EmDataMutationV1(seq_prob, evo_model0)  );
+            em_site_data.emplace_back(new EmDataMutationV1(seq_prob, evo_model0));
 //        SiteProb site  (seq_prob, evo_model0 );
 //        site_prob.push_back(site);
+        }
+
+        t_start = clock();
+        EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
+        em_alg2.Run();
+        em_alg2.PrintSummary();
+        t_end = clock();
+        cout << "Time old: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
+
     }
-
-    t_start = clock();
-    EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
-    em_alg2.Run();
-    em_alg2.PrintSummary();
-    t_end = clock();
-    cout << "Time old: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
-
 //    EmAlgorithmMutationV1 em_alg (2, site_prob, model, em_site_data, em_model0);
 //    EmAlgorithmMutationV1 em_alg3 (em_site_data, em_model);
 //    em_alg3.Run2();
@@ -102,7 +108,6 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
 
 void AddSimulatedData(ModelParams &params, std::vector<SequenceProb> &sp, int descendant_count, size_t fake_sample_count, double fake_prop) {
-    cout << "========= Add simulated data:" << fake_sample_count << endl;
 
     std::random_device rd;
     std::mt19937 e2(rd());
@@ -110,6 +115,8 @@ void AddSimulatedData(ModelParams &params, std::vector<SequenceProb> &sp, int de
     std::uniform_int_distribution<uint16_t> uniform3(0, 3);
 
     size_t fake_diff_count = fake_sample_count * fake_prop;
+    cout << "========= Add simulated data:" << fake_sample_count << " with fake_diff_count: " << fake_diff_count << endl;
+
     descendant_count++;
 
     for (size_t s = 0; s < fake_sample_count; ++s) {
@@ -157,8 +164,10 @@ int main(int argc, char** argv){
 //    cout << "G0: " << global_count[0] << "\tG1: " << global_count[1] << "\tG2: " << global_count[2] << endl;
 //
 //
+
+//    std::exit(1);
     clock_t start0 = clock();
-    std::string file_name = "zz_test_GenomeData_binary_subset";
+    std::string file_name = variable_map["bam"].as<string>();// "zz_test_GenomeData_binary_subset";
 //    PileupUtils::WriteGenomeDataToBinary(file_name, genome_data);
     PileupUtils::ReadGenomeDataFromBinary(file_name, genome_data);
 

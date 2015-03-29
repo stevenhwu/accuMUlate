@@ -142,7 +142,6 @@ void EmAlgorithm::ExpectationStepModelPtr() {
             (*em_model_ptr)[r]->UpdateSummaryStat(s, sum_prob, temp_stats[r]);
             all_probs(r, s) = proportion[r] * sum_prob;
         }
-
         double sum = all_probs.col(s).sum();
         for (size_t r = 0; r < num_category; ++r) {
             double prob = all_probs(r,s) / sum;
