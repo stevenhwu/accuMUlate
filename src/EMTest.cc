@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 #include <boost/program_options.hpp>
-
+#include <random>
 
 #include "api/BamReader.h"
 #include "evolution_models/F81.h"
@@ -104,10 +104,10 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 void AddSimulatedData(ModelParams &params, std::vector<SequenceProb> &sp, int descendant_count, size_t fake_sample_count, double fake_prop) {
     cout << "========= Add simulated data:" << fake_sample_count << endl;
 
-    random_device rd;
-    mt19937 e2(rd());
-    uniform_int_distribution<uint16_t> uniform_dist(0, 5);
-    uniform_int_distribution<uint16_t> uniform3(0, 3);
+    std::random_device rd;
+    std::mt19937 e2(rd());
+    std::uniform_int_distribution<uint16_t> uniform_dist(0, 5);
+    std::uniform_int_distribution<uint16_t> uniform3(0, 3);
 
     size_t fake_diff_count = fake_sample_count * fake_prop;
     descendant_count++;

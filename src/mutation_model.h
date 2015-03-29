@@ -24,10 +24,10 @@
 #include "evolution_models/EvolutionModel.h"
 #include "lookup.h"
 #include "site_prob.h"
-#include <boost/functional/hash.hpp>
-#include <boost/unordered_map.hpp>
-#include <sparsehash/dense_hash_map>
-#include <sparsehash/sparse_hash_map>
+//#include <boost/functional/hash.hpp>
+//#include <boost/unordered_map.hpp>
+//#include <sparsehash/dense_hash_map>
+//#include <sparsehash/sparse_hash_map>
 
 typedef std::array<std::array<double, 4>, 10> Std2DArray;
 
@@ -82,19 +82,11 @@ private:
 
 
 
-    std::size_t hash_value(uint16_t read[4]) {
-        std::size_t seed = 0;
-        boost::hash_combine(seed, read[0]);
-        boost::hash_combine(seed, read[1]);
-        boost::hash_combine(seed, read[2]);
-        boost::hash_combine(seed, read[3]);
-        return seed;
-    }
 
     std::unordered_map<uint64_t , std::array<std::array<double, 2>, 10> > cache_read_data_to_all; //[key][anc_index]
 //    std::array<std::unordered_map<uint64_t, std::array<double, 2>>, 10 > cache_read_data_to_all2; // [anc_index][key]
 //    google::sparse_hash_map<uint64_t, std::array<std::array<double, 2>, 10> > cache_read_data_to_all; //[key][anc_index]
-    boost::unordered_map<uint64_t, std::array<std::array<double, 2>, 10> > cache_read_data_to_all_boost; //[key][anc_index]
+//    boost::unordered_map<uint64_t, std::array<std::array<double, 2>, 10> > cache_read_data_to_all_boost; //[key][anc_index]
 
 
 

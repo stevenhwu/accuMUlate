@@ -3,6 +3,8 @@
 
 #include "utils/bamtools_pileup_engine.h"
 #include <unordered_map>
+#include <iostream>
+#include <string>
 
 //using namespace std;
 //typedef vector< string > SampleNames;
