@@ -35,13 +35,15 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
     std::vector<SequenceProb> sp;
 
+
+
     clock_t t1 = clock();
     const int dup_count = 1;
     for (size_t i = 0; i < base_counts.size(); ++i){
         for (size_t j = 0; j < dup_count; ++j) {
-            SequenceProb ss = SequenceProb(base_counts[i], params);
-            sp.push_back(ss);
-//        sp.emplace_back(SequenceProb(base_counts[i], params));
+//            SequenceProb ss = SequenceProb(base_counts[i], params);
+//            sp.push_back(ss);
+        sp.emplace_back(SequenceProb(base_counts[i], params));
 //        sp.emplace_back( base_counts[i], params);
 
         }
@@ -50,13 +52,14 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     int descendant_count = sp[0].GetDescendantCount();
     double fake_prop = 0.3;//0.2;
     size_t fake_sample_count = 268679;//68679
-    t1 = clock();AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
+//  AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
 
-    cout << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
+    t1 = clock() - t1;
+    cout << ((t1) / CLOCKS_PER_SEC) << "\t" << (t1) << endl;
 
     cout << "Done preprocess. Final site count: " << sp.size() << endl;
     cout << "======================== Setup EmData:" << endl;
-
+//    exit(9);
 
 
     MutationModel mutation_model = MutationModel(evo_model0);
@@ -68,7 +71,7 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     cout << "\n========================\nStart em_algorithm:" << endl;
     clock_t t_start, t_end;
 
-    int trial_time = 10;
+    int trial_time = 1;
     for (int k = 0; k < trial_time; ++k) {
 
 

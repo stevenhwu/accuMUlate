@@ -20,7 +20,7 @@ const bool DEBUG = false;
 
 
 
-SequenceProb::SequenceProb(ModelInput const site_data,  ModelParams const model_params) {
+SequenceProb::SequenceProb(ModelInput const &site_data,  ModelParams const &model_params) {
 
     phi_haploid = model_params.phi_haploid;
     phi_diploid = model_params.phi_diploid;
@@ -34,24 +34,22 @@ SequenceProb::SequenceProb(ModelInput const site_data,  ModelParams const model_
 	ancestor_genotypes = DiploidSequencing(ancestor_data);
 	ancestor_genotypes *= pop_genotypes;
 
-//	DiploidProbs num_genotypes = ancestor_genotypes;
 	descendant_count = site_data.all_reads.size() - 1;
-//	descendant_count = 3;
 	descendant_index.assign(descendant_count, -1);
+
+	all_descendant_data.reserve(descendant_count);
+	all_descendant_genotypes.reserve(descendant_count);
+
     for (i = 1; i < (descendant_count+1); ++i) {
         ReadData data = site_data.all_reads[i];
         all_descendant_data.push_back(data);
+//		all_descendant_data[i-1] =data ;
 
-        HaploidProbs p = HaploidSequencing(data);
-        all_descendant_genotypes.push_back(p);
+//        HaploidProbs p = HaploidSequencing(data);
+		all_descendant_genotypes.emplace_back(HaploidSequencing(data));
+//        all_descendant_genotypes.push_back(p);
+//		all_descendant_genotypes[i-1]=p;
 
-//		auto find1 = temp_map.find(data.key);
-//		if(find1 == temp_map.end()){
-//			temp_map.emplace(data.key, 1);
-//		}
-//		else{
-//			temp_map[data.key]++;
-//		}
     }
 
 //	for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
@@ -117,7 +115,7 @@ DiploidProbs SequenceProb::DiploidPopulation(int ref_allele) { //TODO: refactor 
 	return result.exp();
 }
 
-DiploidProbs SequenceProb::DiploidSequencing(ReadData data) {
+DiploidProbs SequenceProb::DiploidSequencing(ReadData const &data) {
 	DiploidProbs result;
     double alphas_total = (1.0 - phi_diploid) / phi_diploid;
 	for (int i : { 0, 1, 2, 3 }) {
@@ -150,17 +148,19 @@ DiploidProbs SequenceProb::DiploidSequencing(ReadData data) {
 //    return result.exp();
 }
 
-HaploidProbs SequenceProb::HaploidSequencing(ReadData data) {
+HaploidProbs SequenceProb::HaploidSequencing(ReadData const &data) {
 	HaploidProbs result;
     
     double alphas_total = (1.0 - phi_haploid) / phi_haploid;
 	for (int i : { 0, 1, 2, 3 }) {
 		double alphas[4];
+		std::fill(alphas, alphas+4, error_prob / 3.0 * alphas_total);
 		for (int k : { 0, 1, 2, 3 }) {
-			if (k == i)
+			if (k == i) {
 				alphas[k] = (1.0 - error_prob) * alphas_total;
-			else
-				alphas[k] = error_prob / 3.0 * alphas_total;
+				break;
+			}
+//			else[k] = error_prob / 3.0 * alphas_total;
 		}
 		result[i] = DirichletMultinomialLogProbability(alphas, data);
 	}
@@ -202,6 +202,10 @@ DiploidProbs SequenceProb::GetAncestorGenotypes() {
     return ancestor_genotypes;
 }
 
+
+//HaploidProbs SequenceProb::HaploidProbsFactory(ReadData const &data) {
+//	return SequenceProb::HaploidSequencing(data);
+//}
 
 std::array<DiploidProbs, 4> SequenceProb::DiploidPopulationFactory(ModelParams const model_params) {
 

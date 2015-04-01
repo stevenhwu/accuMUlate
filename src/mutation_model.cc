@@ -243,7 +243,7 @@ void MutationModel::UpdateCache() {
 //    }
 
 
-    for (int i = 0; i < map_index_key_to_haploid.size(); ++i) {
+    for (size_t i = 0; i < map_index_key_to_haploid.size(); ++i) {
         auto &genotype = map_index_key_to_haploid[i];
 
         double summary_stat_diff= 0;

@@ -39,9 +39,10 @@ public:
 //    SequenceProb();
 
     static std::array<DiploidProbs, 4> DiploidPopulationFactory(ModelParams const model_params);
+    static HaploidProbs HaploidProbsFactory(ReadData const &data);
     static void printReadData(ReadData read_data);
 
-    SequenceProb(ModelInput const site_data, ModelParams const model_params);
+    SequenceProb(ModelInput const &site_data, ModelParams const &model_params);
     ~SequenceProb();
 
 
@@ -77,10 +78,9 @@ public:
 protected:
     DiploidProbs DiploidPopulation(int ref_allele);
 
-    HaploidProbs HaploidSequencing(ReadData data);
+    HaploidProbs HaploidSequencing(ReadData const &data);
 
-    DiploidProbs DiploidSequencing(ReadData data);
-
+    DiploidProbs DiploidSequencing(ReadData const &data);
 
 
     template<class T>

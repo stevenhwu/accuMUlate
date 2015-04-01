@@ -21,6 +21,6 @@ public:
 
 };
 
-double DirichletMultinomialLogProbability(double alphas[4], ReadData data);
+double DirichletMultinomialLogProbability(double (&alphas)[4], ReadData const &data);
 
 #endif /* DIRICHLETMULTINOMIALDISTRIBUTION_H_ */
