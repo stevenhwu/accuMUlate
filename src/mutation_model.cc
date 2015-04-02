@@ -85,7 +85,6 @@ void MutationModel::InitCache() {
     int index = 0;
     for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
         SequenceProb &item = all_sequence_prob[i];
-
         for (int j = 0; j < item.GetDescendantCount(); ++j) {
             ReadData rd = item.GetDescendantReadData(j);
             auto rd_key = rd.key;
@@ -93,7 +92,7 @@ void MutationModel::InitCache() {
             auto find_key = map_rd_to_index.find(rd_key);
 
             if(find_key == map_rd_to_index.end()){
-
+//                std::cout << item.GetDescendantIndex(j) << "\t" << index << std::endl;
                 map_rd_key_to_haploid[rd_key]= item.GetDescendantGenotypes(j);
 
 //                std::array<std::array<double, 2>, 10> temp;
@@ -107,6 +106,7 @@ void MutationModel::InitCache() {
                 index++;
 //                std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << std::endl;
 //                std::cout << "\t" << rd.reads[0] << "\t" << rd.reads[1] << "\t" <<rd.reads[2] << "\t" <<rd.reads[3] << "\t" << rd_key << std::endl;
+
             }
             item.SetDescendantIndex(j, map_rd_to_index[rd_key]);
         }
@@ -139,7 +139,7 @@ void MutationModel::InitCache() {
     }
     summary_stat_diff_vec = std::vector<double>(map_index_key_to_haploid.size());
         UpdateCache();
-
+    std::exit(6);
 }
 void MutationModel::UpdateCache() {
 
@@ -583,7 +583,7 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
 //}
 //
 //
-//void MutationModel::CalculateLikelihood(SequenceProb &sequence_prob) {
+//void MutationModel::CalculateLikelihood(SequenceProbV1 &sequence_prob) {
 //
 //    ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
 //    all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
@@ -601,7 +601,7 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
 
 
 //
-//void MutationModel::CalculateLikelihoodOriginal(SequenceProb &sequence_prob, double &prob, double &stat_same, double &stat_diff) {
+//void MutationModel::CalculateLikelihoodOriginal(SequenceProbV1 &sequence_prob, double &prob, double &stat_same, double &stat_diff) {
 //
 //    ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
 //    all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();

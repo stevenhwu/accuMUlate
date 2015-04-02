@@ -5,8 +5,8 @@
  *      Author: Steven Wu
  */
 #pragma once
-#ifndef SEQUENCE_PROB_H_
-#define SEQUENCE_PROB_H_
+#ifndef SEQUENCE_PROB_V1_H_
+#define SEQUENCE_PROB_V1_H_
 
 #ifdef __GNUC__
 #define DEPRECATED(func) func __attribute__ ((deprecated))
@@ -28,16 +28,16 @@
 #include <set>
 #include <unordered_map>
 
+//
+//extern const int ANCESTOR_COUNT;
+//extern const int BASE_COUNT;
+//
+//extern Eigen::IOFormat nice_row;
 
-extern const int ANCESTOR_COUNT;
-extern const int BASE_COUNT;
 
-extern Eigen::IOFormat nice_row;
-
-
-class SequenceProb {
+class SequenceProbV1 {
 public:
-//    SequenceProb();
+//    SequenceProbV1();
 
     static std::array<DiploidProbs, 4> DiploidPopulationFactory(ModelParams const model_params);
     static HaploidProbs HaploidProbsFactory(ReadData const &data);
@@ -47,14 +47,14 @@ public:
 
     void AddModel(ModelParams const &model_params) {
 
-//        phi_haploid = model_params.phi_haploid;
+        phi_haploid = model_params.phi_haploid;
         phi_diploid = model_params.phi_diploid;
         error_prob = model_params.error_prob;
         theta = model_params.theta;
         frequency_prior = model_params.nuc_freq;
 
     }
-    SequenceProb(){};
+//    SequenceProbV1(){};
     void SetupDiploid(ModelInput const &site_data) {
         size_t i = 0;
 
@@ -68,42 +68,42 @@ public:
 
         all_descendant_data.reserve(descendant_count);
         all_descendant_genotypes.reserve(descendant_count);
-//        auto a = site_data.all_reads;
-//                a.erase(a.begin());
+
         for (i = 1; i < (descendant_count + 1); ++i) {
             ReadData data = site_data.all_reads[i];
             all_descendant_data.push_back(data);
+
         }
     }
 
-    void SetupHaploid(std::vector<HaploidProbs> &vector) {
-        all_descendant_genotypes = vector;
+    void SetupHaploid() {
+
     }
 
-//    SequenceProb(const SequenceProb& s);
-//    SequenceProb& operator=(const SequenceProb& s);
-//    SequenceProb(SequenceProb&& s);
+//    SequenceProbV1(const SequenceProbV1& s);
+//    SequenceProbV1& operator=(const SequenceProbV1& s);
+//    SequenceProbV1(SequenceProbV1&& s);
 
-//    SequenceProb(const SequenceProb &s) {
+//    SequenceProbV1(const SequenceProbV1 &s) {
 //        std::cout << "Copy Constructor" << std::endl;
 //
 //    }
-//    SequenceProb & operator=(const SequenceProb &s) {
+//    SequenceProbV1& operator=(const SequenceProbV1 &s) {
 //        std::cout << "Copy assignment operator" << std::endl;
 //
 //    }
 //
-//    SequenceProb(SequenceProb &&s) {
+//    SequenceProbV1(SequenceProbV1 &&s) {
 //    	std::cout << "Move Constructor" << std::endl;
 //    }
 //
-//    SequenceProb & operator= (SequenceProb && s) {
+//    SequenceProbV1& operator= (SequenceProbV1&& s) {
 //        std::cout << "Move assignment operator" << std::endl;
 //    }
 
 
-    SequenceProb(ModelInput const &site_data, ModelParams const &model_params);
-    ~SequenceProb();
+    SequenceProbV1(ModelInput const &site_data, ModelParams const &model_params);
+    ~SequenceProbV1();
 
 
 //    void UpdateMuProb(MutationProb muProb);

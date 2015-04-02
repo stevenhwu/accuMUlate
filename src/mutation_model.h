@@ -61,7 +61,7 @@ public:
     int GetSiteCount() const;
 
 //    void UpdateModel(EvolutionModel &evo_model);
-//    void CalculateLikelihood(SequenceProb &sequence_prob);
+//    void CalculateLikelihood(SequenceProbV1 &sequence_prob);
 //    void CalculateAllDescendantGivenAncestor(int a, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
 
 private:
@@ -133,7 +133,7 @@ public:
 //
 //    void CalculateOneDescendantGivenAncestorOrig(int anc_index10, HaploidProbs prob_reads_given_descent, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff);
 //
-//    void CalculateLikelihoodOriginal(SequenceProb &sequence_prob, double &prob, double &stat_same, double &stat_diff);
+//    void CalculateLikelihoodOriginal(SequenceProbV1 &sequence_prob, double &prob, double &stat_same, double &stat_diff);
 //
 //    void CalculateOneDescendantGivenAncestorCache(int anc_index10, HaploidProbs prob_reads_given_descent, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff);
 

@@ -11,6 +11,7 @@
 #include "pileup_utils.h"
 #include "algorithm/em_algorithm_mutation.h"
 #include "algorithm/em_algorithm_mutation_v1.h"
+#include "sequencing_factory.h"
 
 using namespace std;
 using namespace BamTools;
@@ -33,25 +34,47 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
     cout << "init: site_count: " << base_counts.size() << endl;
 
+    std::vector<SequenceProbV1> sp1;
+    SequencingFactory sequencing_factory_v1 (params);
+    clock_t t1;
+
+    t1 = clock();
+    sequencing_factory_v1.CreateSequenceProbV1(sp1, base_counts);
+    cout << "Time init seq v1: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
+
     std::vector<SequenceProb> sp;
+    SequencingFactory sequencing_factory (params);
+
+    t1 = clock();
+    sequencing_factory.CreateSequenceProbsVector(sp, base_counts);
+    cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
 
+    for (int l = 0; l <5; ++l) {
+        cout << "================\n"<< l << endl;
+        std::cout << sp1[l].GetAncestorGenotypes().format(nice_row) << std::endl;
+        std::cout << sp[l].GetAncestorGenotypes().format(nice_row) << std::endl;
 
-    clock_t t1 = clock();
-    const int dup_count = 1;
-    for (size_t i = 0; i < base_counts.size(); ++i){
-        for (size_t j = 0; j < dup_count; ++j) {
-//            SequenceProb ss = SequenceProb(base_counts[i], params);
-//            sp.push_back(ss);
-        sp.emplace_back(SequenceProb(base_counts[i], params));
-//        sp.emplace_back( base_counts[i], params);
+        std::cout << sp1[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
+        std::cout << sp[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
+        std::cout << sp1[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
+        std::cout << sp[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
 
-        }
     }
+    int l = base_counts.size() - 1 ;
+    cout << "================\n"<< l << endl;
+    std::cout << sp1[l].GetAncestorGenotypes().format(nice_row) << std::endl;
+    std::cout << sp[l].GetAncestorGenotypes().format(nice_row) << std::endl;
 
-    int descendant_count = sp[0].GetDescendantCount();
-    double fake_prop = 0.3;//0.2;
-    size_t fake_sample_count = 268679;//68679
+    std::cout << sp1[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
+    std::cout << sp[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
+    std::cout << sp1[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
+    std::cout << sp[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
+
+
+//    int descendant_count = sp[0].GetDescendantCount();
+//    double fake_prop = 0.3;//0.2;
+//    size_t fake_sample_count = 268679;//68679
 //  AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
 
     t1 = clock() - t1;
@@ -215,7 +238,7 @@ void SummariseReadsData(GenomeData base_counts){
             sum += diff;
             total += ref_base_count;
 //            cout << diff << " -- " << max << " " << ref_base_count << "\t== ";
-//            SequenceProb::printReadData(base_counts[i].all_reads[j]) ;
+//            SequenceProbV1::printReadData(base_counts[i].all_reads[j]) ;
 
         }
         double prop = (double) sum / total;
@@ -225,12 +248,12 @@ void SummariseReadsData(GenomeData base_counts){
             cout << "\t==" << sum << " " << total << " " << prop << endl;
 
             for (size_t j = 0; j < base_counts[i].all_reads.size(); ++j) {
-//                SequenceProb::printReadData(base_counts[i].all_reads[j]);
+//                SequenceProbV1::printReadData(base_counts[i].all_reads[j]);
             }
         }
 //        cout << "================================="<< endl;
     }
-//    cout << "================Done: SequenceProb. Total: " << site_count << endl;
+//    cout << "================Done: SequenceProbV1. Total: " << site_count << endl;
 
 
     /*
