@@ -24,7 +24,8 @@ SiteProb::SiteProb(SequenceProb &sequence_prob,
     ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
     all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
     descendant_count = all_descendant_genotypes.size();
-    std::cout << "fail" << std::endl;
+    std::cout << "Deprecated method" << std::endl;
+    std::exit(99);
 }
 
 
@@ -142,7 +143,7 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
         double prob_reads_given_a = ancestor_genotypes[index16] * ancestor_prior[index10] *  prod_prob_ancestor;
             //TODO: IF need speed, cache this
         prob_reads += prob_reads_given_a;
-
+//        std::cout << prob_reads_given_a << "\t" << ancestor_genotypes[index16] << "\t" <<  ancestor_prior[index10] << "\t" <<  prod_prob_ancestor<< "\t" <<  std::endl;
 //        all_stats_same += summary_stat_same_ancestor*prob_reads_given_a;
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
 
@@ -195,9 +196,9 @@ void SiteProb::CalculateAllDescendantGivenAncestor(int index16, double &product_
                     "\tSame:" << summary_stat_same << "\tDiff:" << summary_stat_diff << "\t" <<
                     " BASE FREQ: " << prob_reads_given_descent.format(nice_row) << std::endl;
         }
-
+//        std::cout << sum_over_probs << "\t" << std::endl;
     }
-
+//    std::cout << std::endl;
 
 }
 //void SiteProb::CalculateOneDescendantGivenAncestor(int index16, int des_index, HaploidProbs &prob_reads_given_descent, std::array<double, 4> &all_diff_stats, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff) {
@@ -205,7 +206,7 @@ void SiteProb::CalculateOneDescendantGivenAncestor(int index16, int des_index, d
 
     prob_reads_d_given_a = 0;
     summary_stat_same = 0;
-//    summary_stat_diff = 0;
+    summary_stat_diff = 0;
 
 //prob_reads_given_descent = {0.4,0.1,0.1,0.4};
 //    prob_reads_given_descent = {0.03,0.03,0.04,0.9};
@@ -214,6 +215,7 @@ void SiteProb::CalculateOneDescendantGivenAncestor(int index16, int des_index, d
 
     for (int b = 0; b < BASE_COUNT; ++b) {
         double prob = transition_matrix_a_to_d(index16, b) * all_descendant_genotypes[des_index][b];
+
 //        double prob = master_prob2[index16][b];
         prob_reads_d_given_a += prob;
 
@@ -242,6 +244,7 @@ void SiteProb::CalculateOneDescendantGivenAncestor(int index16, int des_index, d
     if (DEBUG>2) {
         std::cout << index16 << "\t" <<summary_stat_same << "\t" << summary_stat_diff << std::endl;
     }
+//    std::cout << index16 << "\t" << prob_reads_d_given_a << "\t" << summary_stat_diff << std::endl;
 }
 
 

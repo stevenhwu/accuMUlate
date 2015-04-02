@@ -101,7 +101,7 @@ set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src ${Boost_INCLUDE_DIR} ${Ba
 
 include_directories("/usr/include/")
 include_directories("/usr/include/google")
-include_directories("/usr/include/sparsehash")
+#include_directories("/usr/include/sparsehash")
 
 include_directories("${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
 include_directories(${INCLUDE_DIR})
@@ -115,7 +115,7 @@ ADD_SUBDIRECTORY(src)
 #1
 ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/include/googletest-trunk/")
 #SET(GTEST_ROOT "${CMAKE_SOURCE_DIR}/include/googletest-trunk")
-#ADD_SUBDIRECTORY(test)
+ADD_SUBDIRECTORY(test)
 
 
 #2 Some link error??

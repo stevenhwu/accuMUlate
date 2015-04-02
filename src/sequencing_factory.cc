@@ -203,3 +203,10 @@ void SequencingFactory::CreateSequenceProbV1(std::vector<SequenceProbV1> &sp, Ge
 
     }
 }
+
+
+void SequencingFactory::CreateSequenceProb(SequenceProb &sp, ModelInput const &data, ModelParams const params){
+
+
+
+}

@@ -13,7 +13,7 @@ class SequencingFactory{
 
 
 public:
-
+    static void CreateSequenceProb(SequenceProb &sp, ModelInput const &data, ModelParams const params);
 
     SequencingFactory(ModelParams const &model_params) ;
 
@@ -47,6 +47,7 @@ private:
     DiploidProbs CreateRefDiploidProbs(int ref_allele);
     DiploidProbs DiploidSequencing(ReadData const &data);
     HaploidProbs HaploidSequencing(ReadData const &data);
+
 
 };
 #endif //_ACCUMULATE_SEQUENCING_FACTORY_H_

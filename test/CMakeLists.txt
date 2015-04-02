@@ -17,6 +17,7 @@ SET(TEST_SOURCE_FILES ${TEST_SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/MutationProbTest.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/SequenceProbTest.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/SiteProbTest.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory_test.cc
     )
 
 ADD_SUBDIRECTORY("evolution_models")
