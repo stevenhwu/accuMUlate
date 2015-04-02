@@ -19,7 +19,6 @@ public:
 
     SequenceProb CreateSequenceProb(ModelInput const &site_data);
 
-    SequenceProb & InitSequenceProb(SequenceProb &seq_prob, ModelInput &site_data);
 
     void CreateSequenceProbsVector(std::vector<SequenceProb> &sp, GenomeData &data);
     void CreateSequenceProbV1(std::vector<SequenceProbV1> &sp, GenomeData &data);
@@ -36,18 +35,18 @@ private:
     double haploid_alphas[4][4];
 
 
-//    ReadData &ancestor_data;
-//    DiploidProbs ancestor_genotypes;
-    unsigned long descendant_count;
-
-//    ReadDataVector all_descendant_data;
-//    std::vector<HaploidProbs> all_descendant_genotypes;
-//    Array10D ancestor_prior;
-//    std::vector<int> descendant_index;
+    std::array<DiploidProbs, 4> ref_diploid_probs;
     std::vector<HaploidProbs> convert_index_key_to_haploid;
-    std::unordered_map<uint64_t, HaploidProbs> map_rd_key_to_haploid;//remove later
-    void CalculateHaploidProb(SequenceProb &seq_prob, ModelInput &site_data);
+    std::vector<DiploidProbs> convert_index_key_to_diploid;
 
+
+    void CalculateDescendantGenotypes(SequenceProb &seq_prob);
+    void CalculateAncestorGenotype(SequenceProb &seq_prob);
+
+
+    DiploidProbs CreateRefDiploidProbs(int ref_allele);
+    DiploidProbs DiploidSequencing(ReadData const &data);
     HaploidProbs HaploidSequencing(ReadData const &data);
+
 };
 #endif //_ACCUMULATE_SEQUENCING_FACTORY_H_

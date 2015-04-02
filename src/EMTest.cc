@@ -39,7 +39,7 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     clock_t t1;
 
     t1 = clock();
-    sequencing_factory_v1.CreateSequenceProbV1(sp1, base_counts);
+//    sequencing_factory_v1.CreateSequenceProbV1(sp1, base_counts);
     cout << "Time init seq v1: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
     std::vector<SequenceProb> sp;
@@ -50,26 +50,26 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
 
-    for (int l = 0; l <5; ++l) {
-        cout << "================\n"<< l << endl;
-        std::cout << sp1[l].GetAncestorGenotypes().format(nice_row) << std::endl;
-        std::cout << sp[l].GetAncestorGenotypes().format(nice_row) << std::endl;
-
-        std::cout << sp1[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
-        std::cout << sp[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
-        std::cout << sp1[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
-        std::cout << sp[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
-
-    }
-    int l = base_counts.size() - 1 ;
-    cout << "================\n"<< l << endl;
-    std::cout << sp1[l].GetAncestorGenotypes().format(nice_row) << std::endl;
-    std::cout << sp[l].GetAncestorGenotypes().format(nice_row) << std::endl;
-
-    std::cout << sp1[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
-    std::cout << sp[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
-    std::cout << sp1[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
-    std::cout << sp[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
+//    for (int l = 0; l <5; ++l) {
+//        cout << "================\n"<< l << endl;
+//        std::cout << sp1[l].GetAncestorGenotypes().format(nice_row) << std::endl;
+//        std::cout << sp[l].GetAncestorGenotypes().format(nice_row) << std::endl;
+//
+//        std::cout << sp1[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
+//        std::cout << sp[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
+//        std::cout << sp1[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
+//        std::cout << sp[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
+//
+//    }
+//    int l = base_counts.size() - 1 ;
+//    cout << "================\n"<< l << endl;
+//    std::cout << sp1[l].GetAncestorGenotypes().format(nice_row) << std::endl;
+//    std::cout << sp[l].GetAncestorGenotypes().format(nice_row) << std::endl;
+//
+//    std::cout << sp1[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
+//    std::cout << sp[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
+//    std::cout << sp1[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
+//    std::cout << sp[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
 
 
 //    int descendant_count = sp[0].GetDescendantCount();

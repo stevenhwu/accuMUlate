@@ -54,32 +54,65 @@ public:
         frequency_prior = model_params.nuc_freq;
 
     }
-    SequenceProb(){};
+    SequenceProb(){}
+    uint16_t reference;
+    SequenceProb(ModelInput const &site_data) {
+
+        size_t i = 0;
+        reference = site_data.reference;
+
+        auto rd_vector = site_data.all_reads;
+        ancestor_readdata = rd_vector[i];
+
+        descendant_count = site_data.all_reads.size() - 1;
+        descendant_index.assign(descendant_count, -1);
+        all_descendant_readdata.reserve(descendant_count);
+        all_descendant_genotypes.reserve(descendant_count);
+
+        for (i = 1; i < (descendant_count + 1); ++i) {
+            all_descendant_readdata.emplace_back(rd_vector[i]);
+        }
+    }
+
     void SetupDiploid(ModelInput const &site_data) {
         size_t i = 0;
 
+        auto rd_vector = site_data.all_reads;
+        ancestor_readdata = rd_vector[i];
+
         DiploidProbs pop_genotypes = DiploidPopulation(site_data.reference);
-        ancestor_data = site_data.all_reads[i];
-        ancestor_genotypes = DiploidSequencing(ancestor_data);
+        ancestor_genotypes = DiploidSequencing(ancestor_readdata);
         ancestor_genotypes *= pop_genotypes;
 
         descendant_count = site_data.all_reads.size() - 1;
         descendant_index.assign(descendant_count, -1);
 
-        all_descendant_data.reserve(descendant_count);
+        all_descendant_readdata.reserve(descendant_count);
         all_descendant_genotypes.reserve(descendant_count);
-//        auto a = site_data.all_reads;
-//                a.erase(a.begin());
-        for (i = 1; i < (descendant_count + 1); ++i) {
-            ReadData data = site_data.all_reads[i];
-            all_descendant_data.push_back(data);
-        }
-    }
 
-    void SetupHaploid(std::vector<HaploidProbs> &vector) {
+        for (i = 1; i < (descendant_count + 1); ++i) {
+            all_descendant_readdata.emplace_back(rd_vector[i]);
+        }
+
+    }
+    uint16_t GetReference(){
+        return reference;
+    }
+    void SetDescendantGenotypes(std::vector<HaploidProbs> &vector) {
         all_descendant_genotypes = vector;
     }
-
+    void SetAncestorGenotypes(DiploidProbs &anc_genotype){
+        ancestor_genotypes = anc_genotype;
+    }
+    ReadData GetAncestorReadData(){
+        return ancestor_readdata;
+    }
+    void SetAncestorIndex(int index){
+        ancestor_index = index;
+    }
+    int GetAncestorIndex(){
+        return ancestor_index;
+    }
 //    SequenceProb(const SequenceProb& s);
 //    SequenceProb& operator=(const SequenceProb& s);
 //    SequenceProb(SequenceProb&& s);
@@ -150,8 +183,8 @@ public:
 private:
 
 
-    ReadData ancestor_data;
-    ReadDataVector all_descendant_data;
+    ReadData ancestor_readdata;
+    ReadDataVector all_descendant_readdata;
 
     DiploidProbs ancestor_genotypes;
     std::vector<HaploidProbs> all_descendant_genotypes;
@@ -166,7 +199,7 @@ private:
     double theta;
 
     std::vector<int> descendant_index;
-
+    int ancestor_index;
 };
 
 #endif /* SEQUENCE_PROB_H_ */

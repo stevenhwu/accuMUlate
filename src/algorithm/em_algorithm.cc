@@ -15,10 +15,10 @@
 
 #include <stddef.h>
 
-const double EM_CONVERGE_THRESHOLD = 1e-8;
-const double EM_CONVERGE_RATIO_THRESHOLD = 1e-8;
-const int EM_MAX_ITE = 50;
-int VERBOSE_ITE = 100;
+const double EM_CONVERGE_THRESHOLD = 1e-14;
+const double EM_CONVERGE_RATIO_THRESHOLD = 1e-14;
+const int EM_MAX_ITE = 500;
+int VERBOSE_ITE = 10;
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
 
@@ -216,17 +216,17 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 
     if ( (ite % VERBOSE_ITE) == 0) {
         std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << "\tsum_ratio: " << sum_ratio << std::endl;
-//        PrintSummary();
+        PrintSummary();
     }
 
     if (ite == EM_MAX_ITE){
         std::cout <<"============ DONE. IN DEBUG mode, fix at " << EM_MAX_ITE << " ites ======= " << sum_diff << " Total ite:" << ite << "\n";
         return false;
     }
-//    if (sum_diff < EM_CONVERGE_THRESHOLD) {
-//        std::cout <<"============ DONE ======= " << sum_diff << " Total ite:" << ite << "\n";
-//        return false;
-//    }
+    if (sum_diff < EM_CONVERGE_THRESHOLD) {
+        std::cout <<"============ DONE (diff==0) ======= " << sum_diff << " Total ite:" << ite << "\n";
+        return false;
+    }
 //    if( sum_ratio < EM_CONVERGE_RATIO_THRESHOLD){
 //        std::cout <<"============ DONE ======= " << sum_ratio << " Total ite:" << ite << "\n";
 //        return false;
@@ -237,12 +237,12 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 void EmAlgorithm::PrintSummary(){
     printf("========================\nEM Summary\nParameters: ");
      for (auto &item :parameters) {
-        printf("%.3e\t", item);
+        printf("%.40e\t", item);
     }
 
     printf("\nProportions: ");
     for (auto &item :proportion) {
-        printf("%.3e\t", item);
+        printf("%.40e\t", item);
     }
     printf("\n");
     fflush(stdout);

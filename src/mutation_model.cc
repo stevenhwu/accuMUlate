@@ -139,7 +139,7 @@ void MutationModel::InitCache() {
     }
     summary_stat_diff_vec = std::vector<double>(map_index_key_to_haploid.size());
         UpdateCache();
-    std::exit(6);
+//    std::exit(6);
 }
 void MutationModel::UpdateCache() {
 

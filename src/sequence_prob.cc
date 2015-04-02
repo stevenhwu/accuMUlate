@@ -29,21 +29,21 @@ SequenceProb::SequenceProb(ModelInput const &site_data,  ModelParams const &mode
 
     size_t i=0;
     DiploidProbs pop_genotypes = DiploidPopulation(site_data.reference);
-    ancestor_data = site_data.all_reads[i];
-	ancestor_genotypes = DiploidSequencing(ancestor_data);
+    ancestor_readdata = site_data.all_reads[i];
+	ancestor_genotypes = DiploidSequencing(ancestor_readdata);
 	ancestor_genotypes *= pop_genotypes;
 
 	descendant_count = site_data.all_reads.size() - 1;
 	descendant_index.assign(descendant_count, -1);
 
-	all_descendant_data.reserve(descendant_count);
+	all_descendant_readdata.reserve(descendant_count);
 	all_descendant_genotypes.reserve(descendant_count);
 
 
     for (i = 1; i < (descendant_count+1); ++i) {
         ReadData data = site_data.all_reads[i];
-        all_descendant_data.push_back(data);
-//		all_descendant_data[i-1] =data ;
+        all_descendant_readdata.push_back(data);
+//		all_descendant_readdata[i-1] =data ;
 
 //        HaploidProbs p = HaploidSequencing(data);
 		all_descendant_genotypes.emplace_back(HaploidSequencing(data));
@@ -257,26 +257,26 @@ void SequenceProb::PrintReads(ReadData data) {
 }
 
 ReadData SequenceProb::GetDescendantReadData(int descent_index) {
-	return all_descendant_data[descent_index];
+	return all_descendant_readdata[descent_index];
 }
 ReadDataVector SequenceProb::GetDescendantReadData() {
-	return all_descendant_data;
+	return all_descendant_readdata;
 }
 
 ReadDataVector const &SequenceProb::GetDescendantReadData2() {
-	return all_descendant_data;
+	return all_descendant_readdata;
 }
 
 ReadDataVector const *SequenceProb::GetDescendantReadData3() {
-	return &all_descendant_data;
+	return &all_descendant_readdata;
 }
 
 void SequenceProb::GetDescendantReadDataCOPY(ReadDataVector &all_descendant_data2) {
-	all_descendant_data2 = all_descendant_data;
+	all_descendant_data2 = all_descendant_readdata;
 }
 
 uint64_t SequenceProb::GetDescendantReadDataKey(int descent_index) {
-	return all_descendant_data[descent_index].key;
+	return all_descendant_readdata[descent_index].key;
 }
 
 void SequenceProb::SetDescendantIndex(int des, int index) {
