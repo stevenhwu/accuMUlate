@@ -35,9 +35,9 @@
 //extern Eigen::IOFormat nice_row;
 
 
-class SequenceProbV1 {
+class SequenceProb {
 public:
-//    SequenceProbV1();
+//    SequenceProb();
 
     static std::array<DiploidProbs, 4> DiploidPopulationFactory(ModelParams const model_params);
     static HaploidProbs HaploidProbsFactory(ReadData const &data);
@@ -54,7 +54,7 @@ public:
         frequency_prior = model_params.nuc_freq;
 
     }
-//    SequenceProbV1(){};
+//    SequenceProb(){};
     void SetupDiploid(ModelInput const &site_data) {
         size_t i = 0;
 
@@ -80,30 +80,30 @@ public:
 
     }
 
-//    SequenceProbV1(const SequenceProbV1& s);
-//    SequenceProbV1& operator=(const SequenceProbV1& s);
-//    SequenceProbV1(SequenceProbV1&& s);
+//    SequenceProb(const SequenceProb& s);
+//    SequenceProb& operator=(const SequenceProb& s);
+//    SequenceProb(SequenceProb&& s);
 
-//    SequenceProbV1(const SequenceProbV1 &s) {
+//    SequenceProb(const SequenceProb &s) {
 //        std::cout << "Copy Constructor" << std::endl;
 //
 //    }
-//    SequenceProbV1& operator=(const SequenceProbV1 &s) {
+//    SequenceProb& operator=(const SequenceProb &s) {
 //        std::cout << "Copy assignment operator" << std::endl;
 //
 //    }
 //
-//    SequenceProbV1(SequenceProbV1 &&s) {
+//    SequenceProb(SequenceProb &&s) {
 //    	std::cout << "Move Constructor" << std::endl;
 //    }
 //
-//    SequenceProbV1& operator= (SequenceProbV1&& s) {
+//    SequenceProb& operator= (SequenceProb&& s) {
 //        std::cout << "Move assignment operator" << std::endl;
 //    }
 
 
-    SequenceProbV1(ModelInput const &site_data, ModelParams const &model_params);
-    ~SequenceProbV1();
+    SequenceProb(ModelInput const &site_data, ModelParams const &model_params);
+    ~SequenceProb();
 
 
 //    void UpdateMuProb(MutationProb muProb);

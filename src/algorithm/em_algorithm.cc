@@ -18,7 +18,7 @@
 const double EM_CONVERGE_THRESHOLD = 1e-14;
 const double EM_CONVERGE_RATIO_THRESHOLD = 1e-14;
 const int EM_MAX_ITE = 500;
-int VERBOSE_ITE = 10;
+int VERBOSE_ITE = 100;
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
 

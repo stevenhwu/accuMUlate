@@ -13,7 +13,7 @@
 
 const int DEBUG = 0;
 
-SiteProb::SiteProb(SequenceProb &sequence_prob,
+SiteProb::SiteProb(SiteGenotypes &sequence_prob,
 		 MutationProb &mutation_prob, EvolutionModel &evo_model) {
 
     ancestor_prior = mutation_prob.GetAncestorPrior();
@@ -29,7 +29,7 @@ SiteProb::SiteProb(SequenceProb &sequence_prob,
 }
 
 
-SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
+SiteProb::SiteProb(SiteGenotypes &sequence_prob, EvolutionModel &evo_model) {
     MutationProb mutation_prob = evo_model.GetMutationProb() ;
     ancestor_prior = mutation_prob.GetAncestorPrior();
     frequency_prior = mutation_prob.GetFrequencyPrior();
@@ -37,7 +37,6 @@ SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
     ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
     all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
     descendant_count = all_descendant_genotypes.size();
-
 
 //    all_descendant_diff_stats.resize(descendant_count);
 //    all_descendant_diff_stats2.resize(descendant_count, 0);
@@ -69,7 +68,22 @@ SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
 }
 
 
-SiteProb::~SiteProb() {
+SiteProb::SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model) {
+    MutationProb mutation_prob = evo_model.GetMutationProb();
+    ancestor_prior = mutation_prob.GetAncestorPrior();
+    frequency_prior = mutation_prob.GetFrequencyPrior();
+
+    ancestor_genotypes = sequence_prob.GetAncestorGenotypes();
+    all_descendant_genotypes = sequence_prob.GetDescendantGenotypes();
+    descendant_count = all_descendant_genotypes.size();
+
+    all_descendant_diff_stats2.assign(descendant_count, 0);
+
+    UpdateModel(evo_model);
+}
+
+
+    SiteProb::~SiteProb() {
 }
 
 //int g_count = 0;

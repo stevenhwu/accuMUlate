@@ -3,11 +3,22 @@
 #include <sequence_prob_v1.h>
 
 #include "gtest/gtest.h"
-#include "sequence_prob.h"
+#include "site_genotypes.h"
 
 class SiteProbTest : public ::testing::Test {
 public:
     const double ERROR_THRESHOLD = 1e-10;
+    static
+    void ASSERT_GENOTYPES(HaploidProbs expected, HaploidProbs data){
+        for (int i = 0; i < expected.size(); ++i) {
+            ASSERT_NEAR(expected[i], data[i], ERROR_THRESHOLD );
+        }
+    }
+    static void ASSERT_GENOTYPES(DiploidProbs expected, DiploidProbs data){
+        for (int i = 0; i < expected.size(); ++i) {
+            ASSERT_NEAR(expected[i], data[i], ERROR_THRESHOLD );
+        }
+    }
 
 protected:
     const std::vector<double> freq_equal {0.25,0.25,0.25,0.25};     //beta0= 1.333333

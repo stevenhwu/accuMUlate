@@ -32,7 +32,7 @@ int MutationModel::GetSiteCount() const {
 }
 
 
-void MutationModel::AddSequenceProb(std::vector<SequenceProb> &all) {
+void MutationModel::AddSequenceProb(std::vector<SiteGenotypes> &all) {
     all_sequence_prob = all;
     site_count = all.size();
     descendant_count = all_sequence_prob[0].GetDescendantCount();
@@ -84,7 +84,7 @@ void MutationModel::InitCache() {
 
     int index = 0;
     for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
-        SequenceProb &item = all_sequence_prob[i];
+        SiteGenotypes &item = all_sequence_prob[i];
         for (int j = 0; j < item.GetDescendantCount(); ++j) {
             ReadData rd = item.GetDescendantReadData(j);
             auto rd_key = rd.key;
@@ -126,7 +126,7 @@ void MutationModel::InitCache() {
     }
 
     for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
-        SequenceProb &item = all_sequence_prob[i];
+        SiteGenotypes &item = all_sequence_prob[i];
 //        for (int j = 0; j < item.GetDescendantCount(); ++j) {
 ////            std::cout << item.GetDescendantIndex(j) << "\t" ;
 //            if(item.GetDescendantIndex(j) == -1){

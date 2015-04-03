@@ -34,48 +34,32 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
     cout << "init: site_count: " << base_counts.size() << endl;
 
-    std::vector<SequenceProbV1> sp1;
+    std::vector<SequenceProb> sp;
     SequencingFactory sequencing_factory_v1 (params);
     clock_t t1;
 
     t1 = clock();
-//    sequencing_factory_v1.CreateSequenceProbV1(sp1, base_counts);
+    sequencing_factory_v1.CreateSequenceProbV1(sp, base_counts);
     cout << "Time init seq v1: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
     cout <<  std::numeric_limits<double>::epsilon() << endl;
-    std::vector<SequenceProb> sp;
+
+    std::vector<SiteGenotypes> sg;
     SequencingFactory sequencing_factory (params);
 
     t1 = clock();
-    sequencing_factory.CreateSequenceProbsVector(sp, base_counts);
+    sequencing_factory.CreateSequenceProbsVector(sg, base_counts);
     cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
 
-//    for (int l = 0; l <5; ++l) {
-//        cout << "================\n"<< l << endl;
-//        std::cout << sp1[l].GetAncestorGenotypes().format(nice_row) << std::endl;
-//        std::cout << sp[l].GetAncestorGenotypes().format(nice_row) << std::endl;
-//
-//        std::cout << sp1[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
-//        std::cout << sp[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
-//        std::cout << sp1[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
-//        std::cout << sp[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
-//
-//    }
-//    int l = base_counts.size() - 1 ;
-//    cout << "================\n"<< l << endl;
-//    std::cout << sp1[l].GetAncestorGenotypes().format(nice_row) << std::endl;
-//    std::cout << sp[l].GetAncestorGenotypes().format(nice_row) << std::endl;
-//
-//    std::cout << sp1[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
-//    std::cout << sp[l].GetDescendantGenotypes(0).format(nice_row) << std::endl;
-//    std::cout << sp1[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
-//    std::cout << sp[l].GetDescendantGenotypes(1).format(nice_row) << std::endl;
+    for (int i = 0; i <sg.size(); ++i) {
+        SiteGenotypes sg0 = sg[i];
+        SequenceProb sp0 = sp[i];
+        SiteGenotypes::ASSERT_GENOTYPES(sg0.GetAncestorGenotypes(), sp0.GetAncestorGenotypes());
+        for (int j = 0; j < sg0.GetDescendantCount(); ++j) {
+            SiteGenotypes::ASSERT_GENOTYPES(sg0.GetDescendantGenotypes(j), sp0.GetDescendantGenotypes(j));
+        }
 
-
-//    int descendant_count = sp[0].GetDescendantCount();
-//    double fake_prop = 0.3;//0.2;
-//    size_t fake_sample_count = 268679;//68679
-//  AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
+    }
 
     t1 = clock() - t1;
     cout << ((t1) / CLOCKS_PER_SEC) << "\t" << (t1) << endl;
@@ -86,7 +70,7 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
 
     MutationModel mutation_model = MutationModel(evo_model0);
-    mutation_model.AddSequenceProb(sp);
+    mutation_model.AddSequenceProb(sg);
     std::vector<std::unique_ptr<EmModel>> em_model2;
     em_model2.emplace_back(new EmModelMutation(mutation_model));
     em_model2.emplace_back(new EmModelMutation(mutation_model));
@@ -669,14 +653,18 @@ void TestingEMWithRandomThings(GenomeData base_counts, ModelParams params) {
 
 
     size_t site_count = base_counts.size();
-    std::vector<SequenceProb> sp;
+    std::vector<SiteGenotypes> sp;
 //    site_count = 5000;
     cout << "init: site_count: " << site_count << endl;
     for (size_t i = 0; i < site_count; ++i) {
         SequenceProb ss = SequenceProb(base_counts[i], params);
-        sp.push_back(ss);
-//        sp.push_back(ss);
-//        sp.push_back(ss);
+        SiteGenotypes sg;
+        auto t = ss.GetAncestorGenotypes();
+        sg.SetAncestorGenotypes(t);
+        auto t2 = ss.GetDescendantGenotypes();
+        sg.SetDescendantGenotypes(t2);
+
+        sp.push_back(sg);
     }
 //    int descendant_count = sp[0].GetDescendantCount();
 //    size_t fake_sample_count = 10000;

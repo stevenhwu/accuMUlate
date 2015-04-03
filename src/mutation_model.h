@@ -19,7 +19,7 @@
 #include "model.h"
 #include "mutation_prob.h"
 #include "site_prob.h"
-#include "sequence_prob.h"
+#include "site_genotypes.h"
 #include "distributions/DirichletMultinomialDistribution.h"
 #include "evolution_models/EvolutionModel.h"
 #include "lookup.h"
@@ -45,7 +45,7 @@ public:
 
     void CacheLoopDesAll(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
 
-    void AddSequenceProb(std::vector<SequenceProb> &all);
+    void AddSequenceProb(std::vector<SiteGenotypes> &all);
 
     void InitCache();
     void UpdateCache();
@@ -76,7 +76,7 @@ private:
     Array4D frequency_prior;
     Array10D ancestor_prior;
 
-    std::vector<SequenceProb> all_sequence_prob;
+    std::vector<SiteGenotypes> all_sequence_prob;
     std::vector<std::array<double, 10>> all_ancestor_genotype_prior;
     std::unordered_map<uint64_t, HaploidProbs> map_rd_key_to_haploid;
 

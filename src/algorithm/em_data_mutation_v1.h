@@ -8,7 +8,7 @@
 #pragma once
 
 #include "em_data.h"
-#include "sequence_prob.h"
+#include "site_genotypes.h"
 #include "site_prob.h"
 #include "em_model.h"
 #include "em_model_mutation_v1.h"
@@ -26,6 +26,8 @@ protected:
 //    SiteProb site;
 
 public:
+    EmDataMutationV1(SiteGenotypes &sequence_prob, EvolutionModel &evo_model);
+
     SiteProb site;
 
     EmDataMutationV1() {};

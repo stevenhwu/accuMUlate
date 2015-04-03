@@ -13,10 +13,11 @@
 #include "model.h"
 #include "mutation_prob.h"
 #include "site_prob.h"
-#include "sequence_prob.h"
+#include "site_genotypes.h"
 #include "distributions/DirichletMultinomialDistribution.h"
 #include "evolution_models/EvolutionModel.h"
 #include "lookup.h"
+#include "sequence_prob_v1.h"
 
 struct ProbTwoStats{
 
@@ -31,12 +32,13 @@ public:
     SiteProb() {
     }
 
-    SiteProb(SequenceProb &sequence_prob, MutationProb &mutation_prob, EvolutionModel &evo_model);
+    SiteProb(SiteGenotypes &sequence_prob, MutationProb &mutation_prob, EvolutionModel &evo_model);
 
 //    SiteProb(ModelInput const site_data, ModelParams const model_params, MutationProb const mutation_prob, EvolutionModel const evo_model);
 //    SiteProb(const ModelParams &params, const ModelInput site_data, MutationProb muProb);
 //    SiteProb(const ModelInput site_data, const MutationProb muProb, const EvolutionModel evoModel);
 
+    SiteProb(SiteGenotypes &sequence_prob, EvolutionModel &evo_model);
     SiteProb(SequenceProb &sequence_prob, EvolutionModel &evo_model);
 
     ~SiteProb();

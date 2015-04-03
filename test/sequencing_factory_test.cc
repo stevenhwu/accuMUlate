@@ -131,7 +131,7 @@ TEST_F(SequenceFactorTest, TestInit){
 //    sequencing_factory_v1.CreateSequenceProbV1(sp1, base_counts);
 //    cout << "Time init seq v1: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 //    cout <<  std::numeric_limits<double>::epsilon() << endl;
-    std::vector<SequenceProb> sp;
+    std::vector<SiteGenotypes> sp;
     SequencingFactory sequencing_factory (params_not_equal);
     sequencing_factory.CreateSequenceProbsVector(sp, genome_data);
 //    cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
@@ -146,8 +146,8 @@ TEST_F(SequenceFactorTest, TestInit){
 
         ModelInput &site_data = genome_data[i];
 
-        SequenceProb &factory = sp[i];
-        SequenceProb &expected = sp_expected[i];
+        SiteGenotypes &factory = sp[i];
+        auto &expected = sp_expected[i];
         auto foctory_genotype = factory.GetAncestorGenotypes();
         auto expected_genotype = expected.GetAncestorGenotypes();
         ASSERT_GENOTYPES(expected_genotype, foctory_genotype);

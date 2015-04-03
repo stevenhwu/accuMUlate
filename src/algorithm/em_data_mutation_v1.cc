@@ -10,6 +10,10 @@ EmDataMutationV1::EmDataMutationV1(SequenceProb &sequence_prob, EvolutionModel &
 }
 
 
+EmDataMutationV1::EmDataMutationV1(SiteGenotypes &sequence_prob, EvolutionModel &evo_model){
+    site = SiteProb(sequence_prob, evo_model);
+}
+
 EmDataMutationV1::~EmDataMutationV1() {}
 
 

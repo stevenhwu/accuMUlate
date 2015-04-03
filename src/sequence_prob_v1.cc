@@ -20,7 +20,7 @@ const bool DEBUG = false;
 
 
 
-SequenceProbV1::SequenceProbV1(ModelInput const &site_data,  ModelParams const &model_params) {
+SequenceProb::SequenceProb(ModelInput const &site_data,  ModelParams const &model_params) {
 
     phi_haploid = model_params.phi_haploid;
     phi_diploid = model_params.phi_diploid;
@@ -79,13 +79,13 @@ SequenceProbV1::SequenceProbV1(ModelInput const &site_data,  ModelParams const &
 }
 
 
-SequenceProbV1::~SequenceProbV1() {
+SequenceProb::~SequenceProb() {
 }
 
 
 
 
-DiploidProbs SequenceProbV1::DiploidPopulation(int ref_allele) { //TODO: refactor out, noly need to do this 4 times
+DiploidProbs SequenceProb::DiploidPopulation(int ref_allele) { //TODO: refactor out, noly need to do this 4 times
 	ReadData d;
 	DiploidProbs result;
 
@@ -116,7 +116,7 @@ DiploidProbs SequenceProbV1::DiploidPopulation(int ref_allele) { //TODO: refacto
 	return result.exp();
 }
 
-DiploidProbs SequenceProbV1::DiploidSequencing(ReadData const &data) {
+DiploidProbs SequenceProb::DiploidSequencing(ReadData const &data) {
 	DiploidProbs result;
     double alphas_total = (1.0 - phi_diploid) / phi_diploid;
 	for (int i : { 0, 1, 2, 3 }) {
@@ -149,7 +149,7 @@ DiploidProbs SequenceProbV1::DiploidSequencing(ReadData const &data) {
 //    return result.exp();
 }
 
-HaploidProbs SequenceProbV1::HaploidSequencing(ReadData const &data) {
+HaploidProbs SequenceProb::HaploidSequencing(ReadData const &data) {
 	HaploidProbs result;
     
     double alphas_total = (1.0 - phi_haploid) / phi_haploid;
@@ -175,7 +175,7 @@ HaploidProbs SequenceProbV1::HaploidSequencing(ReadData const &data) {
 
 // FIXME : make sure it only take Eigen::Array class, pass by value or ref here?? Turn out it's not the C++ way, need to use static_cast
 template <class T>
-T SequenceProbV1::ScaleLogArray(T result) {
+T SequenceProb::ScaleLogArray(T result) {
     double scale = result.maxCoeff();
 //    double normalise = result.sum();
 //    result /=  normalise;
@@ -186,11 +186,11 @@ T SequenceProbV1::ScaleLogArray(T result) {
     return result;
 }
 
-std::vector<HaploidProbs> SequenceProbV1::GetDescendantGenotypes() {
+std::vector<HaploidProbs> SequenceProb::GetDescendantGenotypes() {
     return all_descendant_genotypes;
 }
 
-HaploidProbs SequenceProbV1::GetDescendantGenotypes(int descent_index) {
+HaploidProbs SequenceProb::GetDescendantGenotypes(int descent_index) {
 
     if(descent_index >= descendant_count || descent_index < 0){
         //TODO: throw error
@@ -199,16 +199,16 @@ HaploidProbs SequenceProbV1::GetDescendantGenotypes(int descent_index) {
     return all_descendant_genotypes[descent_index];
 }
 
-DiploidProbs SequenceProbV1::GetAncestorGenotypes() {
+DiploidProbs SequenceProb::GetAncestorGenotypes() {
     return ancestor_genotypes;
 }
 
 
-//HaploidProbs SequenceProbV1::HaploidProbsFactory(ReadData const &data) {
-//	return SequenceProbV1::HaploidSequencing(data);
+//HaploidProbs SequenceProb::HaploidProbsFactory(ReadData const &data) {
+//	return SequenceProb::HaploidSequencing(data);
 //}
 
-std::array<DiploidProbs, 4> SequenceProbV1::DiploidPopulationFactory(ModelParams const model_params) {
+std::array<DiploidProbs, 4> SequenceProb::DiploidPopulationFactory(ModelParams const model_params) {
 
 
 	double theta = model_params.theta;
@@ -243,57 +243,57 @@ std::array<DiploidProbs, 4> SequenceProbV1::DiploidPopulationFactory(ModelParams
 	return cache_results;
 }
 
-int SequenceProbV1::GetDescendantCount() {
+int SequenceProb::GetDescendantCount() {
 	return descendant_count;
 }
 
-void SequenceProbV1::printReadData(ReadData read_data) {
+void SequenceProb::printReadData(ReadData read_data) {
 	printf("%d %d %d %d\n", read_data.reads[0], read_data.reads[1], read_data.reads[2], read_data.reads[3]);
 
 }
 
-void SequenceProbV1::PrintReads(ReadData data) {
+void SequenceProb::PrintReads(ReadData data) {
 	printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);
 
 }
 
-ReadData SequenceProbV1::GetDescendantReadData(int descent_index) {
+ReadData SequenceProb::GetDescendantReadData(int descent_index) {
 	return all_descendant_data[descent_index];
 }
-ReadDataVector SequenceProbV1::GetDescendantReadData() {
+ReadDataVector SequenceProb::GetDescendantReadData() {
 	return all_descendant_data;
 }
 
-ReadDataVector const & SequenceProbV1::GetDescendantReadData2() {
+ReadDataVector const & SequenceProb::GetDescendantReadData2() {
 	return all_descendant_data;
 }
 
-ReadDataVector const * SequenceProbV1::GetDescendantReadData3() {
+ReadDataVector const * SequenceProb::GetDescendantReadData3() {
 	return &all_descendant_data;
 }
 
-void SequenceProbV1::GetDescendantReadDataCOPY(ReadDataVector &all_descendant_data2) {
+void SequenceProb::GetDescendantReadDataCOPY(ReadDataVector &all_descendant_data2) {
 	all_descendant_data2 = all_descendant_data;
 }
 
-uint64_t SequenceProbV1::GetDescendantReadDataKey(int descent_index) {
+uint64_t SequenceProb::GetDescendantReadDataKey(int descent_index) {
 	return all_descendant_data[descent_index].key;
 }
 
-void SequenceProbV1::SetDescendantIndex(int des, int index) {
+void SequenceProb::SetDescendantIndex(int des, int index) {
 	descendant_index[des] = index;
 }
 
-int SequenceProbV1::GetDescendantIndex(int des) {
+int SequenceProb::GetDescendantIndex(int des) {
 	return descendant_index[des];
 
 }
 
-const std::vector<int>& SequenceProbV1::GetDescendantIndex() {
+const std::vector<int>& SequenceProb::GetDescendantIndex() {
 	return descendant_index;
 }
 
-void SequenceProbV1::SortIndex() {
+void SequenceProb::SortIndex() {
 //	descendant_index
 //	std::algorithm::sort
 	std::sort (descendant_index.begin(), descendant_index.end());

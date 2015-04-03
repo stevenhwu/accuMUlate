@@ -25,6 +25,7 @@
 #include "distributions/DirichletMultinomialDistribution.h"
 #include "evolution_models/EvolutionModel.h"
 #include "lookup.h"
+
 #include <set>
 #include <unordered_map>
 
@@ -34,10 +35,23 @@ extern const int BASE_COUNT;
 
 extern Eigen::IOFormat nice_row;
 
-
-class SequenceProb {
+const double ERROR_THRESHOLD = 1e-10;
+class SiteGenotypes {
 public:
-//    SequenceProb();
+
+    static
+    void ASSERT_GENOTYPES(HaploidProbs expected, HaploidProbs data){
+        for (int i = 0; i < expected.size(); ++i) {
+            assert( abs(expected[i]- data[i]) < ERROR_THRESHOLD );
+        }
+    }
+    static void ASSERT_GENOTYPES(DiploidProbs expected, DiploidProbs data){
+        for (int i = 0; i < expected.size(); ++i) {
+            assert( abs(expected[i]- data[i]) < ERROR_THRESHOLD );
+        }
+    }
+
+//    SiteGenotypes();
 
     static std::array<DiploidProbs, 4> DiploidPopulationFactory(ModelParams const model_params);
     static HaploidProbs HaploidProbsFactory(ReadData const &data);
@@ -54,9 +68,9 @@ public:
         frequency_prior = model_params.nuc_freq;
 
     }
-    SequenceProb(){}
+    SiteGenotypes(){}
     uint16_t reference;
-    SequenceProb(ModelInput const &site_data) {
+    SiteGenotypes(ModelInput const &site_data) {
 
         size_t i = 0;
         reference = site_data.reference;
@@ -113,30 +127,30 @@ public:
     int GetAncestorIndex(){
         return ancestor_index;
     }
-//    SequenceProb(const SequenceProb& s);
-//    SequenceProb& operator=(const SequenceProb& s);
-//    SequenceProb(SequenceProb&& s);
+//    SiteGenotypes(const SiteGenotypes& s);
+//    SiteGenotypes& operator=(const SiteGenotypes& s);
+//    SiteGenotypes(SiteGenotypes&& s);
 
-//    SequenceProb(const SequenceProb &s) {
+//    SiteGenotypes(const SiteGenotypes &s) {
 //        std::cout << "Copy Constructor" << std::endl;
 //
 //    }
-//    SequenceProb & operator=(const SequenceProb &s) {
+//    SiteGenotypes & operator=(const SiteGenotypes &s) {
 //        std::cout << "Copy assignment operator" << std::endl;
 //
 //    }
 //
-//    SequenceProb(SequenceProb &&s) {
+//    SiteGenotypes(SiteGenotypes &&s) {
 //    	std::cout << "Move Constructor" << std::endl;
 //    }
 //
-//    SequenceProb & operator= (SequenceProb && s) {
+//    SiteGenotypes & operator= (SiteGenotypes && s) {
 //        std::cout << "Move assignment operator" << std::endl;
 //    }
 
 
-    SequenceProb(ModelInput const &site_data, ModelParams const &model_params);
-    ~SequenceProb();
+    SiteGenotypes(ModelInput const &site_data, ModelParams const &model_params);
+    ~SiteGenotypes();
 
 
 //    void UpdateMuProb(MutationProb muProb);

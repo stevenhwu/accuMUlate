@@ -6,22 +6,22 @@
 #define _SEQUENCING_FACTORY_H_
 
 #include "model.h"
-#include "sequence_prob.h"
+#include "site_genotypes.h"
 #include "sequence_prob_v1.h"
 
 class SequencingFactory{
 
 
 public:
-    static void CreateSequenceProb(SequenceProb &sp, ModelInput const &data, ModelParams const params);
+    static void CreateSequenceProb(SiteGenotypes &sp, ModelInput const &data, ModelParams const params);
 
     SequencingFactory(ModelParams const &model_params) ;
 
-    SequenceProb CreateSequenceProb(ModelInput const &site_data);
+    SiteGenotypes CreateSequenceProb(ModelInput const &site_data);
 
 
-    void CreateSequenceProbsVector(std::vector<SequenceProb> &sp, GenomeData &data);
-    void CreateSequenceProbV1(std::vector<SequenceProbV1> &sp, GenomeData &data);
+    void CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp, GenomeData &data);
+    void CreateSequenceProbV1(std::vector<SequenceProb> &sp, GenomeData &data);
 
 private:
 
@@ -40,8 +40,8 @@ private:
     std::vector<DiploidProbs> convert_index_key_to_diploid;
 
 
-    void CalculateDescendantGenotypes(SequenceProb &seq_prob);
-    void CalculateAncestorGenotype(SequenceProb &seq_prob);
+    void CalculateDescendantGenotypes(SiteGenotypes &seq_prob);
+    void CalculateAncestorGenotype(SiteGenotypes &seq_prob);
 
 
     DiploidProbs CreateRefDiploidProbs(int ref_allele);

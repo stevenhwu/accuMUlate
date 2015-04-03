@@ -94,7 +94,7 @@ DiploidProbs SequencingFactory::DiploidSequencing(ReadData const &data) {
 }
 
 
-void SequencingFactory::CalculateAncestorGenotype(SequenceProb &seq_prob) {
+void SequencingFactory::CalculateAncestorGenotype(SiteGenotypes &seq_prob) {
 
     auto ancestor_genotypes = convert_index_key_to_diploid[seq_prob.GetAncestorIndex()];
     ancestor_genotypes *= ref_diploid_probs[seq_prob.GetReference()];
@@ -112,7 +112,7 @@ void SequencingFactory::CalculateAncestorGenotype(SequenceProb &seq_prob) {
 
 }
 
-void SequencingFactory::CalculateDescendantGenotypes(SequenceProb &seq_prob) {
+void SequencingFactory::CalculateDescendantGenotypes(SiteGenotypes &seq_prob) {
 
     std::vector<HaploidProbs> all_descendant_genotypes;
     all_descendant_genotypes.reserve(seq_prob.GetDescendantCount());
@@ -137,7 +137,7 @@ HaploidProbs SequencingFactory::HaploidSequencing(ReadData const &data) {
 
 
 
-void SequencingFactory::CreateSequenceProbsVector(std::vector<SequenceProb> &sp, GenomeData &genome_data) {
+void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp, GenomeData &genome_data) {
 
     //    ReadDataVector GetDescendantReadData();
 //    ReadDataVector const & GetDescendantReadData2();
@@ -154,7 +154,7 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SequenceProb> &sp,
     int index = 0;
     int index_ancestor = 0;
     for (size_t i = 0; i < sp.size(); ++i) {
-        SequenceProb &item = sp[i];
+        SiteGenotypes &item = sp[i];
 
         for (int j = 0; j < item.GetDescendantCount(); ++j) {
             ReadData rd = item.GetDescendantReadData(j);
@@ -188,10 +188,10 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SequenceProb> &sp,
     std::cout << index_ancestor << "\t" << convert_index_key_to_diploid.size() << "\t" << map_ancestor_to_index.size() <<std::endl;
 
 
-//    return SequenceProb();
+//    return SiteGenotypes();
 }
 
-void SequencingFactory::CreateSequenceProbV1(std::vector<SequenceProbV1> &sp, GenomeData &genome_data) {
+void SequencingFactory::CreateSequenceProbV1(std::vector<SequenceProb> &sp, GenomeData &genome_data) {
     sp.reserve(genome_data.size());
     for (size_t i = 0; i < genome_data.size(); ++i) {
 //        std::cout << i << "\t" << std::endl;
@@ -205,8 +205,6 @@ void SequencingFactory::CreateSequenceProbV1(std::vector<SequenceProbV1> &sp, Ge
 }
 
 
-void SequencingFactory::CreateSequenceProb(SequenceProb &sp, ModelInput const &data, ModelParams const params){
-
-
-
-}
+//void SequencingFactory::CreateSequenceProb(SequenceProb &sp, ModelInput const &data, ModelParams const params){
+//
+//}

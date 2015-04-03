@@ -17,7 +17,7 @@ SET(SOURCE_FILES ${SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/pileup_utils.cc
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/sequence_prob.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/site_genotypes.cc
 
     ${CMAKE_CURRENT_SOURCE_DIR}/sequence_prob_v1.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.cc
