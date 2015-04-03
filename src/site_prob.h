@@ -18,6 +18,8 @@
 #include "evolution_models/EvolutionModel.h"
 #include "lookup.h"
 #include "sequence_prob_v1.h"
+#include "constant.h"
+
 
 struct ProbTwoStats{
 

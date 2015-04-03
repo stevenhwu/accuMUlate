@@ -15,6 +15,7 @@
 
 int DEBUG = 0;
 
+
 MutationModel::MutationModel(EvolutionModel &evo_model0) {
 
     MutationProb mutation_prob = evo_model0.GetMutationProb();
@@ -30,6 +31,7 @@ MutationModel::MutationModel(EvolutionModel &evo_model0) {
 int MutationModel::GetSiteCount() const {
     return site_count;
 }
+
 
 
 void MutationModel::AddSequenceProb(std::vector<SiteGenotypes> &all) {
@@ -296,16 +298,18 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
 //        cd.push_back( &cache_read_data_to_all_index[aa[i]]);
 //    }
 
-
+    double t;
     for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
 //        int index16 = LookupTable::index_converter_10_to_16[index10];
 //        CalculateAllDescendantGivenAncestor(index10, prod_prob_ancestor, summary_stat_diff_ancestor);
 
 //        clock_t t_start = clock();
 //        for (int i = 0; i < 1e9; ++i) {
+//        NoCacheCalculateDes(site_index, index10, prod_prob_ancestor, t, summary_stat_diff_ancestor);
+        CacheLoopDesAll2(index10, aa, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
 
-//            CacheLoopDesAll(site_index, index10, prod_prob_ancestor, summary_stat_diff_ancestor);
-        CacheLoopDesAll2(index10, aa, prod_prob_ancestor, summary_stat_diff_ancestor);
+
+        //            CacheLoopDesAll(site_index, index10, prod_prob_ancestor, summary_stat_diff_ancestor);
 //        CacheLoopDesAll3(index10, aa, prod_prob_ancestor, summary_stat_diff_ancestor);
 //            01:13    2:7-8    3:10-11
 //        }
@@ -315,6 +319,9 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
         double prob_reads_given_a = all_ancestor_genotype_prior[site_index][index10] * prod_prob_ancestor;
         prob_reads += prob_reads_given_a;
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
+
+
+//        std::cout << "M: " << prob_reads_given_a << "\t" << (summary_stat_diff_ancestor) << "\t" << prob_reads << "\t" << all_stats_diff  << std::endl;
 
 //        prob_reads += cache_read_data_to_all_index_rev[index10][aa[index10]].second;
 //        all_stats_diff += cache_read_data_to_all_index_rev[index10][aa[index10]].first;
@@ -327,7 +334,7 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
 #endif
     }
     all_stats_diff /= prob_reads;
-    all_stats_diff /= descendant_count;
+    all_stats_diff /= descendant_count;//TODO: need this to auto calculate stat_same. sum to 1
 
 #ifdef DEBUG5
     	double stat_same = 0;
@@ -449,38 +456,38 @@ void MutationModel::CacheLoopDesAll(int site_index, int anc_index, double &produ
 
 
 //
-//void MutationModel::CalculateAllDescendantGivenAncestor(int a, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
-//
-////    product_prob_given_ancestor=1;
-////    double product_prob_given_ancestor1 = 1;
-////    double summary_stat_diff_ancestor1 = 0;
-////    double product_prob_given_ancestor2 = 1;
-////    double summary_stat_diff_ancestor2 = 0;
-//
-////    summary_stat_same_ancestor = 0;
-//
-//
-////    NoCacheCalculateDes(a, product_prob_given_ancestor1, summary_stat_diff_ancestor1);//-10
-//
-////    CacheLoopMap(a, product_prob_given_ancestor2, summary_stat_diff_ancestor2);//7~
+void MutationModel::CalculateAllDescendantGivenAncestor(int a, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
+
+//    product_prob_given_ancestor=1;
+//    double product_prob_given_ancestor1 = 1;
+//    double summary_stat_diff_ancestor1 = 0;
+//    double product_prob_given_ancestor2 = 1;
+//    double summary_stat_diff_ancestor2 = 0;
+
+//    summary_stat_same_ancestor = 0;
+
+
+//    NoCacheCalculateDes(a, product_prob_given_ancestor1, summary_stat_diff_ancestor1);//-10
+
+//    CacheLoopMap(a, product_prob_given_ancestor2, summary_stat_diff_ancestor2);//7~
 //    CacheLoopDes(a, product_prob_given_ancestor, summary_stat_diff_ancestor);//7~
-//
-//    //    product_prob_given_ancestor = product_prob_given_ancestor1;
-////    summary_stat_diff_ancestor = summary_stat_diff_ancestor1;
-//
-////    product_prob_given_ancestor = product_prob_given_ancestor2;
-////    summary_stat_diff_ancestor = summary_stat_diff_ancestor2;
-//
-////    if( (product_prob_given_ancestor1 - product_prob_given_ancestor2) > (product_prob_given_ancestor1/1e10) ){
-////        std::cout << "Diff prob" << "\t" << product_prob_given_ancestor1 << "\t" << product_prob_given_ancestor2 << "\t" << (product_prob_given_ancestor1/1e8) << std::endl;
-////    }
-////    if( (summary_stat_diff_ancestor1 - summary_stat_diff_ancestor2) > (summary_stat_diff_ancestor1/1e10) ){
-////        std::cout << "Diff stat" << "\t" << summary_stat_diff_ancestor1 << "\t" << summary_stat_diff_ancestor2 << "\t" << (summary_stat_diff_ancestor1/1e8) << std::endl;
-////    }
-//
-//
-//}
-//
+
+    //    product_prob_given_ancestor = product_prob_given_ancestor1;
+//    summary_stat_diff_ancestor = summary_stat_diff_ancestor1;
+
+//    product_prob_given_ancestor = product_prob_given_ancestor2;
+//    summary_stat_diff_ancestor = summary_stat_diff_ancestor2;
+
+//    if( (product_prob_given_ancestor1 - product_prob_given_ancestor2) > (product_prob_given_ancestor1/1e10) ){
+//        std::cout << "Diff prob" << "\t" << product_prob_given_ancestor1 << "\t" << product_prob_given_ancestor2 << "\t" << (product_prob_given_ancestor1/1e8) << std::endl;
+//    }
+//    if( (summary_stat_diff_ancestor1 - summary_stat_diff_ancestor2) > (summary_stat_diff_ancestor1/1e10) ){
+//        std::cout << "Diff stat" << "\t" << summary_stat_diff_ancestor1 << "\t" << summary_stat_diff_ancestor2 << "\t" << (summary_stat_diff_ancestor1/1e8) << std::endl;
+//    }
+
+
+}
+
 void MutationModel::NoCacheCalculateDes(int site_index, int a, double &product_prob_given_ancestor, double &stat_same, double &summary_stat_diff_ancestor) {
     product_prob_given_ancestor = 1;
     summary_stat_diff_ancestor = 0;
@@ -495,7 +502,7 @@ void MutationModel::NoCacheCalculateDes(int site_index, int a, double &product_p
         summary_stat_diff_ancestor += summary_stat_diff;
         product_prob_given_ancestor *= sum_over_probs;
 
-        stat_same += summary_stat_same;
+//        stat_same += summary_stat_same;
     }
 }
 
@@ -509,13 +516,13 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
 
 
     for (int b = 0; b < BASE_COUNT; ++b) {
-        double p = prob_reads_given_descent[b];
-        double prob = transition_matrix_a_to_d(index16, b) * p;
+
+        double prob = transition_matrix_a_to_d(index16, b) * prob_reads_given_descent[b];
 //        double prob = cache_data_transition[t][anc_index10][b];
         prob_reads_d_given_a += prob;
 
         summary_stat_same += prob_reads_given_descent[b] * (1.0-mutation_rate) * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
-        summary_stat_diff += p * mutation_rate * frequency_prior[b];
+        summary_stat_diff += prob_reads_given_descent[b] * mutation_rate * frequency_prior[b];
 
         if (DEBUG>3)
         {

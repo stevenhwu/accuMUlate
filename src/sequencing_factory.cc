@@ -183,6 +183,7 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp
 
         CalculateDescendantGenotypes(item);
         CalculateAncestorGenotype(item);
+
     }
     std::cout << index << "\t" << convert_index_key_to_haploid.size() << "\t" << map_rd_to_index.size() <<std::endl;
     std::cout << index_ancestor << "\t" << convert_index_key_to_diploid.size() << "\t" << map_ancestor_to_index.size() <<std::endl;

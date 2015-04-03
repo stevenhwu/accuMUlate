@@ -299,3 +299,7 @@ void SequenceProb::SortIndex() {
 	std::sort (descendant_index.begin(), descendant_index.end());
 
 }
+
+SequenceProb::SequenceProb() {
+
+}

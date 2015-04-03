@@ -39,12 +39,19 @@ class SequenceProb {
 public:
 //    SequenceProb();
 
+    SequenceProb();
+
     static std::array<DiploidProbs, 4> DiploidPopulationFactory(ModelParams const model_params);
     static HaploidProbs HaploidProbsFactory(ReadData const &data);
     static void printReadData(ReadData read_data);
 
 
-
+    void SetDescendantGenotypes(std::vector<HaploidProbs> &vector) {
+        all_descendant_genotypes = vector;
+    }
+    void SetAncestorGenotypes(DiploidProbs &anc_genotype){
+        ancestor_genotypes = anc_genotype;
+    }
     void AddModel(ModelParams const &model_params) {
 
         phi_haploid = model_params.phi_haploid;

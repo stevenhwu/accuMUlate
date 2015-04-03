@@ -37,9 +37,10 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     std::vector<SequenceProb> sp;
     SequencingFactory sequencing_factory_v1 (params);
     clock_t t1;
-
+//    base_counts.erase(base_counts.begin(), base_counts.begin()+10);
+//    base_counts.erase(base_counts.begin()+3, base_counts.end());
     t1 = clock();
-    sequencing_factory_v1.CreateSequenceProbV1(sp, base_counts);
+//    sequencing_factory_v1.CreateSequenceProbV1(sp, base_counts);
     cout << "Time init seq v1: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
     cout <<  std::numeric_limits<double>::epsilon() << endl;
 
@@ -53,12 +54,17 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
     for (int i = 0; i <sg.size(); ++i) {
         SiteGenotypes sg0 = sg[i];
-        SequenceProb sp0 = sp[i];
-        SiteGenotypes::ASSERT_GENOTYPES(sg0.GetAncestorGenotypes(), sp0.GetAncestorGenotypes());
+        SequenceProb sp0 (base_counts[i], params);
+        SiteGenotypes::SiteGenotypes_ASSERT_GENOTYPES(sg0.GetAncestorGenotypes(), sp0.GetAncestorGenotypes());
         for (int j = 0; j < sg0.GetDescendantCount(); ++j) {
-            SiteGenotypes::ASSERT_GENOTYPES(sg0.GetDescendantGenotypes(j), sp0.GetDescendantGenotypes(j));
+            SiteGenotypes::SiteGenotypes_ASSERT_GENOTYPES(sg0.GetDescendantGenotypes(j), sp0.GetDescendantGenotypes(j));
         }
+//        auto a = sg0.GetAncestorGenotypes();
+//        sp0.SetAncestorGenotypes(a);
+//        auto d = sg0.GetDescendantGenotypes();
+//        sp0.SetDescendantGenotypes(d);
 
+        sp.push_back(sp0);
     }
 
     t1 = clock() - t1;
@@ -106,6 +112,7 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
         EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
         em_alg2.Run();
         em_alg2.PrintSummary();
+        em_alg0.PrintSummary();
         t_end = clock();
         cout << "Time old: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
 

@@ -60,5 +60,5 @@ typedef Eigen::Array<double, 16, 4> MutationMatrix;
 double TetMAProbOneMutation(const ModelParams &params, const ModelInput site_data);
 double TetMAProbability(const ModelParams &params, const ModelInput site_data);
 
-
+void SimulateGenomeData(GenomeData &genome_data, int descendant_count, size_t fake_sample_count, double fake_prop = 0);
 #endif

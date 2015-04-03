@@ -9,14 +9,7 @@
 #include <strings.h>
 #include "site_genotypes.h"
 
-
-const int ANCESTOR_COUNT = 10;
-const int BASE_COUNT = 4;
-
-Eigen::IOFormat nice_row(Eigen::StreamPrecision, Eigen::DontAlignCols, " ", " ");
-
 const bool DEBUG = false;
-
 
 
 SiteGenotypes::SiteGenotypes(ModelInput const &site_data,  ModelParams const &model_params) {

@@ -20,34 +20,32 @@
 
 #include <vector>
 #include <iostream>
+#include <set>
+#include <unordered_map>
+
 #include "model.h"
 #include "mutation_prob.h"
 #include "distributions/DirichletMultinomialDistribution.h"
 #include "evolution_models/EvolutionModel.h"
 #include "lookup.h"
-
-#include <set>
-#include <unordered_map>
+#include "constant.h"
 
 
-extern const int ANCESTOR_COUNT;
-extern const int BASE_COUNT;
 
-extern Eigen::IOFormat nice_row;
-
-const double ERROR_THRESHOLD = 1e-10;
 class SiteGenotypes {
 public:
 
     static
-    void ASSERT_GENOTYPES(HaploidProbs expected, HaploidProbs data){
+    void SiteGenotypes_ASSERT_GENOTYPES(HaploidProbs expected, HaploidProbs data){
         for (int i = 0; i < expected.size(); ++i) {
             assert( abs(expected[i]- data[i]) < ERROR_THRESHOLD );
+            assert( expected[i] == data[i] );
         }
     }
-    static void ASSERT_GENOTYPES(DiploidProbs expected, DiploidProbs data){
+    static void SiteGenotypes_ASSERT_GENOTYPES(DiploidProbs expected, DiploidProbs data){
         for (int i = 0; i < expected.size(); ++i) {
             assert( abs(expected[i]- data[i]) < ERROR_THRESHOLD );
+            assert( expected[i] == data[i] );
         }
     }
 

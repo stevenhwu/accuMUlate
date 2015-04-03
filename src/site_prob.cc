@@ -162,6 +162,8 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
 
 
+//        std::cout << "S: " << prob_reads_given_a << "\t" << (summary_stat_diff_ancestor) << "\t" << prob_reads << "\t" << all_stats_diff  << std::endl;
+
         if (DEBUG>1) {
             std::cout << "==A: " << index10 << " " << index16 << " " << LookupTable::genotype_lookup_10[index10] << " " <<
                     ancestor_genotypes[index16] << "\t";
@@ -171,10 +173,12 @@ void SiteProb::CalculateAncestorToDescendant(double &prob_reads, double &all_sta
         }
 
     }
-
+//    std::exit(3);
 //    all_stats_same /= prob_reads;
     all_stats_diff /= prob_reads;
-    all_stats_same = descendant_count - all_stats_diff;
+    all_stats_diff /= descendant_count;
+    all_stats_same = 1 - all_stats_diff;
+//    all_stats_same = descendant_count- all_stats_diff;
     if(DEBUG>0){
         std::cout << "summaryALL\tSame:" << all_stats_same << "\tDiff:" << all_stats_diff << "\t" << (all_stats_diff + all_stats_same) << std::endl;
         std::cout << "total_sum2: "<< total_sum2 << "\tProb: " << prob_reads <<std::endl;

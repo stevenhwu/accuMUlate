@@ -13,6 +13,48 @@
 #include "model.h"
 
 
+
+
+void SimulateGenomeData(GenomeData &genome_data, int descendant_count, size_t fake_sample_count, double fake_prop) {
+
+	std::random_device rd;
+	std::mt19937 e2(rd());
+	std::uniform_int_distribution<uint16_t> uniform_dist(0, 5);
+	std::uniform_int_distribution<uint16_t> uniform3(0, 3);
+	uint16_t delta_reads = 20;
+
+	size_t fake_diff_count = fake_sample_count * fake_prop;
+	descendant_count++;// for ancestor
+
+	for (size_t s = 0; s < fake_sample_count; ++s) {
+
+		ReadDataVector bcalls(descendant_count, ReadData{0});
+		uint16_t ref_index = uniform3(e2);
+		for (int i = 0; i < descendant_count; ++i) {
+			bcalls[i].key=0;
+			for (int j = 0; j < 4; ++j) {
+				bcalls[i].reads[j] = uniform_dist(e2);
+			}
+			bcalls[i].reads[ref_index] = delta_reads + uniform_dist(e2);
+		}
+
+
+		if(s < fake_diff_count) { //diff ref
+			uint16_t old_ref = ref_index;
+			do{
+				ref_index = uniform3(e2);
+			}while (ref_index == old_ref);
+			for (int j = 0; j < 4; ++j) {
+				bcalls[0].reads[j] = uniform_dist(e2);
+			}
+			bcalls[0].reads[ref_index] = delta_reads + uniform_dist(e2);
+		}
+
+		genome_data.emplace_back( ModelInput{ref_index, bcalls} ) ;
+	}
+
+}
+
 //using namespace std;
 
 //double DirichletMultinomialLogProbability(double (&alphas)[4], ReadData &data) {

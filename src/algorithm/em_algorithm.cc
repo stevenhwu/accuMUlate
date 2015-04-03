@@ -17,7 +17,7 @@
 
 const double EM_CONVERGE_THRESHOLD = 1e-14;
 const double EM_CONVERGE_RATIO_THRESHOLD = 1e-14;
-const int EM_MAX_ITE = 500;
+const int EM_MAX_ITE = 300;
 int VERBOSE_ITE = 100;
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
@@ -227,15 +227,16 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
         std::cout <<"============ DONE (diff==0) ======= " << sum_diff << " Total ite:" << ite << "\n";
         return false;
     }
-//    if( sum_ratio < EM_CONVERGE_RATIO_THRESHOLD){
-//        std::cout <<"============ DONE ======= " << sum_ratio << " Total ite:" << ite << "\n";
-//        return false;
-//    }
+    if( sum_ratio < EM_CONVERGE_RATIO_THRESHOLD){
+        std::cout <<"============ DONE (ratio < THRESHOLD) ======= " << sum_ratio << " Total ite:" << ite << "\n";
+        return false;
+    }
     return true;
 }
 
 void EmAlgorithm::PrintSummary(){
-    printf("========================\nEM Summary\nParameters: ");
+//    std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << "\tsum_ratio: " << sum_ratio << std::endl;
+    printf("EM Summary\nParameters: ");
      for (auto &item :parameters) {
         printf("%.40e\t", item);
     }
@@ -244,7 +245,7 @@ void EmAlgorithm::PrintSummary(){
     for (auto &item :proportion) {
         printf("%.40e\t", item);
     }
-    printf("\n");
+    printf("\n================= END SUMMARY ============\n");
     fflush(stdout);
 }
 

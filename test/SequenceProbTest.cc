@@ -5,7 +5,7 @@
 
 class SequenceProbTest : public ::testing::Test {
 public:
-    const double ERROR_THRESHOLD = 1e-15;
+
 protected:
     int foo;
     ModelParams params_equal;
