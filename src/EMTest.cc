@@ -127,28 +127,11 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
             site_prob.push_back(site);
         }
 
-        t_start = clock();
-        EmAlgorithmMutationV1 em_alg (2, site_prob, evo_model0, em_site_data, em_model0);
-        em_alg.Run2();
-        t_end = clock();
-        cout << "\nTime old2: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
 
-
-        t_start = clock();
-        EmAlgorithmMutationV1 em_alg3 (em_site_data, em_model2);
-        em_alg3.Run2();
-        t_end = clock();
-        cout << "\nTime old3: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
-
-//        em_alg.PrintSummary();
-        em_alg3.PrintSummary();
-        em_alg2.PrintSummary();
-        em_alg0.PrintSummary();
 
 
     }
 
-//    em_alg3.Run2();
 
 }
 

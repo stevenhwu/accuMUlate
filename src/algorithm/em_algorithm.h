@@ -70,13 +70,10 @@ protected:
     std::vector<std::unique_ptr<EmModel>> *em_model_ptr;
 
     std::vector<std::unique_ptr<EmModel>> em_model;
-    EmModel *em_model0;
-
     std::vector<std::unique_ptr<EmSummaryStat>> all_em_stats;
 
-    std::vector<std::unique_ptr<EmSummaryStat>> em_stat_local_ptr;
-    std::unique_ptr<EmSummaryStat> em_stat_local_single; //TODO: Should be able to remove
 
+    EmModel *em_model0;//Should be able to remove as well. try to finialse V1 setup
 
     std::vector<double> parameters;
     std::vector<double> proportion;

@@ -88,7 +88,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakeModule/")
 find_package( Boost COMPONENTS program_options REQUIRED )
 find_package( Eigen3 3 REQUIRED )
 find_package( Bamtools REQUIRED )
-find_package( gsl REQUIRED )
+#find_package( gsl REQUIRED )
 
 FIND_PACKAGE(ZLIB)
 IF(ZLIB_FOUND)
@@ -96,7 +96,7 @@ IF(ZLIB_FOUND)
 ENDIF(ZLIB_FOUND)
 
 
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${GSL_LIBRARIES} ${Bamtools_LIBRARIES})
+set(LIBS ${LIBS} ${Boost_LIBRARIES} ${Bamtools_LIBRARIES}) #  ${GSL_LIBRARIES}
 set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src ${Boost_INCLUDE_DIR} ${Bamtools_INCLUDE_DIR}  ${EIGEN3_INCLUDE_DIR})
 
 include_directories("/usr/include/")

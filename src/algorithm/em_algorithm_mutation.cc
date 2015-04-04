@@ -15,7 +15,7 @@ EmAlgorithmMutation::~EmAlgorithmMutation() {
 
 void EmAlgorithmMutation::Run() {
 
-    em_stat_local_single->Print();
+//    em_stat_local_single->Print();
     size_t i = 0;
     bool isConverged = true;
     while(isConverged){
@@ -46,14 +46,23 @@ void EmAlgorithmMutation::InitialiseParameters() {
 
 void EmAlgorithmMutation::InitialiseSummaryStat() {
 
-    em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutation());
-    em_stat_local_single->Print();
+//    em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutation());
+//    em_stat_local_single->Print();
 
     temp_stats = std::vector<std::vector<double>>(num_category);
     for (size_t i = 0; i < num_category; ++i) {
         all_em_stats.emplace_back(new EmSummaryStatMutation());
 //        all_em_stats.emplace_back(new EmSummaryStatMutation());
-        temp_stats[i] = std::vector<double>(em_stat_local_single->GetStatCount());
+        temp_stats[i] = std::vector<double>(all_em_stats[i]->GetStatCount());
+    }
+
+    std::cout << "temp_stat_size: " << temp_stats.size() << std::endl;
+    for (int i = 0; i < temp_stats.size(); ++i) {
+        std::cout << "temp_stat_size[i]: " << temp_stats[i].size() << std::endl;
+        for (int j = 0; j < temp_stats[i].size(); ++j) {
+            std::cout << temp_stats[i][j] << "\t";
+        }
+        std::cout << std::endl;
     }
 
 

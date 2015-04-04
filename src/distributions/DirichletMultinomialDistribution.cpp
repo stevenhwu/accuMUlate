@@ -7,8 +7,8 @@
 
 #include "DirichletMultinomialDistribution.h"
 
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_rng.h>
+//#include <gsl/gsl_randist.h>
+//#include <gsl/gsl_rng.h>
 #include <cmath>
 #include <iostream>
 #include "../model.h"
@@ -64,47 +64,47 @@ DirichletMultinomialDistribution::~DirichletMultinomialDistribution() {
 //	return result;
 //}
 
-void DirichletMultinomialDistribution::DirichletMultinomialRandom(
-		double alphas[4], ReadData& data) {
-
-	  const gsl_rng_type * T;
-	  gsl_rng * r;
-	  gsl_rng_env_setup();
-
-	  T = gsl_rng_mt19937;
-	  r = gsl_rng_alloc (T);
-
-	  int i, n = 10;
-	  double mu = 3.0;
-
-	  /* create a generator chosen by the
-	     environment variable GSL_RNG_TYPE */
-
-	  double theta[4] = {0.1,0.1,0.1,0.1};
-//	gsl_rng_
-	gsl_ran_dirichlet(r, 10, alphas, theta);
-	/*
-	simPop
-function (J = 10, K = 20, n, pi, theta)
-{
-    if (length(n) == 1)
-        n <- rep(n, J)
-    if (missing(pi))
-        pi <- rnorm(K, mean = 14, sd = 4)
-    else K <- length(pi)
-    pi <- pi/sum(pi)
-    P <- rdirichlet(J, pi * (1 - theta)/theta)
-    X <- matrix(0, J, K)
-    for (i in 1:J) X[i, ] <- rmultinom(1, n[i], P[i, ])
-    list(theta = theta, pi = pi, data = X)
-}
-<environment: namespace:dirmult>
->
-
-	*/
-
-
-}
+//void DirichletMultinomialDistribution::DirichletMultinomialRandom(
+//		double alphas[4], ReadData& data) {
+//
+//	  const gsl_rng_type * T;
+//	  gsl_rng * r;
+//	  gsl_rng_env_setup();
+//
+//	  T = gsl_rng_mt19937;
+//	  r = gsl_rng_alloc (T);
+//
+//	  int i, n = 10;
+//	  double mu = 3.0;
+//
+//	  /* create a generator chosen by the
+//	     environment variable GSL_RNG_TYPE */
+//
+//	  double theta[4] = {0.1,0.1,0.1,0.1};
+////	gsl_rng_
+//	gsl_ran_dirichlet(r, 10, alphas, theta);
+//	/*
+//	simPop
+//function (J = 10, K = 20, n, pi, theta)
+//{
+//    if (length(n) == 1)
+//        n <- rep(n, J)
+//    if (missing(pi))
+//        pi <- rnorm(K, mean = 14, sd = 4)
+//    else K <- length(pi)
+//    pi <- pi/sum(pi)
+//    P <- rdirichlet(J, pi * (1 - theta)/theta)
+//    X <- matrix(0, J, K)
+//    for (i in 1:J) X[i, ] <- rmultinom(1, n[i], P[i, ])
+//    list(theta = theta, pi = pi, data = X)
+//}
+//<environment: namespace:dirmult>
+//>
+//
+//	*/
+//
+//
+//}
 
 
 
