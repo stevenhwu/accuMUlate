@@ -1,18 +1,18 @@
-#include <iostream>
 #include "em_summary_stat.h"
 
+EmSummaryStat::EmSummaryStat() : EmSummaryStat(EM_SUMMARY_STAT_STATS_COUNT){
+};
 
-EmSummaryStat::EmSummaryStat() : EmSummaryStat(EM_SUMMARY_STAT_STATS_COUNT){};
 
 EmSummaryStat::EmSummaryStat(int const stat_count0) : stat_count(stat_count0) {
-    stat = std::vector<double> (stat_count);
+    stat.assign(stat_count, 0);
 }
 
 size_t EmSummaryStat::GetStatCount(){
     return stat_count;
 }
 
-void EmSummaryStat::print() {
+void EmSummaryStat::Print() {
     std::cout << "Print_EmSumStat: C=" << stat_count <<" ";
     for (int i = 0; i < stat_count; ++i) {
         std::cout << stat[i] << "\t" ;

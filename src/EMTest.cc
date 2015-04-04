@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 #include <boost/program_options.hpp>
-
+#include <random>
 
 #include "api/BamReader.h"
 #include "evolution_models/F81.h"
@@ -97,7 +97,7 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
 //    exit(2);
 
-//    std::vector<SiteProb> site_prob;
+
 //    std::vector<EmData*> em_site_prob;
         EmModelMutationV1 em_model0(evo_model0);
         std::vector<std::unique_ptr<EmData>> em_site_data;
@@ -111,14 +111,43 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
         t_start = clock();
         EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
         em_alg2.Run();
+
+
         em_alg2.PrintSummary();
         em_alg0.PrintSummary();
         t_end = clock();
         cout << "Time old: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
 
+
+
+        //even older methods
+        std::vector<SiteProb> site_prob;
+        for (auto &seq_prob: sp) {
+            SiteProb site  (seq_prob, evo_model0 );
+            site_prob.push_back(site);
+        }
+
+        t_start = clock();
+        EmAlgorithmMutationV1 em_alg (2, site_prob, evo_model0, em_site_data, em_model0);
+        em_alg.Run2();
+        t_end = clock();
+        cout << "\nTime old2: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
+
+
+        t_start = clock();
+        EmAlgorithmMutationV1 em_alg3 (em_site_data, em_model2);
+        em_alg3.Run2();
+        t_end = clock();
+        cout << "\nTime old3: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
+
+//        em_alg.PrintSummary();
+        em_alg3.PrintSummary();
+        em_alg2.PrintSummary();
+        em_alg0.PrintSummary();
+
+
     }
-//    EmAlgorithmMutationV1 em_alg (2, site_prob, model, em_site_data, em_model0);
-//    EmAlgorithmMutationV1 em_alg3 (em_site_data, em_model);
+
 //    em_alg3.Run2();
 
 }
@@ -352,7 +381,7 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
 //    EmSummaryStat es;
 //    es.stat = 100;
 //
-//    EmSummaryStatMutationV1 es2;
+//    EmSummaryStatMutation es2;
 //    es2.stat = 200;
 //    es2.stat_diff = 210;
 //
@@ -365,7 +394,7 @@ int RunBasicProbCalc(GenomeData base_counts, ModelParams params) {
 //    ed2.UpdateSummaryStat(0, es2);
 //    ed0.UpdateSummaryStat(0, es2);
 //
-//    es2.print();
+//    es2.Print();
 
 
     testCalWeighting(muProb, sp);

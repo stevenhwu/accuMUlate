@@ -1,5 +1,5 @@
 #include "em_algorithm_mutation.h"
-#include "em_summary_stat_mutation_v1.h"
+#include "em_summary_stat_mutation.h"
 
 
 EmAlgorithmMutation::EmAlgorithmMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr) : EmAlgorithm(model_ptr) {
@@ -15,7 +15,7 @@ EmAlgorithmMutation::~EmAlgorithmMutation() {
 
 void EmAlgorithmMutation::Run() {
 
-    em_stat_local_single->print();
+    em_stat_local_single->Print();
     size_t i = 0;
     bool isConverged = true;
     while(isConverged){
@@ -46,13 +46,13 @@ void EmAlgorithmMutation::InitialiseParameters() {
 
 void EmAlgorithmMutation::InitialiseSummaryStat() {
 
-    em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutationV1());
-    em_stat_local_single->print();
+    em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutation());
+    em_stat_local_single->Print();
 
     temp_stats = std::vector<std::vector<double>>(num_category);
     for (size_t i = 0; i < num_category; ++i) {
-        all_em_stats.emplace_back(new EmSummaryStatMutationV1());
-//        all_em_stats.emplace_back(new EmSummaryStatMutationV1());
+        all_em_stats.emplace_back(new EmSummaryStatMutation());
+//        all_em_stats.emplace_back(new EmSummaryStatMutation());
         temp_stats[i] = std::vector<double>(em_stat_local_single->GetStatCount());
     }
 

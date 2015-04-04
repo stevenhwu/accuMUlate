@@ -6,17 +6,15 @@
  */
 
 #pragma once
+#ifndef EM_DATA_MUTATION_V1_H
+#define EM_DATA_MUTATION_V1_H_
+
 
 #include "em_data.h"
 #include "site_genotypes.h"
 #include "site_prob.h"
 #include "em_model.h"
 #include "em_model_mutation_v1.h"
-#include "em_model_binomial.h"
-
-
-#ifndef EM_DATA_MUTATION_V1_H
-#define EM_DATA_MUTATION_V1_H_
 
 
 
@@ -36,9 +34,9 @@ public:
 
     virtual void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat);
 
-    virtual void UpdateEmModel(EmModel *em_model);
-
     virtual void UpdateSummaryStat(double &prob, std::vector<double> &temp_stat);
+
+    virtual void UpdateEmModel(EmModel *em_model);
 };
 
 

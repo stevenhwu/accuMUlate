@@ -21,6 +21,17 @@
 
 extern const double EM_CONVERGE_THRESHOLD;
 
+/*
+Try to be generic, but doesn't work out too well at moment.
+Approach 1: completely separate data and model. 1 copy each.
+ - repeat data leads to repeated calculation, hard to reuse data
+ - hard to pass things around (generically). either non-generic method to pass the parameters or use casting(bad!?)
+
+Approach 2: model incluede data
+ - What happen with huge data and huge number of cagetoires. n category = n models
+
+try?? m x d (category x datapoint) strcuture, to avoid any duplications
+*/
 class EmAlgorithm {
 
 
@@ -64,7 +75,7 @@ protected:
     std::vector<std::unique_ptr<EmSummaryStat>> all_em_stats;
 
     std::vector<std::unique_ptr<EmSummaryStat>> em_stat_local_ptr;
-    std::unique_ptr<EmSummaryStat> em_stat_local_single;
+    std::unique_ptr<EmSummaryStat> em_stat_local_single; //TODO: Should be able to remove
 
 
     std::vector<double> parameters;

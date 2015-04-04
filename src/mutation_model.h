@@ -48,10 +48,10 @@ public:
     void AddSequenceProb(std::vector<SiteGenotypes> &all);
 
     void InitCache();
+
     void UpdateCache();
 
     void UpdateExpBeta(double expBeta);
-
 
     void CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff);
 

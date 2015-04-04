@@ -22,15 +22,11 @@ public:
     /*
     stat[0] = stat_same;
     stat[1] = stat_diff;
-
      */
 
     EmSummaryStatBinomial();
 
-    virtual ~EmSummaryStatBinomial() {
-    }
-
-
+    virtual ~EmSummaryStatBinomial(){}
 
     virtual double MaximiseStats();
 };

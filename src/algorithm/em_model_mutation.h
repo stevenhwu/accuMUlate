@@ -30,7 +30,7 @@ public:
 
     virtual size_t GetDataCount();
 
-    void GetParameterInfo();
+    virtual void GetParameterInfo();
 
 //    EvolutionModel * GetEvoModel();
 //    EvolutionModel * GetEvoModel() const;

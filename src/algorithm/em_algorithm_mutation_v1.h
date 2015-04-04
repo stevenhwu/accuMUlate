@@ -19,7 +19,7 @@
 
 #include "em_model_mutation_v1.h"
 #include "em_data_mutation_v1.h"
-#include "em_summary_stat_mutation_v1.h"
+#include "em_summary_stat_mutation.h"
 
 
 class EmAlgorithmMutationV1 : public EmAlgorithm{
@@ -42,9 +42,14 @@ public:
 
 //    EM(int num_category0, vector<SiteProb> &em_data0, EvolutionModel &em_model0, vector<EmData*> &d, EmModel &m);
 
-    EmAlgorithmMutationV1(int num_category0, std::vector<SiteProb> &em_data0, EvolutionModel &em_model0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModel &em_model);
+    EmAlgorithmMutationV1(int num_category0,
+            std::vector<SiteProb> &em_data0,
+            EvolutionModel &em_model0,
+            std::vector<std::unique_ptr<EmData>> &data_ptr,
+            EmModel &em_model);
 
-    EmAlgorithmMutationV1(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &em_model_ptr);
+    EmAlgorithmMutationV1(std::vector<std::unique_ptr<EmData>> &data_ptr,
+            std::vector<std::unique_ptr<EmModel>> &em_model_ptr);
 
     EmAlgorithmMutationV1(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModelMutationV1 &em_model);
 

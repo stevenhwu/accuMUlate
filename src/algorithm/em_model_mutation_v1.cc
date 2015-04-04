@@ -53,12 +53,12 @@ EvolutionModel *EmModelMutationV1::GetEvoModel() {
 
 void EmModelMutationV1::UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat) {
     std::cout << "Error!! Not yet implemented" << std::endl;
-    exit(41);
+    std::exit(44);
 }
 
 size_t EmModelMutationV1::GetDataCount() {
     std::cout << "Error!! Not yet implemented" << std::endl;
-    exit(41);
+    std::exit(44);
 }
 
 //EvolutionModel * EmModelMutationV1::GetEvoModel() const {

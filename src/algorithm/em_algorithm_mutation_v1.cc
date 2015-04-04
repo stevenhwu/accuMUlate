@@ -118,7 +118,7 @@ EmAlgorithmMutationV1::~EmAlgorithmMutationV1() {
 }
 
 void EmAlgorithmMutationV1::Run() {
-em_stat_local_single->print();
+    em_stat_local_single->Print();
     size_t i = 0;
     bool isConverged = true;
     while(isConverged){
@@ -142,7 +142,7 @@ void EmAlgorithmMutationV1::ExpectationStepCustom(size_t data_index, size_t cate
 
 void EmAlgorithmMutationV1::Run2() {
 
-    em_stat_local_single->print();
+    em_stat_local_single->Print();
     size_t i = 0;
     bool isConverged = true;
     while (isConverged) {
@@ -172,26 +172,26 @@ void EmAlgorithmMutationV1::InitialiseParameters() {
 
 void EmAlgorithmMutationV1::InitialiseSummaryStat() {
 
-    em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutationV1());
-    em_stat_local_single->print();
+    em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutation());
+    em_stat_local_single->Print();
 
     temp_stats = std::vector<std::vector<double>>(num_category);
     for (size_t i = 0; i < num_category; ++i) {
-        all_em_stats.emplace_back(new EmSummaryStatMutationV1());
-//        all_em_stats.emplace_back(new EmSummaryStatMutationV1());
+        all_em_stats.emplace_back(new EmSummaryStatMutation());
+//        all_em_stats.emplace_back(new EmSummaryStatMutation());
         temp_stats[i] = std::vector<double>(em_stat_local_single->GetStatCount());
     }
 
 
 //    for (size_t i = 0; i < num_category; ++i) {
-//        EmSummaryStatMutationV1 a;
+//        EmSummaryStatMutation a;
 //        all_em_stats_nonptr.push_back(a);
 ////        all_em_stats_nonptr[i]->SetStats(std::vector<double> {i+1.0, i+1.0});
-////        all_em_stats_nonptr[i]->print();
+////        all_em_stats_nonptr[i]->Print();
 //    }
 //    for (size_t i = 0; i < num_category; ++i) {
 //
-////        all_em_stats_nonptr[i]->print();
+////        all_em_stats_nonptr[i]->Print();
 //    }
 
 }

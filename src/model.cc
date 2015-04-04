@@ -7,6 +7,7 @@
 #include <map>
 #include <fstream>
 #include <memory>
+#include <random>
 #include <distributions/DirichletMultinomialDistribution.h>
 #include "Eigen/Dense"
 

@@ -10,17 +10,16 @@
 #ifndef EM_SUMMARY_STAT_MUTATION_V1_H_
 #define EM_SUMMARY_STAT_MUTATION_V1_H_
 
-#include "em_summary_stat_binomial.h"
-#include "em_summary_stat.h"
 
-class EmSummaryStatMutationV1 : public EmSummaryStatBinomial{
+#include "em_summary_stat_binomial.h"
+
+
+class EmSummaryStatMutation : public EmSummaryStatBinomial{
 
 public:
-    EmSummaryStatMutationV1() {
-    }
+    EmSummaryStatMutation() : EmSummaryStatBinomial(){}
 
-    virtual ~EmSummaryStatMutationV1() {
-    }
+    virtual ~EmSummaryStatMutation() {}
 
 
     virtual double MaximiseStats() override;

@@ -24,7 +24,7 @@ EmAlgorithmBinomial::EmAlgorithmBinomial(int num_category0, std::vector<std::uni
 void EmAlgorithmBinomial::InitialiseSummaryStat() {
 
     em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatBinomial());
-    em_stat_local_single->print();
+    em_stat_local_single->Print();
     temp_stats = std::vector<std::vector<double>>(num_category);
     for (size_t i = 0; i < num_category; ++i) {
         all_em_stats.emplace_back(new EmSummaryStatBinomial());

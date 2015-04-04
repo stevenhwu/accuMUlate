@@ -22,13 +22,12 @@ void EmModelMutation::UpdateSummaryStat(int site_index, double &prob, std::vecto
 }
 
 
-void EmModelMutation::GetParameterInfo(){
-    std::cout << "Error!! Not yet implemented" << std::endl;
-    exit(41);
+size_t EmModelMutation::GetDataCount() {
+    return mutation_model.GetSiteCount();
 }
 
 
-
-size_t EmModelMutation::GetDataCount() {
-    return mutation_model.GetSiteCount();
+void EmModelMutation::GetParameterInfo(){
+    std::cout << "Error!! Not yet implemented" << std::endl;
+    std::exit(44);
 }
