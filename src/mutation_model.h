@@ -46,7 +46,7 @@ public:
 
     void CacheLoopDesAll(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
 
-    void AddSequenceProb(std::vector<SiteGenotypes> &all);
+    void AddSequenceProb(std::vector<SiteGenotypesIndex> &all);
 
     void InitCache();
 
@@ -77,6 +77,14 @@ private:
     Array4D frequency_prior;
     Array10D ancestor_prior;
 
+    static std::vector<HaploidProbs> convert_index_key_to_haploid;
+    static std::vector<DiploidProbs> convert_index_key_to_diploid;
+    static std::array<DiploidProbs, 4> ref_diploid_probs;
+    static std::vector<SiteGenotypesIndex>  all_sequence_prob_index;
+
+
+
+
     std::vector<SiteGenotypes> all_sequence_prob;
     std::vector<std::array<double, 10>> all_ancestor_genotype_prior;
     std::unordered_map<uint64_t, HaploidProbs> map_rd_key_to_haploid;
@@ -98,9 +106,6 @@ private:
 //    boost::unordered_map<uint64_t, std::array<std::array<double, 2>, 10> > cache_read_data_to_all_boost; //[key][anc_index]
 
     std::unordered_map<uint64_t, int> map_rd_to_index;
-    std::vector<HaploidProbs> convert_index_key_to_haploid;
-    std::vector<DiploidProbs> convert_index_key_to_diploid;
-    std::array<DiploidProbs, 4> ref_diploid_probs;
 
 
 //    std::vector<std::array<std::array<double, 2>, 10> > cache_read_data_to_all_index;
@@ -160,7 +165,7 @@ public:
 
     void SummaryIndexToHaploid();
 
-    void AddGenotypeFactory(SequencingFactory &factory);
+    static void AddGenotypeFactory(SequencingFactory &factory);
 
     void AddSequenceProbOld1(std::vector<SiteGenotypes> &all);
 };

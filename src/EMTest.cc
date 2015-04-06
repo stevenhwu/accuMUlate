@@ -43,8 +43,8 @@ int getMemoryUsage(){ //Note: this value is in KB!
     fclose(file);
     return result;
 }
-void printMemoryUsage(){
-    std::cout << "Memory: " << (getMemoryUsage()/1000.0) << std::endl;
+void printMemoryUsage(char const *string1 = "") {
+    std::cout << "Memory: " << string1 << " " << (getMemoryUsage()/1000.0) << std::endl;
 }
 using namespace std;
 using namespace BamTools;
@@ -59,6 +59,8 @@ void AddSimulatedData(ModelParams &params, std::vector<SequenceProb> &sp, int de
 
 void SummariseReadsData(GenomeData base_counts);
 
+
+void CreateMutationModel(MutationModel &model, GenomeData &data, ModelParams &params);
 
 void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
@@ -76,16 +78,22 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 //    sequencing_factory_v1.CreateSequenceProbV1(sp, base_counts);
     cout << "Time init seq v1: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 //    cout <<  std::numeric_limits<double>::epsilon() << endl;
-    printMemoryUsage();
-    std::vector<SiteGenotypes> sg;
-    SequencingFactory sequencing_factory(params);
-
-
-    t1 = clock();
-    sequencing_factory.CreateSequenceProbsVector(sg, base_counts);
-    cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
-
-    printMemoryUsage();
+//    printMemoryUsage();
+    std::vector<SiteGenotypesIndex> sgi;
+//    std::vector<SiteGenotypes> sg;
+//    SequencingFactory sequencing_factory(params);
+//
+//
+//    printMemoryUsage();
+//
+//    t1 = clock();
+//    sequencing_factory.CreateSequenceProbsVector(sgi, base_counts);
+//    cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
+//
+//    printMemoryUsage();
+//
+//    sequencing_factory.CreateSequenceProbsVector(sg, base_counts);
+//    printMemoryUsage();
 
 //    std::cout << "Testing: " << sg.size() << "\t" << base_counts.size() << std::endl;
 //    for (int i = 0; i <sg.size(); ++i) {
@@ -101,27 +109,38 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     t1 = clock() - t1;
     cout << ((t1) / CLOCKS_PER_SEC) << "\t" << (t1) << endl;
 
-    cout << "Done preprocess. Final site count: " << sg.size() << endl;
+    cout << "Done preprocess. Final site count: " << sgi.size() << endl;
     cout << "======================== Setup EmData:" << endl;
-
     MutationModel mutation_model = MutationModel(evo_model0);
-    mutation_model.AddGenotypeFactory(sequencing_factory);
-    mutation_model.AddSequenceProb(sg);
-
-    mutation_model.SummaryIndexToHaploid();
-
-    printMemoryUsage();
-    MutationModel mutation_model2 = MutationModel(evo_model0);
-
-    mutation_model2.AddSequenceProbOld1(sg);
-    mutation_model2.SummaryIndexToHaploid();
-    printMemoryUsage();
+    CreateMutationModel(mutation_model, base_counts, params);
+    printMemoryUsage("exit functions, should decrease");
+//    MutationModel mutation_model = MutationModel(evo_model0);
+//    printMemoryUsage();
+//    mutation_model.AddGenotypeFactory(sequencing_factory);
+//    printMemoryUsage();
+//    mutation_model.AddSequenceProb(sgi);
 
 
     std::vector<std::unique_ptr<EmModel>> em_model2;
     em_model2.emplace_back(new EmModelMutation(mutation_model));
     em_model2.emplace_back(new EmModelMutation(mutation_model));
+    printMemoryUsage("double object?");
+
+//    std::exit(120);
+//    mutation_model.SummaryIndexToHaploid();
+cout << "========================Old EmData:" << endl;
     printMemoryUsage();
+    MutationModel mutation_model2 = MutationModel(evo_model0);
+
+//    mutation_model2.AddSequenceProbOld1(sg);
+//    mutation_model2.SummaryIndexToHaploid();
+    printMemoryUsage();
+
+
+//    std::vector<std::unique_ptr<EmModel>> em_model2;
+//    em_model2.emplace_back(new EmModelMutation(mutation_model));
+//    em_model2.emplace_back(new EmModelMutation(mutation_model));
+//    printMemoryUsage();
 
     cout << "\n========================\nStart em_algorithm:" << endl;
     clock_t t_start, t_end;
@@ -188,6 +207,33 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     }
 
 
+}
+
+void CreateMutationModel(MutationModel &mutation_model, GenomeData &base_counts, ModelParams &params) {
+
+
+    clock_t t1;
+    t1 = clock();
+
+    printMemoryUsage();
+
+    std::vector<SiteGenotypesIndex> sgi;
+    printMemoryUsage();
+    SequencingFactory sequencing_factory(params);
+    printMemoryUsage("init factory");
+
+    t1 = clock();
+    sequencing_factory.CreateSequenceProbsVector(sgi, base_counts);
+    cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
+    printMemoryUsage("after factor");
+
+
+//    MutationModel mutation_model = MutationModel(evo_model0);
+    printMemoryUsage();
+    MutationModel::AddGenotypeFactory(sequencing_factory);
+    printMemoryUsage("add genotype");
+    mutation_model.AddSequenceProb(sgi);
+    printMemoryUsage("add seq");
 }
 
 
@@ -719,131 +765,5 @@ exit(4);
 
 
 
-
-void TestingEMWithRandomThings(GenomeData base_counts, ModelParams params) {
-
-    MutationProb mutation_prob = MutationProb(params);
-    F81 evo_model0(mutation_prob);
-
-
-    size_t site_count = base_counts.size();
-    std::vector<SiteGenotypes> sp;
-//    site_count = 5000;
-    cout << "init: site_count: " << site_count << endl;
-    for (size_t i = 0; i < site_count; ++i) {
-        SequenceProb ss = SequenceProb(base_counts[i], params);
-        SiteGenotypes sg;
-        auto t = ss.GetAncestorGenotypes();
-        sg.SetAncestorGenotypes(t);
-        auto t2 = ss.GetDescendantGenotypes();
-        sg.SetDescendantGenotypes(t2);
-
-        sp.push_back(sg);
-    }
-//    int descendant_count = sp[0].GetDescendantCount();
-//    size_t fake_sample_count = 10000;
-//    double fake_prop = 0.25;
-//    AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
-
-//    TimeTrialWithCache(sp, params);//TODO: Time trial, cache is slower!?!
-//    TimeTrialWithCache2(sp, params);//
-
-    cout << "Done preprocess. Final site count: " << sp.size() << endl;
-
-
-//    MutationModel model = MutationModel(evo_model0);
-//    PreprocessSequenceProb2(sp, params, evo_model0);
-//    model.AddSequenceProb(sp);
-//    double prob, diff, total1, total2;
-//    model.cache_read_data_to_all = all_cache_read_to_all_2;
-//    for (size_t i = 0; i < sp.size(); ++i) {
-//        for (int a = 0; a < 10; ++a) {
-//            model.CacheLoopDesAll(i, a, prob, diff);
-//            total1 += prob;
-//            total2 += diff;
-//        }
-//        model.CalculateAncestorToDescendant(i, prob, diff);
-//        cout << prob << "\t" << diff<< endl;
-//    }
-//    cout << total1 << "\t" << total2 << endl;
-//    exit(11);
-//
-//    MutationModel model2 = MutationModel(evo_model0);
-//    model2.AddSequenceProb(sp);
-//    total1 = 0; total2 = 0;
-//    for (size_t i = 0; i < sp.size(); ++i) {
-//        for (int a = 0; a < 10; ++a) {
-//            model2.CacheLoopDesAll(i, a, prob, diff);
-//            total1 += prob;
-//            total2 += diff;
-//        }
-//    }
-//    cout << total1 << "\t" << total2 << endl;
-
-    int descendant_count = sp[0].GetDescendantCount();
-    size_t fake_sample_count = 68679;//68679
-    double fake_prop = 0.2;//0.2;
-//    AddSimulatedData(params, sp, descendant_count, fake_sample_count, fake_prop);
-
-    cout << "======================== Setup EmData:" << endl;
-
-//    std::vector<SiteProb> site_prob;
-    std::vector<EmData*> em_site_prob;
-    std::vector<std::unique_ptr<EmData>> em_site_data;
-//    for (size_t s = 0; s < site_count; ++s) {
-    for (auto &seq_prob: sp) {
-        em_site_data.emplace_back(  new EmDataMutationV1(seq_prob, evo_model0)  );
-//        SiteProb site  (seq_prob, evo_model0 );
-//        site_prob.push_back(site);
-    }
-
-//    F81 evo_model0(mutation_prob);
-//    F81 evo_model1(mutation_prob);
-//    F81 evo_model1 = evo_model0;
-    EmModelMutationV1 em_model0 (evo_model0);
-//    EmModelMutationV1 em_model1 (em_model0);
-//    EmModelMutationV1 em_model1 (evo_model1);
-
-//    em_model0.GetParameterInfo();
-//    em_model1.GetParameterInfo();
-
-//    em_model1.UpdateParameter(0.1);
-//    em_model0.UpdateParameter(0.01);
-//    std::vector<std::unique_ptr<EmModel>> em_model;
-//    em_model.emplace_back(new EmModelMutationV1(evo_model0));
-//    em_model.emplace_back(new EmModelMutationV1(em_model0));
-
-
-    MutationModel mutation_model = MutationModel(evo_model0);
-    mutation_model.AddSequenceProb(sp);
-    std::vector<std::unique_ptr<EmModel>> em_model2;
-    em_model2.emplace_back(new EmModelMutation(mutation_model));
-    em_model2.emplace_back(new EmModelMutation(mutation_model));
-//    MutationModel
-
-    cout << "\n========================\nStart em_algorithm:" << endl;
-    clock_t t_start, t_end;
-
-    t_start = clock();
-    EmAlgorithmMutation em_alg0 (em_model2);
-    em_alg0.Run();
-    em_alg0.PrintSummary();
-    t_end = clock();
-    cout << "Time new: " << (t_end - t_start)/ CLOCKS_PER_SEC << endl;
-
-    t_start = clock();
-//    EmAlgorithmMutationV1 em_alg (2, site_prob, model, em_site_data, em_model0);
-    EmAlgorithmMutationV1 em_alg2 (2, em_site_data, em_model0);
-    em_alg2.Run();
-    em_alg2.PrintSummary();
-    t_end = clock();
-    cout << "Time old: " << (t_end - t_start)/CLOCKS_PER_SEC << endl;
-
-//    EmAlgorithmMutationV1 em_alg3 (em_site_data, em_model);
-//    em_alg3.Run2();
-
-//
-
-}
 
 
