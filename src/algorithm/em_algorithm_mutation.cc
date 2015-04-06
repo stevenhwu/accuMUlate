@@ -56,14 +56,14 @@ void EmAlgorithmMutation::InitialiseSummaryStat() {
         temp_stats[i] = std::vector<double>(all_em_stats[i]->GetStatCount());
     }
 
-    std::cout << "temp_stat_size: " << temp_stats.size() << std::endl;
-    for (int i = 0; i < temp_stats.size(); ++i) {
-        std::cout << "temp_stat_size[i]: " << temp_stats[i].size() << std::endl;
-        for (int j = 0; j < temp_stats[i].size(); ++j) {
-            std::cout << temp_stats[i][j] << "\t";
-        }
-        std::cout << std::endl;
-    }
+//    std::cout << "temp_stat_size: " << temp_stats.size() << std::endl;
+//    for (int i = 0; i < temp_stats.size(); ++i) {
+//        std::cout << "temp_stat_size[i]: " << temp_stats[i].size() << std::endl;
+//        for (int j = 0; j < temp_stats[i].size(); ++j) {
+//            std::cout << temp_stats[i][j] << "\t";
+//        }
+//        std::cout << std::endl;
+//    }
 
 
 }

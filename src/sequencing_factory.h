@@ -23,6 +23,9 @@ public:
     void CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp, GenomeData &data);
     void CreateSequenceProbV1(std::vector<SequenceProb> &sp, GenomeData &data);
 
+    std::vector<HaploidProbs> &GetConvertIndexKeyToHaploid();
+    std::vector<DiploidProbs> &GetConvertIndexKeyToDiploid();
+    std::array<DiploidProbs, 4> &GetRefDiploidProbs();
 private:
 
     ModelParams model_params;
@@ -36,6 +39,11 @@ private:
 
 
     std::array<DiploidProbs, 4> ref_diploid_probs;
+
+
+    std::unordered_map<uint64_t, int> map_rd_to_index;
+    std::unordered_map<uint64_t, int> map_ancestor_to_index;
+
     std::vector<HaploidProbs> convert_index_key_to_haploid;
     std::vector<DiploidProbs> convert_index_key_to_diploid;
 

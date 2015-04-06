@@ -13,6 +13,39 @@
 #include "algorithm/em_algorithm_mutation_v1.h"
 #include "sequencing_factory.h"
 
+#include "sys/types.h"
+#include "sys/sysinfo.h"
+
+#include "stdlib.h"
+#include "stdio.h"
+#include "string.h"
+
+
+int parseLine(char* line){
+    int i = strlen(line);
+    while (*line < '0' || *line > '9') line++;
+    line[i-3] = '\0';
+    i = atoi(line);
+    return i;
+}
+int getMemoryUsage(){ //Note: this value is in KB!
+    FILE* file = fopen("/proc/self/status", "r");
+    int result = -1;
+    char line[128];
+
+
+    while (fgets(line, 128, file) != NULL){
+        if (strncmp(line, "VmSize:", 7) == 0){
+            result = parseLine(line);
+            break;
+        }
+    }
+    fclose(file);
+    return result;
+}
+void printMemoryUsage(){
+    std::cout << "Memory: " << (getMemoryUsage()/1000.0) << std::endl;
+}
 using namespace std;
 using namespace BamTools;
 
@@ -35,54 +68,64 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
     cout << "init: site_count: " << base_counts.size() << endl;
 
     std::vector<SequenceProb> sp;
-    SequencingFactory sequencing_factory_v1 (params);
+//    SequencingFactory sequencing_factory_v1 (params);
     clock_t t1;
 //    base_counts.erase(base_counts.begin(), base_counts.begin()+10);
 //    base_counts.erase(base_counts.begin()+3, base_counts.end());
     t1 = clock();
 //    sequencing_factory_v1.CreateSequenceProbV1(sp, base_counts);
     cout << "Time init seq v1: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
-    cout <<  std::numeric_limits<double>::epsilon() << endl;
-
+//    cout <<  std::numeric_limits<double>::epsilon() << endl;
+    printMemoryUsage();
     std::vector<SiteGenotypes> sg;
-    SequencingFactory sequencing_factory (params);
+    SequencingFactory sequencing_factory(params);
+
 
     t1 = clock();
     sequencing_factory.CreateSequenceProbsVector(sg, base_counts);
     cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
+    printMemoryUsage();
 
-    for (int i = 0; i <sg.size(); ++i) {
-        SiteGenotypes sg0 = sg[i];
-        SequenceProb sp0 (base_counts[i], params);
-        SiteGenotypes::SiteGenotypes_ASSERT_GENOTYPES(sg0.GetAncestorGenotypes(), sp0.GetAncestorGenotypes());
-        for (int j = 0; j < sg0.GetDescendantCount(); ++j) {
-            SiteGenotypes::SiteGenotypes_ASSERT_GENOTYPES(sg0.GetDescendantGenotypes(j), sp0.GetDescendantGenotypes(j));
-        }
-//        auto a = sg0.GetAncestorGenotypes();
-//        sp0.SetAncestorGenotypes(a);
-//        auto d = sg0.GetDescendantGenotypes();
-//        sp0.SetDescendantGenotypes(d);
-
-        sp.push_back(sp0);
-    }
+//    std::cout << "Testing: " << sg.size() << "\t" << base_counts.size() << std::endl;
+//    for (int i = 0; i <sg.size(); ++i) {
+//        SiteGenotypes sg0 = sg[i];
+//        SequenceProb sp0 (base_counts[i], params);
+//        SiteGenotypes::SiteGenotypes_ASSERT_GENOTYPES(sg0.GetAncestorGenotypes(), sp0.GetAncestorGenotypes());
+//        for (int j = 0; j < sg0.GetDescendantCount(); ++j) {
+//            SiteGenotypes::SiteGenotypes_ASSERT_GENOTYPES(sg0.GetDescendantGenotypes(j), sp0.GetDescendantGenotypes(j));
+//        }
+//    }
+//    std::exit(8);
 
     t1 = clock() - t1;
     cout << ((t1) / CLOCKS_PER_SEC) << "\t" << (t1) << endl;
 
-    cout << "Done preprocess. Final site count: " << sp.size() << endl;
+    cout << "Done preprocess. Final site count: " << sg.size() << endl;
     cout << "======================== Setup EmData:" << endl;
-//    exit(9);
-
 
     MutationModel mutation_model = MutationModel(evo_model0);
+    mutation_model.AddGenotypeFactory(sequencing_factory);
     mutation_model.AddSequenceProb(sg);
+
+    mutation_model.SummaryIndexToHaploid();
+
+    printMemoryUsage();
+    MutationModel mutation_model2 = MutationModel(evo_model0);
+
+    mutation_model2.AddSequenceProbOld1(sg);
+    mutation_model2.SummaryIndexToHaploid();
+    printMemoryUsage();
+
+
     std::vector<std::unique_ptr<EmModel>> em_model2;
     em_model2.emplace_back(new EmModelMutation(mutation_model));
     em_model2.emplace_back(new EmModelMutation(mutation_model));
+    printMemoryUsage();
 
     cout << "\n========================\nStart em_algorithm:" << endl;
     clock_t t_start, t_end;
+
 
     int trial_time = 1;
     for (int k = 0; k < trial_time; ++k) {
@@ -90,42 +133,54 @@ void RunEmWithRealData(GenomeData &base_counts, ModelParams params) {
 
         t_start = clock();
         EmAlgorithmMutation em_alg0(em_model2);
+
+        printMemoryUsage();
+//        exit(2);
+
         em_alg0.Run();
         em_alg0.PrintSummary();
         t_end = clock();
         cout << "Time new: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl << endl;
+        printMemoryUsage();
+
+
+        std::vector<std::unique_ptr<EmModel>> em_model5;
+        em_model5.emplace_back(new EmModelMutation(mutation_model2));
+        em_model5.emplace_back(new EmModelMutation(mutation_model2));
+        EmAlgorithmMutation em_alg5(em_model5);
+        em_alg5.Run();
+        em_alg0.PrintSummary();
+        em_alg5.PrintSummary();
+        t_end = clock();
+//        cout << "Time new: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl << endl;
+//        printMemoryUsage();
 
 //    exit(2);
 
+//    std::vector<SequenceProb> sp;
+//    SequencingFactory sequencing_factory_v1 (params);
 
-//    std::vector<EmData*> em_site_prob;
-        EmModelMutationV1 em_model0(evo_model0);
-        std::vector<std::unique_ptr<EmData>> em_site_data;
-        for (auto &seq_prob: sp) {
-
-            em_site_data.emplace_back(new EmDataMutationV1(seq_prob, evo_model0));
-//        SiteProb site  (seq_prob, evo_model0 );
-//        site_prob.push_back(site);
-        }
-
-        t_start = clock();
-        EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
-        em_alg2.Run();
+//    t1 = clock();
+//    sequencing_factory_v1.CreateSequenceProbV1(sp, base_counts);
+//    cout << "Time init seq v1: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
 
-        em_alg2.PrintSummary();
-        em_alg0.PrintSummary();
-        t_end = clock();
-        cout << "Time old: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
-
-
-
-        //even older methods
-        std::vector<SiteProb> site_prob;
-        for (auto &seq_prob: sp) {
-            SiteProb site  (seq_prob, evo_model0 );
-            site_prob.push_back(site);
-        }
+//        EmModelMutationV1 em_model0(evo_model0);
+//        std::vector<std::unique_ptr<EmData>> em_site_data;
+//        for (auto &seq_prob: sp) {
+//            em_site_data.emplace_back(new EmDataMutationV1(seq_prob, evo_model0));
+//        }
+//
+//        t_start = clock();
+//        EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
+//        em_alg2.Run();
+//
+//
+//        em_alg2.PrintSummary();
+//        em_alg0.PrintSummary();
+//        t_end = clock();
+//        cout << "Time old: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
+//
 
 
 

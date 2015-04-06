@@ -5,8 +5,8 @@
  *      Author: Steven Wu
  */
 #pragma once
-#ifndef SEQUENCE_PROB_H_
-#define SEQUENCE_PROB_H_
+#ifndef SITE_GENOTYPES_H_
+#define SITE_GENOTYPES_H_
 
 //#ifdef __GNUC__
 //#define DEPRECATED(func) func __attribute__ ((deprecated))
@@ -38,36 +38,30 @@ public:
     static
     void SiteGenotypes_ASSERT_GENOTYPES(HaploidProbs expected, HaploidProbs data){
         for (int i = 0; i < expected.size(); ++i) {
-            assert( abs(expected[i]- data[i]) < ERROR_THRESHOLD );
-            assert( expected[i] == data[i] );
+            if (expected[i] != data[i] ){
+                std::cerr << "Genotype (HaploidPorbs) not equal" << "\t" << expected[i] << "\t" <<  data[i] << std::endl;
+                std::abort();
+            }
+
         }
     }
     static void SiteGenotypes_ASSERT_GENOTYPES(DiploidProbs expected, DiploidProbs data){
         for (int i = 0; i < expected.size(); ++i) {
-            assert( abs(expected[i]- data[i]) < ERROR_THRESHOLD );
-            assert( expected[i] == data[i] );
+            if (expected[i] != data[i] ){
+                std::cerr << "Genotype (DiploidPorbs) not equal" << "\t" << expected[i] << "\t" <<  data[i] << std::endl;
+                std::abort();
+            }
+
         }
     }
 
-//    SiteGenotypes();
-
-    static std::array<DiploidProbs, 4> DiploidPopulationFactory(ModelParams const model_params);
-    static HaploidProbs HaploidProbsFactory(ReadData const &data);
-    static void printReadData(ReadData read_data);
-
-
-
-    void AddModel(ModelParams const &model_params) {
-
-//        phi_haploid = model_params.phi_haploid;
-        phi_diploid = model_params.phi_diploid;
-        error_prob = model_params.error_prob;
-        theta = model_params.theta;
-        frequency_prior = model_params.nuc_freq;
-
-    }
     SiteGenotypes(){}
     uint16_t reference;
+    SiteGenotypes(uint16_t ref, int descendant_count0): reference(ref), descendant_count(descendant_count0){
+        all_descendant_genotypes.reserve(descendant_count);
+        descendant_index.assign(descendant_count, -1);
+    }
+
     SiteGenotypes(ModelInput const &site_data) {
 
         size_t i = 0;
@@ -86,27 +80,27 @@ public:
         }
     }
 
-    void SetupDiploid(ModelInput const &site_data) {
-        size_t i = 0;
-
-        auto rd_vector = site_data.all_reads;
-        ancestor_readdata = rd_vector[i];
-
-        DiploidProbs pop_genotypes = DiploidPopulation(site_data.reference);
-        ancestor_genotypes = DiploidSequencing(ancestor_readdata);
-        ancestor_genotypes *= pop_genotypes;
-
-        descendant_count = site_data.all_reads.size() - 1;
-        descendant_index.assign(descendant_count, -1);
-
-        all_descendant_readdata.reserve(descendant_count);
-        all_descendant_genotypes.reserve(descendant_count);
-
-        for (i = 1; i < (descendant_count + 1); ++i) {
-            all_descendant_readdata.emplace_back(rd_vector[i]);
-        }
-
-    }
+//    void SetupDiploid(ModelInput const &site_data) {
+//        size_t i = 0;
+//
+//        auto rd_vector = site_data.all_reads;
+//        ancestor_readdata = rd_vector[i];
+//
+//        DiploidProbs pop_genotypes = DiploidPopulation(site_data.reference);
+//        ancestor_genotypes = DiploidSequencing(ancestor_readdata);
+//        ancestor_genotypes *= pop_genotypes;
+//
+//        descendant_count = site_data.all_reads.size() - 1;
+//        descendant_index.assign(descendant_count, -1);
+//
+//        all_descendant_readdata.reserve(descendant_count);
+//        all_descendant_genotypes.reserve(descendant_count);
+//
+//        for (i = 1; i < (descendant_count + 1); ++i) {
+//            all_descendant_readdata.emplace_back(rd_vector[i]);
+//        }
+//
+//    }
     uint16_t GetReference(){
         return reference;
     }
@@ -125,6 +119,10 @@ public:
     int GetAncestorIndex(){
         return ancestor_index;
     }
+
+//    void clear(){
+//        all_descendant_readdata.clear();
+//    }
 //    SiteGenotypes(const SiteGenotypes& s);
 //    SiteGenotypes& operator=(const SiteGenotypes& s);
 //    SiteGenotypes(SiteGenotypes&& s);
@@ -188,30 +186,28 @@ public:
     DiploidProbs DiploidSequencing(ReadData const &data);
 
 
-    template<class T>
-    T ScaleLogArray(T result);
 
 
 private:
 
 
-    ReadData ancestor_readdata;
-    ReadDataVector all_descendant_readdata;
+    [[deprecated]] ReadData ancestor_readdata;
+    [[deprecated]] ReadDataVector all_descendant_readdata;
 
     DiploidProbs ancestor_genotypes;
     std::vector<HaploidProbs> all_descendant_genotypes;
 
-    std::vector<double> frequency_prior;
-    Array10D ancestor_prior;
+//    std::vector<double> frequency_prior;
+//    Array10D ancestor_prior;
 
     size_t descendant_count;
-    double phi_haploid;
-    double phi_diploid;
-    double error_prob;
-    double theta;
+//    double phi_haploid;
+//    double phi_diploid;
+//    double error_prob;
+//    double theta;
 
     std::vector<int> descendant_index;
     int ancestor_index;
 };
 
-#endif /* SEQUENCE_PROB_H_ */
+#endif /* SITE_GENOTYPES_H_ */

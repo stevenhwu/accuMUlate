@@ -24,6 +24,7 @@
 #include "evolution_models/EvolutionModel.h"
 #include "lookup.h"
 #include "site_prob.h"
+#include "sequencing_factory.h"
 //#include <boost/functional/hash.hpp>
 //#include <boost/unordered_map.hpp>
 //#include <sparsehash/dense_hash_map>
@@ -97,7 +98,9 @@ private:
 //    boost::unordered_map<uint64_t, std::array<std::array<double, 2>, 10> > cache_read_data_to_all_boost; //[key][anc_index]
 
     std::unordered_map<uint64_t, int> map_rd_to_index;
-    std::vector<HaploidProbs> map_index_key_to_haploid;
+    std::vector<HaploidProbs> convert_index_key_to_haploid;
+    std::vector<DiploidProbs> convert_index_key_to_diploid;
+    std::array<DiploidProbs, 4> ref_diploid_probs;
 
 
 //    std::vector<std::array<std::array<double, 2>, 10> > cache_read_data_to_all_index;
@@ -151,6 +154,15 @@ public:
     void CacheLoopDesAll2(int anc_index, std::vector<int> const &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
     void CacheLoopDesAll3(int anc_index, std::vector<int> const &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
     void CacheLoopDesAll4(int anc_index, std::vector<std::array<std::array<double, 2>, 10>*> &cd, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) ;
+
+    void InitCacheOld1();
+
+
+    void SummaryIndexToHaploid();
+
+    void AddGenotypeFactory(SequencingFactory &factory);
+
+    void AddSequenceProbOld1(std::vector<SiteGenotypes> &all);
 };
 
 

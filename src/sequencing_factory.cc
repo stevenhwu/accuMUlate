@@ -148,17 +148,30 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp
         sp.emplace_back(genome_data[i]);
     }
 
-    std::unordered_map<uint64_t, int> map_rd_to_index;
-    std::unordered_map<uint64_t, int> map_ancestor_to_index;
-
     int index = 0;
     int index_ancestor = 0;
-    for (size_t i = 0; i < sp.size(); ++i) {
+
+
+    sp.reserve(genome_data.size());
+
+    for (size_t i = 0; i < genome_data.size(); ++i) {
+
+//        uint16_t ref = genome_data[i].reference;
+//        int descendant_conut = genome_data[i].all_reads.size()-1;
+
+        ModelInput &data = genome_data[i];
+        int descendant_conut = data.all_reads.size() - 1;
+
+//        sp.emplace_back(data.reference, descendant_conut);
         SiteGenotypes &item = sp[i];
 
         for (int j = 0; j < item.GetDescendantCount(); ++j) {
-            ReadData rd = item.GetDescendantReadData(j);
+//            std::cout << i <<  "\t" << j << std::endl;
+//            ReadData rd = item.GetDescendantReadData(j);
+//            ReadData &rd = genome_data[i].all_reads[j+1];
+            ReadData &rd = data.all_reads[j+1];
             auto rd_key = rd.key;
+
             auto find_key = map_rd_to_index.find(rd_key);
 
             if (find_key == map_rd_to_index.end()) {
@@ -170,7 +183,9 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp
         }
 
 
-        ReadData rd = item.GetAncestorReadData();
+//        ReadData rd = item.GetAncestorReadData();
+//        ReadData &rd = genome_data[i].all_reads[0];
+        ReadData &rd = data.all_reads[0];
         auto rd_key = rd.key;
         auto find_key = map_ancestor_to_index.find(rd_key);
         if (find_key == map_ancestor_to_index.end()) {
@@ -208,4 +223,17 @@ void SequencingFactory::CreateSequenceProbV1(std::vector<SequenceProb> &sp, Geno
 
 //void SequencingFactory::CreateSequenceProb(SequenceProb &sp, ModelInput const &data, ModelParams const params){
 //
+//}std::vector<HaploidProbs> & SequencingFactory::GetConvertIndexKeyToHaploid(){
+//return <#initializer#>;
 //}
+
+std::vector<HaploidProbs> &SequencingFactory::GetConvertIndexKeyToHaploid() {
+    return convert_index_key_to_haploid;
+}
+std::vector<DiploidProbs> &SequencingFactory::GetConvertIndexKeyToDiploid() {
+    return convert_index_key_to_diploid;
+}
+
+std::array<DiploidProbs, 4> &SequencingFactory::GetRefDiploidProbs() {
+    return ref_diploid_probs;
+}

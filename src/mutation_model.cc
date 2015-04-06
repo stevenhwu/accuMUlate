@@ -32,8 +32,52 @@ int MutationModel::GetSiteCount() const {
     return site_count;
 }
 
+void MutationModel::AddGenotypeFactory(SequencingFactory &factory) {
 
+    convert_index_key_to_haploid = factory.GetConvertIndexKeyToHaploid();
+    convert_index_key_to_diploid = factory.GetConvertIndexKeyToDiploid();
+    ref_diploid_probs = factory.GetRefDiploidProbs();
+//    all_ancestor_genotype_prior.reserve(convert_index_key_to_diploid.size());
+//    for (size_t i = 0; i < convert_index_key_to_diploid.size(); ++i) {
+//
+//
+//        std::array<double, 10> ancestor_genotype_prior;
+//        for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+//            int index16 = LookupTable::index_converter_10_to_16[index10];
+//            ancestor_genotype_prior[index10] = convert_index_key_to_diploid[i][index16] * ancestor_prior[index10];
+//        }
+////        all_ancestor_genotype_prior[i] = ancestor_genotype_prior;
+//        all_ancestor_genotype_prior.push_back(ancestor_genotype_prior);
+//    }
 
+}
+
+void MutationModel::AddSequenceProbOld1(std::vector<SiteGenotypes> &all) {
+    all_sequence_prob = all;
+    site_count = all.size();
+    descendant_count = all_sequence_prob[0].GetDescendantCount();
+    std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
+    all_ancestor_genotype_prior.resize(all_sequence_prob.size());
+
+    for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
+        auto ancestor_genotypes = all_sequence_prob[i].GetAncestorGenotypes();
+
+        std::array<double, 10> ancestor_genotype_prior;
+        for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+            int index16 = LookupTable::index_converter_10_to_16[index10];
+            ancestor_genotype_prior[index10] = ancestor_genotypes[index16] * ancestor_prior[index10];
+//            if(i == 0){
+//                std::cout << ancestor_genotype_prior[index10] << "\t" << ancestor_genotypes[index16] << "\t" << ancestor_prior[index10] << std::endl;
+//            }
+        }
+//        if(i == 0){
+//            std::cout << std::endl;
+//        }
+        all_ancestor_genotype_prior[i] = ancestor_genotype_prior;
+    }
+
+    InitCacheOld1();
+}
 void MutationModel::AddSequenceProb(std::vector<SiteGenotypes> &all) {
     all_sequence_prob = all;
     site_count = all.size();
@@ -72,10 +116,37 @@ void MutationModel::UpdateExpBeta(double expBeta) {
 //    std::cout << "MicroB time cache: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << std::endl;
 
 }
-
-
+void MutationModel::SummaryIndexToHaploid() {
+    std::cout << "sum index2Hap" << std::endl;
+    for (int i = 0; i < 5; ++i) {
+        std::cout << convert_index_key_to_haploid[i].format(nice_row) << std::endl;
+    }
+    std::cout << convert_index_key_to_haploid[convert_index_key_to_haploid.size()-1].format(nice_row) << std::endl;
+    std::cout << convert_index_key_to_haploid[convert_index_key_to_haploid.size()-2].format(nice_row) << std::endl;
+}
 
 void MutationModel::InitCache() {
+
+    std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << index << std::endl;
+
+    std::cout << "INDEX size: " << convert_index_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << map_rd_key_to_haploid.size() << "\t" <<
+            index << std::endl;
+    int index_size = convert_index_key_to_haploid.size();
+
+
+    for (int k = 0; k < 10; ++k) {
+        std::vector<std::pair<double, double>> temp;
+        temp.assign(index_size, std::make_pair(0,0));
+        cache_read_data_to_all_index_rev[k] = temp;
+    }
+
+    summary_stat_diff_vec = std::vector<double>(index_size);
+    UpdateCache();
+
+}
+
+
+void MutationModel::InitCacheOld1() {
 
     std::unordered_map<uint64_t, int> count;
 
@@ -103,7 +174,7 @@ void MutationModel::InitCache() {
 
                 //                cache_read_data_to_all_index.push_back( temp);
                 cache_read_data_to_all_index.push_back(temp) ;
-                map_index_key_to_haploid.push_back( item.GetDescendantGenotypes(j) );
+                convert_index_key_to_haploid.push_back( item.GetDescendantGenotypes(j) );
                 map_rd_to_index[rd_key] = index;
                 index++;
 //                std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << std::endl;
@@ -139,7 +210,7 @@ void MutationModel::InitCache() {
 //        std::cout << std::endl;
 
     }
-    summary_stat_diff_vec = std::vector<double>(map_index_key_to_haploid.size());
+    summary_stat_diff_vec = std::vector<double>(convert_index_key_to_haploid.size());
         UpdateCache();
 //    std::exit(6);
 }
@@ -153,14 +224,14 @@ void MutationModel::UpdateCache() {
     }
 
 //    cache_read_data_to_all_index[index];// = temp;
-//    map_index_key_to_haploid[index];// = item.GetDescendantGenotypes(j);
+//    convert_index_key_to_haploid[index];// = item.GetDescendantGenotypes(j);
 
 
-//    for (int i = 0; i < map_index_key_to_haploid.size(); ++i) {
+//    for (int i = 0; i < convert_index_key_to_haploid.size(); ++i) {
 //
 ////        auto rd_key = item.first;
 ////        auto genotype = item.second;
-//        auto &genotype = map_index_key_to_haploid[i];
+//        auto &genotype = convert_index_key_to_haploid[i];
 //        double summary_stat_diff = 0;
 //        for (int b = 0; b < BASE_COUNT; ++b) {
 //            summary_stat_diff += genotype[b] * temp_base_prob[b];//p * evo_model.GetMutationProb().mutation_rate.prob * frequency_prior[b];
@@ -191,8 +262,8 @@ void MutationModel::UpdateCache() {
 //
 //
 //    }
-//    for (int i = 0; i < map_index_key_to_haploid.size(); ++i) {
-//        auto &genotype = map_index_key_to_haploid[i];
+//    for (int i = 0; i < convert_index_key_to_haploid.size(); ++i) {
+//        auto &genotype = convert_index_key_to_haploid[i];
 //        summary_stat_diff_vec[i] = 0;
 //        for (int b = 0; b < BASE_COUNT; ++b) {
 //            summary_stat_diff_vec[i] += genotype[b] * temp_base_prob[b];//p * evo_model.GetMutationProb().mutation_rate.prob * frequency_prior[b];
@@ -202,9 +273,9 @@ void MutationModel::UpdateCache() {
 //
 //    for (int k = 0; k < ANCESTOR_COUNT; ++k) {
 //        auto &temp = cache_read_data_to_all_index_rev[k];
-//        for (int i = 0; i < map_index_key_to_haploid.size(); ++i) {
+//        for (int i = 0; i < convert_index_key_to_haploid.size(); ++i) {
 //
-//            auto &genotype = map_index_key_to_haploid[i];
+//            auto &genotype = convert_index_key_to_haploid[i];
 ////            double summary_stat_diff = 0;
 ////            for (int b = 0; b < BASE_COUNT; ++b) {
 ////                summary_stat_diff += genotype[b] * temp_base_prob[b];//p * evo_model.GetMutationProb().mutation_rate.prob * frequency_prior[b];
@@ -235,10 +306,10 @@ void MutationModel::UpdateCache() {
 //  }
 //    std::exit(3);
 
-//    std::vector<double> summary_stat_diff_vec(map_index_key_to_haploid.size());
+//    std::vector<double> summary_stat_diff_vec(convert_index_key_to_haploid.size());
 //    std::fill(summary_stat_diff_vec.begin(), summary_stat_diff_vec.end(), 0);
-//    for (int i = 0; i < map_index_key_to_haploid.size(); ++i) {
-//        auto &genotype = map_index_key_to_haploid[i];
+//    for (int i = 0; i < convert_index_key_to_haploid.size(); ++i) {
+//        auto &genotype = convert_index_key_to_haploid[i];
 ////        summary_stat_diff_vec[i] = 0;
 //        for (int b = 0; b < BASE_COUNT; ++b) {
 //            summary_stat_diff_vec[i] += genotype[b] * temp_base_prob[b];//p * evo_model.GetMutationProb().mutation_rate.prob * frequency_prior[b];
@@ -246,8 +317,8 @@ void MutationModel::UpdateCache() {
 //    }
 
 
-    for (size_t i = 0; i < map_index_key_to_haploid.size(); ++i) {
-        auto &genotype = map_index_key_to_haploid[i];
+    for (size_t i = 0; i < convert_index_key_to_haploid.size(); ++i) {
+        auto &genotype = convert_index_key_to_haploid[i];
 
         double summary_stat_diff= 0;
         for (int b = 0; b < BASE_COUNT; ++b) {
@@ -299,9 +370,12 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
 //        cd.push_back( &cache_read_data_to_all_index[aa[i]]);
 //    }
 
+    int anc_genotype_index = all_sequence_prob[site_index].GetAncestorIndex();
+    auto cache =  convert_index_key_to_diploid[all_sequence_prob[site_index].GetAncestorIndex()] *
+            ref_diploid_probs[all_sequence_prob[site_index].GetReference()] ;
     double t;
     for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
-//        int index16 = LookupTable::index_converter_10_to_16[index10];
+        int index16 = LookupTable::index_converter_10_to_16[index10];
 //        CalculateAllDescendantGivenAncestor(index10, prod_prob_ancestor, summary_stat_diff_ancestor);
 
 //        clock_t t_start = clock();
@@ -316,9 +390,16 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
 //        }
 //        clock_t t_end = clock();
 //        std::cout << "MicroB time: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << std::endl;
+        double prob_reads_given_a = 0;
+        if(all_ancestor_genotype_prior.size()==0) {
+            prob_reads_given_a = cache[index16] * ancestor_prior[index10] * prod_prob_ancestor;
+        }
+        else {
+            prob_reads_given_a = all_ancestor_genotype_prior[site_index][index10] * prod_prob_ancestor;
+        }
 
-        double prob_reads_given_a = all_ancestor_genotype_prior[site_index][index10] * prod_prob_ancestor;
         prob_reads += prob_reads_given_a;
+
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
 
 
