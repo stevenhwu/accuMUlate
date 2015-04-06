@@ -64,6 +64,7 @@ typedef Eigen::Array4d HaploidProbs;
 typedef Eigen::Array<double, 16, 1> DiploidProbs;
 typedef Eigen::Array<double, 16, 4> MutationMatrix;
 
+typedef std::array<double, 10> DiploidProbsIndex10;
 
 
 

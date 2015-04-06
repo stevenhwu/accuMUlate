@@ -54,7 +54,7 @@ add_executable(EMTest EMTest.cc ${SOURCE_FILES} sequencing_factory.h sequencing_
 target_link_libraries(EMTest ${LIBS} )
 target_link_libraries(EMTest profiler)
 
-add_executable(AlignmentPreprocessor main_alignment_preprocessor.cc ${SOURCE_FILES} genotype_utils.cpp genotype_utils.h)
+add_executable(AlignmentPreprocessor main_alignment_preprocessor.cc ${SOURCE_FILES})
 target_link_libraries(AlignmentPreprocessor ${LIBS} )
 #target_link_libraries(AlignmentPreprocessor profiler)
 

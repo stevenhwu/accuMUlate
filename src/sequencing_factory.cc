@@ -28,7 +28,7 @@ SequencingFactory::SequencingFactory(ModelParams const &model_params2) :model_pa
     for (int i : { 0, 1, 2, 3 }) {
         ref_diploid_probs[i] = CreateRefDiploidProbs(i);
     }
-
+    CalculateAncestorPrior();
 }
 
 
@@ -309,8 +309,23 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
     std::cout << index_ancestor << "\t" << convert_index_key_to_diploid.size() << "\t" << map_ancestor_to_index.size() <<std::endl;
 
 
+
 //    return SiteGenotypes();
 }
+
+void SequencingFactory::CalculateAncestorPrior() {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = i; j < 4; ++j) {
+            int index10 = LookupTable::index_converter_4_4_to_10[i][j];
+            ancestor_prior[index10] = frequency_prior[i] * frequency_prior[j];
+            if(i != j){
+                ancestor_prior[index10] *= 2; //Count both AC and CA
+            }
+        }
+    }
+}
+
+
 //
 //void SequencingFactory::CalculateAncestorGenotypeIndex(SiteGenotypesIndex &seq_prob) {
 //

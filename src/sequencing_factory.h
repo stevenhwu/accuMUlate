@@ -36,6 +36,7 @@ private:
     double error_prob;
     double theta;
     std::vector<double> frequency_prior;
+    Array10D ancestor_prior;
 
     double haploid_alphas[4][4];
 
@@ -48,6 +49,7 @@ private:
 
     std::vector<HaploidProbs> convert_index_key_to_haploid;
     std::vector<DiploidProbs> convert_index_key_to_diploid;
+    std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10;
 
 
     void CalculateDescendantGenotypes(SiteGenotypes &seq_prob);
@@ -61,5 +63,6 @@ private:
     HaploidProbs HaploidSequencing(ReadData const &data);
 
 
+    void CalculateAncestorPrior();
 };
 #endif //_ACCUMULATE_SEQUENCING_FACTORY_H_

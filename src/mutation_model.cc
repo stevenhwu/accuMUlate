@@ -132,12 +132,12 @@ void MutationModel::SummaryIndexToHaploid() {
 }
 
 void MutationModel::InitCache() {
-
-    std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << index << std::endl;
+    int index_size = convert_index_key_to_haploid.size();
+    std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << index_size << std::endl;
 
     std::cout << "INDEX size: " << convert_index_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << map_rd_key_to_haploid.size() << "\t" <<
-            index << std::endl;
-    int index_size = convert_index_key_to_haploid.size();
+            index_size << std::endl;
+
 
 
     for (int k = 0; k < 10; ++k) {
