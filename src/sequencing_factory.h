@@ -49,7 +49,6 @@ private:
 
     std::array<DiploidProbs, 4> ref_diploid_probs;
 
-
     std::unordered_map<uint64_t, uint> map_rd_to_index;
     std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
 

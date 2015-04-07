@@ -83,8 +83,8 @@ private:
 //    static std::array<DiploidProbs, 4> ref_diploid_probs;
     static std::vector<SiteGenotypesIndex>  all_sequence_prob_index;
 
-    static std::vector<HaploidProbs> convert_index_key_to_haploid_unnormalised;
-    static std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10_unnormalised;
+//    static std::vector<HaploidProbs> convert_index_key_to_haploid_unnormalised;
+//    static std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10_unnormalised;
 
 
 

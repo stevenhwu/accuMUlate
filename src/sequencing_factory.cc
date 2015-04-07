@@ -204,7 +204,12 @@ std::vector<DiploidProbsIndex10> &SequencingFactory::GetConvertIndexKeyToDiploid
     return convert_index_key_to_diploid_10_unnormalised;
 }
 
+
 void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sgi, GenomeData &genome_data) {
+
+
+//    std::unordered_map<uint64_t, uint> map_rd_to_index;
+//    std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
 
     //    ReadDataVector GetDescendantReadData();
 //    ReadDataVector const & GetDescendantReadData2();
@@ -246,8 +251,8 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 
                 HaploidProbs prob = HaploidSequencing(rd);
                 {
-                    HaploidProbs prob_exp = prob.exp();
-                    convert_index_key_to_haploid_unnormalised.push_back(prob_exp);
+//                    HaploidProbs prob_exp = prob.exp();
+//                    convert_index_key_to_haploid_unnormalised.push_back(prob_exp);
                 }
 
                 double scale = prob.maxCoeff();
@@ -271,8 +276,8 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
         if (find_key == map_ancestor_to_index[data.reference].end()) {
             DiploidProbs temp_prob = DiploidSequencing(rd);
             {
-                DiploidProbsIndex10 temp_dip_10 = ConvertDiploid16ToDiploid10(temp_prob.exp(), data.reference);
-                convert_index_key_to_diploid_10_unnormalised.push_back(temp_dip_10);
+//                DiploidProbsIndex10 temp_dip_10 = ConvertDiploid16ToDiploid10(temp_prob.exp(), data.reference);
+//                convert_index_key_to_diploid_10_unnormalised.push_back(temp_dip_10);
             }
 
             double scale = temp_prob.maxCoeff();
