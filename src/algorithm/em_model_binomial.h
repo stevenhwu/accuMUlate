@@ -20,7 +20,7 @@ public:
 
     EmModelBinomial(int n0, double prob0);
 
-    virtual ~EmModelBinomial(){};
+    virtual ~EmModelBinomial(){}
 
     virtual void UpdateParameter(double param);
 

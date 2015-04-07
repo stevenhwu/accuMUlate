@@ -1,16 +1,9 @@
 //
 // Created by steven on 4/3/15.
 //
-
+#pragma once
 #ifndef _CONSTANT_H_
 #define _CONSTANT_H_
-
-
-//extern const int ANCESTOR_COUNT;
-//extern const int BASE_COUNT;
-//
-//extern Eigen::IOFormat nice_row;
-//
 
 
 

@@ -33,15 +33,17 @@ int MutationModel::GetSiteCount() const {
 }
 
     std::vector<HaploidProbs> MutationModel::convert_index_key_to_haploid;
-    std::vector<DiploidProbs> MutationModel::convert_index_key_to_diploid;
-    std::array<DiploidProbs, 4> MutationModel::ref_diploid_probs;
+//    std::vector<DiploidProbs> MutationModel::convert_index_key_to_diploid;
+    std::vector<DiploidProbsIndex10> MutationModel::convert_index_key_to_diploid_10;
+//    std::array<DiploidProbs, 4> MutationModel::ref_diploid_probs;
     std::vector<SiteGenotypesIndex>  MutationModel::all_sequence_prob_index;
 
 void MutationModel::AddGenotypeFactory(SequencingFactory &factory) {
 
     MutationModel::convert_index_key_to_haploid = factory.GetConvertIndexKeyToHaploid();
-    MutationModel::convert_index_key_to_diploid = factory.GetConvertIndexKeyToDiploid();
-    MutationModel::ref_diploid_probs = factory.GetRefDiploidProbs();
+//    MutationModel::convert_index_key_to_diploid = factory.GetConvertIndexKeyToDiploid();
+    MutationModel::convert_index_key_to_diploid_10 = factory.GetConvertIndexKeyToDiploidIndex10();
+//    MutationModel::ref_diploid_probs = factory.GetRefDiploidProbs();
 //    all_ancestor_genotype_prior.reserve(convert_index_key_to_diploid.size());
 //    for (size_t i = 0; i < convert_index_key_to_diploid.size(); ++i) {
 //
@@ -56,34 +58,34 @@ void MutationModel::AddGenotypeFactory(SequencingFactory &factory) {
 //    }
 
 }
-
-void MutationModel::AddSequenceProbOld1(std::vector<SiteGenotypes> &all) {
-    all_sequence_prob = all;
-
-    site_count = all.size();
-    descendant_count = all_sequence_prob[0].GetDescendantCount();
-    std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
-    all_ancestor_genotype_prior.resize(all_sequence_prob.size());
-
-    for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
-        auto ancestor_genotypes = all_sequence_prob[i].GetAncestorGenotypes();
-
-        std::array<double, 10> ancestor_genotype_prior;
-        for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
-            int index16 = LookupTable::index_converter_10_to_16[index10];
-            ancestor_genotype_prior[index10] = ancestor_genotypes[index16] * ancestor_prior[index10];
-//            if(i == 0){
-//                std::cout << ancestor_genotype_prior[index10] << "\t" << ancestor_genotypes[index16] << "\t" << ancestor_prior[index10] << std::endl;
-//            }
-        }
-//        if(i == 0){
-//            std::cout << std::endl;
+//
+//void MutationModel::AddSequenceProbOld1(std::vector<SiteGenotypes> &all) {
+//    all_sequence_prob = all;
+//
+//    site_count = all.size();
+//    descendant_count = all_sequence_prob[0].GetDescendantCount();
+//    std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
+//    all_ancestor_genotype_prior.resize(all_sequence_prob.size());
+//
+//    for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
+//        auto ancestor_genotypes = all_sequence_prob[i].GetAncestorGenotypes();
+//
+//        std::array<double, 10> ancestor_genotype_prior;
+//        for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+//            int index16 = LookupTable::index_converter_10_to_16[index10];
+//            ancestor_genotype_prior[index10] = ancestor_genotypes[index16] * ancestor_prior[index10];
+////            if(i == 0){
+////                std::cout << ancestor_genotype_prior[index10] << "\t" << ancestor_genotypes[index16] << "\t" << ancestor_prior[index10] << std::endl;
+////            }
 //        }
-        all_ancestor_genotype_prior[i] = ancestor_genotype_prior;
-    }
-
-    InitCacheOld1();
-}
+////        if(i == 0){
+////            std::cout << std::endl;
+////        }
+//        all_ancestor_genotype_prior[i] = ancestor_genotype_prior;
+//    }
+//
+//    InitCacheOld1();
+//}
 void MutationModel::AddSequenceProb(std::vector<SiteGenotypesIndex> &all) {
     MutationModel::all_sequence_prob_index = all;
     site_count = all.size();
@@ -122,23 +124,20 @@ void MutationModel::UpdateExpBeta(double expBeta) {
 //    std::cout << "MicroB time cache: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << std::endl;
 
 }
-void MutationModel::SummaryIndexToHaploid() {
-    std::cout << "sum index2Hap" << std::endl;
-    for (int i = 0; i < 5; ++i) {
-        std::cout << convert_index_key_to_haploid[i].format(nice_row) << std::endl;
-    }
-    std::cout << convert_index_key_to_haploid[convert_index_key_to_haploid.size()-1].format(nice_row) << std::endl;
-    std::cout << convert_index_key_to_haploid[convert_index_key_to_haploid.size()-2].format(nice_row) << std::endl;
-}
+//void MutationModel::SummaryIndexToHaploid() {
+//    std::cout << "sum index2Hap" << std::endl;
+//    for (int i = 0; i < 5; ++i) {
+//        std::cout << convert_index_key_to_haploid[i].format(nice_row) << std::endl;
+//    }
+//    std::cout << convert_index_key_to_haploid[convert_index_key_to_haploid.size()-1].format(nice_row) << std::endl;
+//    std::cout << convert_index_key_to_haploid[convert_index_key_to_haploid.size()-2].format(nice_row) << std::endl;
+//}
 
 void MutationModel::InitCache() {
     int index_size = convert_index_key_to_haploid.size();
-    std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << index_size << std::endl;
-
-    std::cout << "INDEX size: " << convert_index_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << map_rd_key_to_haploid.size() << "\t" <<
-            index_size << std::endl;
-
-
+//    std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << index_size << std::endl;
+//    std::cout << "INDEX size: " << convert_index_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << map_rd_key_to_haploid.size() << "\t" <<
+//            index_size << std::endl;
 
     for (int k = 0; k < 10; ++k) {
         std::vector<std::pair<double, double>> temp;
@@ -150,75 +149,75 @@ void MutationModel::InitCache() {
 
 }
 
-
-void MutationModel::InitCacheOld1() {
-
-    std::unordered_map<uint64_t, int> count;
-
-//    cache_read_data_to_all.reserve(10000000);
-//    cache_read_data_to_all.rehash( 10000000);
-//    cache_read_data_to_all_index.reserve(all_sequence_prob.size());
-//    cache_read_data_to_all_index = std::vector<std::array<std::pair<double, double>, 10> >(all_sequence_prob.size());
-
-    int index = 0;
-    for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
-        SiteGenotypes &item = all_sequence_prob[i];
-        for (int j = 0; j < item.GetDescendantCount(); ++j) {
-            ReadData rd = item.GetDescendantReadData(j);
-            auto rd_key = rd.key;
-            count[rd_key]++;
-            auto find_key = map_rd_to_index.find(rd_key);
-
-            if(find_key == map_rd_to_index.end()){
-//                std::cout << item.GetDescendantIndex(j) << "\t" << index << std::endl;
-                map_rd_key_to_haploid[rd_key]= item.GetDescendantGenotypes(j);
-
-//                std::array<std::array<double, 2>, 10> temp;
-                std::array<std::pair<double, double>, 10> temp;
-
-
-                //                cache_read_data_to_all_index.push_back( temp);
-                cache_read_data_to_all_index.push_back(temp) ;
-                convert_index_key_to_haploid.push_back( item.GetDescendantGenotypes(j) );
-                map_rd_to_index[rd_key] = index;
-                index++;
-//                std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << std::endl;
-//                std::cout << "\t" << rd.reads[0] << "\t" << rd.reads[1] << "\t" <<rd.reads[2] << "\t" <<rd.reads[3] << "\t" << rd_key << std::endl;
-
-            }
-            item.SetDescendantIndex(j, map_rd_to_index[rd_key]);
-        }
-
-    }
-    std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << index << std::endl;
-
-    for (int k = 0; k < 10; ++k) {
-        std::vector<std::pair<double, double>> temp;
-        temp.assign(index, std::make_pair(0,0));
-//        std::vector<std::array<double, 2>> temp;
-//        for (int i = 0; i < index; ++i) {
-//            std::array<double, 2> t2;
-//            temp.push_back(t2);
-//        }
-        cache_read_data_to_all_index_rev[k] = temp;
-    }
-
-    for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
-        SiteGenotypes &item = all_sequence_prob[i];
+//
+//void MutationModel::InitCacheOld1() {
+//
+//    std::unordered_map<uint64_t, int> count;
+//
+////    cache_read_data_to_all.reserve(10000000);
+////    cache_read_data_to_all.rehash( 10000000);
+////    cache_read_data_to_all_index.reserve(all_sequence_prob.size());
+////    cache_read_data_to_all_index = std::vector<std::array<std::pair<double, double>, 10> >(all_sequence_prob.size());
+//
+//    int index = 0;
+//    for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
+//        SiteGenotypes &item = all_sequence_prob[i];
 //        for (int j = 0; j < item.GetDescendantCount(); ++j) {
-////            std::cout << item.GetDescendantIndex(j) << "\t" ;
-//            if(item.GetDescendantIndex(j) == -1){
-//                std::cout << i << "\t" << j << "\t" <<  item.GetDescendantIndex(j) << "\t" << std::endl;
+//            ReadData rd = item.GetDescendantReadData(j);
+//            auto rd_key = rd.key;
+//            count[rd_key]++;
+//            auto find_key = map_rd_to_index.find(rd_key);
+//
+//            if(find_key == map_rd_to_index.end()){
+////                std::cout << item.GetDescendantIndex(j) << "\t" << index << std::endl;
+//                map_rd_key_to_haploid[rd_key]= item.GetDescendantGenotypes(j);
+//
+////                std::array<std::array<double, 2>, 10> temp;
+//                std::array<std::pair<double, double>, 10> temp;
+//
+//
+//                //                cache_read_data_to_all_index.push_back( temp);
+//                cache_read_data_to_all_index.push_back(temp) ;
+//                convert_index_key_to_haploid.push_back( item.GetDescendantGenotypes(j) );
+//                map_rd_to_index[rd_key] = index;
+//                index++;
+////                std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << std::endl;
+////                std::cout << "\t" << rd.reads[0] << "\t" << rd.reads[1] << "\t" <<rd.reads[2] << "\t" <<rd.reads[3] << "\t" << rd_key << std::endl;
+//
 //            }
+//            item.SetDescendantIndex(j, map_rd_to_index[rd_key]);
 //        }
-//        item.SortIndex();
-//        std::cout << std::endl;
-
-    }
-    summary_stat_diff_vec = std::vector<double>(convert_index_key_to_haploid.size());
-        UpdateCache();
-//    std::exit(6);
-}
+//
+//    }
+//    std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << index << std::endl;
+//
+//    for (int k = 0; k < 10; ++k) {
+//        std::vector<std::pair<double, double>> temp;
+//        temp.assign(index, std::make_pair(0,0));
+////        std::vector<std::array<double, 2>> temp;
+////        for (int i = 0; i < index; ++i) {
+////            std::array<double, 2> t2;
+////            temp.push_back(t2);
+////        }
+//        cache_read_data_to_all_index_rev[k] = temp;
+//    }
+//
+//    for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
+//        SiteGenotypes &item = all_sequence_prob[i];
+////        for (int j = 0; j < item.GetDescendantCount(); ++j) {
+//////            std::cout << item.GetDescendantIndex(j) << "\t" ;
+////            if(item.GetDescendantIndex(j) == -1){
+////                std::cout << i << "\t" << j << "\t" <<  item.GetDescendantIndex(j) << "\t" << std::endl;
+////            }
+////        }
+////        item.SortIndex();
+////        std::cout << std::endl;
+//
+//    }
+//    summary_stat_diff_vec = std::vector<double>(convert_index_key_to_haploid.size());
+//        UpdateCache();
+////    std::exit(6);
+//}
 
 void MutationModel::UpdateCache() {
 
@@ -368,57 +367,31 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
     double summary_stat_diff_ancestor = 0;
     double prod_prob_ancestor = 1;
 
-    const std::vector<int> &aa = all_sequence_prob_index[site_index].GetDescendantIndex();
-//    std::vector< std::array<std::array<double, 2>, 10>* > cd;
+    const auto &descendant_genotypes = all_sequence_prob_index[site_index].GetDescendantIndex();
 
-//    for (int i = 0; i < descendant_count; ++i) {
-//        cd.push_back( &cache_read_data_to_all_index[aa[i]]);
-//    }
-//    std::cout << convert_index_key_to_diploid.size() << std::endl;
-//    std::cout << aa.size() << std::endl;
-//    std::cout << aa[0] << std::endl;
-//    std::cout << convert_index_key_to_diploid.size() << std::endl;
-    int anc_genotype_index = all_sequence_prob_index[site_index].GetAncestorIndex();
-//    std::cout << "\t" << anc_genotype_index << std::endl;
-    auto cache =  convert_index_key_to_diploid[all_sequence_prob_index[site_index].GetAncestorIndex()];
-//            *  ref_diploid_probs[all_sequence_prob[site_index].GetReference()] ;
-    double t;
+    uint32_t anc_genotype_index = all_sequence_prob_index[site_index].GetAncestorIndex();
+//    auto &cache =  convert_index_key_to_diploid[anc_genotype_index];
+    auto &ancestor_genotype_10 =  convert_index_key_to_diploid_10[anc_genotype_index];
 
     for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
         int index16 = LookupTable::index_converter_10_to_16[index10];
-//        CalculateAllDescendantGivenAncestor(index10, prod_prob_ancestor, summary_stat_diff_ancestor);
 
-//        clock_t t_start = clock();
-//        for (int i = 0; i < 1e9; ++i) {
+        CacheLoopDesAll2(index10, descendant_genotypes, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
+
 //        NoCacheCalculateDes(site_index, index10, prod_prob_ancestor, t, summary_stat_diff_ancestor);
-        CacheLoopDesAll2(index10, aa, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
-
-
-        //            CacheLoopDesAll(site_index, index10, prod_prob_ancestor, summary_stat_diff_ancestor);
+//        CacheLoopDesAll(site_index, index10, prod_prob_ancestor, summary_stat_diff_ancestor);
 //        CacheLoopDesAll3(index10, aa, prod_prob_ancestor, summary_stat_diff_ancestor);
-//            01:13    2:7-8    3:10-11
-//        }
-//        clock_t t_end = clock();
-//        std::cout << "MicroB time: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << std::endl;
+
+
         double prob_reads_given_a = 0;
-        if(all_ancestor_genotype_prior.size()==0) {
-            prob_reads_given_a = cache[index16] * ancestor_prior[index10] * prod_prob_ancestor;
-        }
-        else {
-            prob_reads_given_a = all_ancestor_genotype_prior[site_index][index10] * prod_prob_ancestor;
-        }
+//        if(all_ancestor_genotype_prior.size()==0) {
+//            prob_reads_given_a = cache[index16] * ancestor_prior[index10] * prod_prob_ancestor;
+        prob_reads_given_a = ancestor_genotype_10[index10] * prod_prob_ancestor;
 
         prob_reads += prob_reads_given_a;
 
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
 
-
-//        std::cout << "M: " << prob_reads_given_a << "\t" << (summary_stat_diff_ancestor) << "\t" << prob_reads << "\t" << all_stats_diff  << std::endl;
-
-//        prob_reads += cache_read_data_to_all_index_rev[index10][aa[index10]].second;
-//        all_stats_diff += cache_read_data_to_all_index_rev[index10][aa[index10]].first;
-//        prob_reads += cache_read_data_to_all_index_rev[index10][index10].second;
-//        all_stats_diff += cache_read_data_to_all_index_rev[index10][index10].first;
 
 #ifdef DEBUG1
         std::cout << "==A: " << index10 << " " << all_ancestor_genotype_prior[site_index][index10] << "\t" << "Diff:" <<
@@ -465,45 +438,30 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
 //    }
 //}
 
-void MutationModel::CacheLoopDesAll4(int anc_index, std::vector<std::array<std::array<double, 2>, 10>*> &cd, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
-
-    product_prob_given_ancestor = 1;
-    summary_stat_diff_ancestor = 0;
-
-//    auto &vv = cache_read_data_to_all_index_rev[anc_index];
-    for (int d = 0; d < descendant_count; ++d) {
-
-        std::array<double, 2> &cache = (*(cd[d]) )[anc_index];
-        product_prob_given_ancestor *= cache[0];
-        summary_stat_diff_ancestor += cache[1];
-
-    }
-}
-
-
-void MutationModel::CacheLoopDesAll3(int anc_index, const std::vector<int> &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
-
-    product_prob_given_ancestor = 1;
-    summary_stat_diff_ancestor = 0;
-
-
-//    for (int d = 0; d < descendant_count; ++d) {
-    for (auto &item : aa) {
-
-//        std::array<double, 2> &cache = cache_read_data_to_all_index[aa[d]][anc_index];
-//        product_prob_given_ancestor *= cache[0];
-//        summary_stat_diff_ancestor += cache[1];
-        std::pair<double, double> cp = cache_read_data_to_all_index[item][anc_index];
-        product_prob_given_ancestor *= cp.first;
-        summary_stat_diff_ancestor += cp.second;
-
-
-    }
-}
+//
+//void MutationModel::CacheLoopDesAll3(int anc_index, const std::vector<int> &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
+//
+//    product_prob_given_ancestor = 1;
+//    summary_stat_diff_ancestor = 0;
+//
+//
+////    for (int d = 0; d < descendant_count; ++d) {
+//    for (auto &item : aa) {
+//
+////        std::array<double, 2> &cache = cache_read_data_to_all_index[aa[d]][anc_index];
+////        product_prob_given_ancestor *= cache[0];
+////        summary_stat_diff_ancestor += cache[1];
+//        std::pair<double, double> cp = cache_read_data_to_all_index[item][anc_index];
+//        product_prob_given_ancestor *= cp.first;
+//        summary_stat_diff_ancestor += cp.second;
+//
+//
+//    }
+//}
 
 
 
-void MutationModel::CacheLoopDesAll2(int anc_index, const std::vector<int> &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
+void MutationModel::CacheLoopDesAll2(int anc_index, const std::vector<uint32_t> &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
 
     product_prob_given_ancestor = 1;
     summary_stat_diff_ancestor = 0;
@@ -519,36 +477,8 @@ void MutationModel::CacheLoopDesAll2(int anc_index, const std::vector<int> &aa, 
 }
 
 
-void MutationModel::CacheLoopDesAll(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
-
-    product_prob_given_ancestor = 1;
-    summary_stat_diff_ancestor = 0;
-
-//    auto &t = all_sequence_prob[site_index];
-//    auto key = all_sequence_prob[site_index].GetDescendantReadDataKey(0);
-
-//    auto &aa = cache_read_data_to_all2[anc_index];
-    const std::vector<int> &aa = all_sequence_prob[site_index].GetDescendantIndex();
-    auto &vv = cache_read_data_to_all_index_rev[anc_index];
-    for (int d = 0; d < descendant_count; ++d) {
-
-//        auto key = all_sequence_prob[site_index].GetDescendantReadDataKey(d);
-//        auto &cache = cache_read_data_to_all[key][anc_index];
 //
-////        auto key = aa.GetDescendantIndex(d);
-////        std::array<double, 2> cache;
-//
-        std::pair<double, double> &cp = cache_read_data_to_all_index[aa[d]][anc_index];
-        product_prob_given_ancestor *= cp.first;
-        summary_stat_diff_ancestor += cp.second;
-
-    }
-//    std::cout << std::endl;
-}
-
-
-//
-void MutationModel::CalculateAllDescendantGivenAncestor(int a, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
+//void MutationModel::CalculateAllDescendantGivenAncestor(int a, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
 
 //    product_prob_given_ancestor=1;
 //    double product_prob_given_ancestor1 = 1;
@@ -578,23 +508,25 @@ void MutationModel::CalculateAllDescendantGivenAncestor(int a, double &product_p
 //    }
 
 
-}
+//}
 
 void MutationModel::NoCacheCalculateDes(int site_index, int a, double &product_prob_given_ancestor, double &stat_same, double &summary_stat_diff_ancestor) {
     product_prob_given_ancestor = 1;
     summary_stat_diff_ancestor = 0;
     stat_same = 0;
+    std::vector<uint32_t> const &descendant_index = all_sequence_prob_index[site_index].GetDescendantIndex();
     for (int d = 0; d < descendant_count; ++d) {//TODO: Check descendant info, merge some of them together
         double summary_stat_same = 0;
         double summary_stat_diff = 0;
         double sum_over_probs = 1;
-        HaploidProbs prob_reads_given_descent = all_sequence_prob[site_index].GetDescendantGenotypes(d);
+
+//        HaploidProbs prob_reads_given_descent = all_sequence_prob[site_index].GetDescendantGenotypes(d);
+        HaploidProbs prob_reads_given_descent = convert_index_key_to_haploid[descendant_index [d]];//UNTESTED:
         CalculateOneDescendantGivenAncestor(a, prob_reads_given_descent, sum_over_probs, summary_stat_same, summary_stat_diff);
 
         summary_stat_diff_ancestor += summary_stat_diff;
         product_prob_given_ancestor *= sum_over_probs;
 
-//        stat_same += summary_stat_same;
     }
 }
 

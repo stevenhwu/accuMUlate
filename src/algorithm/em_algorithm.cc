@@ -15,10 +15,10 @@
 
 #include <stddef.h>
 
-const double EM_CONVERGE_THRESHOLD = 1e-14;
-const double EM_CONVERGE_RATIO_THRESHOLD = 1e-14;
-const int EM_MAX_ITE = 10;
-int VERBOSE_ITE = 100;
+const double EM_CONVERGE_THRESHOLD = 1e-11;
+const double EM_CONVERGE_RATIO_THRESHOLD = 1e-11;
+const int EM_MAX_ITE = 1000;
+int VERBOSE_ITE = 10;
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
     std::cout << "Old Construct: " << num_category << "\t One data, one model" << std::endl;
@@ -224,11 +224,11 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
         return false;
     }
     if (sum_diff < EM_CONVERGE_THRESHOLD) {
-        std::cout <<"============ DONE (diff==0) ======= " << sum_diff << " Total ite:" << ite << "\n";
+        std::cout <<"============ DONE (diff ~~ 0) ======= Diff:" << sum_diff << "\tRatio:" << sum_ratio  <<" Total ite:" << ite << "\n";
         return false;
     }
     if( sum_ratio < EM_CONVERGE_RATIO_THRESHOLD){
-        std::cout <<"============ DONE (ratio < THRESHOLD) ======= " << sum_ratio << " Total ite:" << ite << "\n";
+        std::cout <<"============ DONE (ratio < THRESHOLD) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
         return false;
     }
     return true;

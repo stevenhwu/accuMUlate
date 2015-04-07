@@ -1,33 +1,37 @@
 //
 // Created by steven on 3/31/15.
 //
-
+#pragma once
 #ifndef _SEQUENCING_FACTORY_H_
 #define _SEQUENCING_FACTORY_H_
 
 #include "model.h"
 #include "site_genotypes.h"
 #include "sequence_prob_v1.h"
-#include "SiteGenotypeIndex.h"
+#include "site_genotype_index.h"
 
 class SequencingFactory{
 
 
 public:
-    static void CreateSequenceProb(SiteGenotypes &sp, ModelInput const &data, ModelParams const params);
 
     SequencingFactory(ModelParams const &model_params) ;
 
-    SiteGenotypes CreateSequenceProb(ModelInput const &site_data);
-
-
-    void CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp, GenomeData &data);
     void CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sp, GenomeData &data);
-    void CreateSequenceProbV1(std::vector<SequenceProb> &sp, GenomeData &data);
 
     std::vector<HaploidProbs> &GetConvertIndexKeyToHaploid();
+    std::vector<DiploidProbsIndex10> &GetConvertIndexKeyToDiploidIndex10();
+
+
+//    void CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp, GenomeData &data);
+
+//    void CreateSequenceProbV1(std::vector<SequenceProb> &sp, GenomeData &data);
+
+
     std::vector<DiploidProbs> &GetConvertIndexKeyToDiploid();
     std::array<DiploidProbs, 4> &GetRefDiploidProbs();
+
+
 private:
 
     ModelParams model_params;
@@ -44,19 +48,19 @@ private:
     std::array<DiploidProbs, 4> ref_diploid_probs;
 
 
-    std::unordered_map<uint64_t, int> map_rd_to_index;
-    std::array<std::unordered_map<uint64_t, int>, 4> map_ancestor_to_index;
+    std::unordered_map<uint64_t, uint> map_rd_to_index;
+    std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
 
     std::vector<HaploidProbs> convert_index_key_to_haploid;
-    std::vector<DiploidProbs> convert_index_key_to_diploid;
+//    std::vector<DiploidProbs> convert_index_key_to_diploid;
     std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10;
 
-
-    void CalculateDescendantGenotypes(SiteGenotypes &seq_prob);
-    void CalculateAncestorGenotype(SiteGenotypes &seq_prob);
-
-    void CalculateDescendantGenotypesIndex(SiteGenotypesIndex &seq_prob);
-    void CalculateAncestorGenotypeIndex(SiteGenotypesIndex &seq_prob);
+//
+//    void CalculateDescendantGenotypes(SiteGenotypes &seq_prob);
+//    void CalculateAncestorGenotype(SiteGenotypes &seq_prob);
+//
+//    void CalculateDescendantGenotypesIndex(SiteGenotypesIndex &seq_prob);
+//    void CalculateAncestorGenotypeIndex(SiteGenotypesIndex &seq_prob);
 
     DiploidProbs CreateRefDiploidProbs(int ref_allele);
     DiploidProbs DiploidSequencing(ReadData const &data);
@@ -64,5 +68,8 @@ private:
 
 
     void CalculateAncestorPrior();
+
+    DiploidProbsIndex10 ConvertDiploid16ToDiploid10(DiploidProbs probs, int reference);
+
 };
 #endif //_ACCUMULATE_SEQUENCING_FACTORY_H_

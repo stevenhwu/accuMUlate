@@ -50,7 +50,7 @@ endif()
 add_executable(accuMUlate main.cc ${SOURCE_FILES})
 target_link_libraries(accuMUlate ${LIBS} )
 
-add_executable(EMTest EMTest.cc ${SOURCE_FILES} sequencing_factory.h sequencing_factory.cc sequencing_factory.h sequencing_factory.h SiteGenotypeIndex.cpp SiteGenotypeIndex.h)
+add_executable(EMTest EMTest.cc ${SOURCE_FILES} sequencing_factory.h sequencing_factory.cc sequencing_factory.h sequencing_factory.h site_genotype_index.cpp site_genotype_index.h)
 target_link_libraries(EMTest ${LIBS} )
 target_link_libraries(EMTest profiler)
 

@@ -16,7 +16,13 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 
 set(CMAKE_CXX_FLAGS  "-std=c++11")
 set(CMAKE_CXX_FLAGS_RELEASE  "-std=c++11 -O3")
-set(CMAKE_CXX_FLAGS_RelWithDebInfo "-std=c++11 -O3 -Wall -D")
+
+
+set(CMAKE_CXX_FLAGS_RelWithDebInfo "-std=c++11 -O3 -Wall -Wall -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS_RelWithDebInfo "${CMAKE_CXX_FLAGS_DEBUG} -Wno-deprecated-declarations -Wno-deprecated" )
+
+
+
 set(CMAKE_CXX_FLAGS_DEBUG  "-std=c++11 -g  -O0 -Wvla -Wall  -Wextra -pedantic ")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} "-std=c++11 -g -Wvla -Wall  -Wextra -pedantic -Wno-unused-private-field -Wno-unused-variable")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wextra -Waggregate-return -Wcast-align") #-pedantic-errors
@@ -40,19 +46,39 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wunused-function  -Wunused
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wunused-value  -Wunused-variable  -Wvariadic-macros ")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wvolatile-register-var  -Wwrite-strings ")
 
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Weverything")
-##turn off some!
+
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wextra-semi ")
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wconversion -Wsign-conversion ")
+
+##Everything
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic") #forget about c++98
+
+##turn off some for now, should add back to final code
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-deprecated-declarations -Wno-deprecated" )
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-unused-private-field -Wno-unused-variable -Wno-unused-private-field")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-unreachable-code") #for debug
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-conversion -Wno-padded -Wno-missing-noreturn") #Way too many from Eigen/Boost
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wshadow")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-unused-parameter -Wno-unused-function")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-unreachable-code")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-conversion -Wno-sign-conversion -Wno-missing-noreturn") #Way too many from Eigen/Boost
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-float-equal -Wno-sign-compare")
 
 
-#set(CMAKE_CXX_FLAGS_DEBUG  "-std=c++11 -g -Wvla -Wall  -Wextra ")
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  \"
+#"-Wno-deprecated-declarations -Wno-deprecated "\
+#-Wno-float-equal -Wno-sign-compare")
+#-Wno-unused-private-field -Wno-unused-variable -Wno-unused-private-field \
+#-Wno-unused-parameter -Wno-unused-function \
+#-Wno-unreachable-code \
+#-Wno-conversion -Wno-sign-conversion -Wno-missing-noreturn \
+
+##
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-shadow")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-padded")
+
+##
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-global-constructors -Wno-exit-time-destructors")
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  -Wno-weak-vtables -Wno-missing-prototypes")
 
 
-
-#set(CMAKE_CXX_FLAGS  "-std=c++11 -g -Wvla -Weverything -Wno-unused-private-field -Wno-unused-variable -Wno-documentation -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-deprecated -Wno-sign-conversion")
 
 ########## BUILD TYPE ##########
 SET( CMAKE_CXX_FLAGS_MAINTAINER "-Wall -Wabi" CACHE STRING
@@ -97,14 +123,16 @@ ENDIF(ZLIB_FOUND)
 
 
 set(LIBS ${LIBS} ${Boost_LIBRARIES} ${Bamtools_LIBRARIES}) #  ${GSL_LIBRARIES}
-set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src ${Boost_INCLUDE_DIR} ${Bamtools_INCLUDE_DIR}  ${EIGEN3_INCLUDE_DIR})
+set(INCLUDE_DIR ${INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${Bamtools_INCLUDE_DIR}  ${EIGEN3_INCLUDE_DIR})
 
-include_directories("/usr/include/")
-include_directories("/usr/include/google")
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
+include_directories(SYSTEM ${INCLUDE_DIR})
+
+include_directories(SYSTEM "/usr/include/")
+include_directories(SYSTEM "/usr/include/google")
 #include_directories("/usr/include/sparsehash")
-
-include_directories("${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
-include_directories(${INCLUDE_DIR})
+include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
 
 
 message("==================== BUILD TYPE ${CMAKE_BUILD_TYPE} ====================")

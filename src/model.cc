@@ -8,12 +8,10 @@
 #include <fstream>
 #include <memory>
 #include <random>
-#include <distributions/DirichletMultinomialDistribution.h>
+#include "distributions/DirichletMultinomialDistribution.h"
 #include "Eigen/Dense"
 
 #include "model.h"
-
-
 
 
 void SimulateGenomeData(GenomeData &genome_data, int descendant_count, size_t fake_sample_count, double fake_prop) {
@@ -170,6 +168,7 @@ MutationMatrix MutationAccumulation(const ModelParams &params, bool and_mut) {
 }
 
 
+
 DiploidProbs DiploidSequencing(const ModelParams &params, int ref_allele, ReadData data) {
 	DiploidProbs result;
 	double alphas_total = (1.0-params.phi_diploid)/params.phi_diploid;
@@ -199,20 +198,20 @@ DiploidProbs DiploidSequencing(const ModelParams &params, int ref_allele, ReadDa
 }
 
 HaploidProbs HaploidSequencing(const ModelParams &params, int ref_allele, ReadData data) {
-	HaploidProbs result;
-	double alphas_total = (1.0-params.phi_haploid)/params.phi_haploid;
-	for(int i : {0,1,2,3}) {
-		double alphas[4];
-		for(int k : {0,1,2,3}) {
-			if(k == i)
-				alphas[k] = (1.0-params.error_prob)*alphas_total;
-			else
-				alphas[k] = params.error_prob/3.0*alphas_total;
-		}
-		result[i] = DirichletMultinomialLogProbability(alphas, data);
-	}
-	double scale = result.maxCoeff();
-	return (result - scale).exp();
+    HaploidProbs result;
+    double alphas_total = (1.0-params.phi_haploid)/params.phi_haploid;
+    for(int i : {0,1,2,3}) {
+        double alphas[4];
+        for(int k : {0,1,2,3}) {
+            if(k == i)
+                alphas[k] = (1.0-params.error_prob)*alphas_total;
+            else
+                alphas[k] = params.error_prob/3.0*alphas_total;
+        }
+        result[i] = DirichletMultinomialLogProbability(alphas, data);
+    }
+    double scale = result.maxCoeff();
+    return (result - scale).exp();
 }
 
 double TetMAProbability(const ModelParams &params, const ModelInput site_data) {
@@ -220,7 +219,7 @@ double TetMAProbability(const ModelParams &params, const ModelInput site_data) {
 	MutationMatrix mt = MutationAccumulation(params, true);
 
 
-	MutationMatrix mn = m-mt;	
+	MutationMatrix mn = m-mt;
 	DiploidProbs pop_genotypes = DiploidPopulation(params, site_data.reference);
 
 	auto it = site_data.all_reads.begin();
@@ -233,9 +232,9 @@ double TetMAProbability(const ModelParams &params, const ModelInput site_data) {
 		anc_genotypes *= (m.matrix()*p.matrix()).array();
 		num_genotypes *= (mn.matrix()*p.matrix()).array();
 	}
-	
+
     //cerr << "\n" << ancestor_genotypes/ancestor_genotypes.sum() << endl;
-	
+
 	return 1.0 - num_genotypes.sum()/anc_genotypes.sum();
 }
 void printMatrix(DiploidProbs d){

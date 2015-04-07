@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 #include <stddef.h>
-#include <Eigen/Dense>
+//#include <Eigen/Dense>
 #include "em_model.h"
 #include "em_data.h"
 

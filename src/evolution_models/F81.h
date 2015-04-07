@@ -3,7 +3,7 @@
 #define __F81_H_
 
 
-#include <model.h>
+#include "model.h"
 #include "mutation_prob.h"
 #include "EvolutionModel.h"
 

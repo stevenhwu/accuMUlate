@@ -28,7 +28,7 @@ public:
 
     SiteProb site;
 
-    EmDataMutationV1() {};
+    EmDataMutationV1() {}
     EmDataMutationV1(SequenceProb &sequence_prob, EvolutionModel &evo_model);
     virtual  ~EmDataMutationV1();
 

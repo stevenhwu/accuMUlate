@@ -98,7 +98,7 @@ DirichletMultinomialDistribution::~DirichletMultinomialDistribution() {
 //    for (i in 1:J) X[i, ] <- rmultinom(1, n[i], P[i, ])
 //    list(theta = theta, pi = pi, data = X)
 //}
-//<environment: namespace:dirmult>
+
 //>
 //
 //	*/
