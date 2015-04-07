@@ -17,8 +17,8 @@
 
 const double EM_CONVERGE_THRESHOLD = 1e-11;
 const double EM_CONVERGE_RATIO_THRESHOLD = 1e-11;
-const int EM_MAX_ITE = 1000;
-int VERBOSE_ITE = 10;
+const int EM_MAX_ITE = 1e6;
+int VERBOSE_ITE = 100;
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
     std::cout << "Old Construct: " << num_category << "\t One data, one model" << std::endl;
@@ -134,20 +134,27 @@ void EmAlgorithm::ExpectationStepModelPtr() {
         all_em_stats[r]->Reset();
         em_model_ptr->at(r)->UpdateParameter(parameters[r]); //exp_beta
     }
-
+    double likelihood = 0;
     for (size_t s = 0; s < site_count; ++s) {
         double sum_prob = 0;
         for (size_t r = 0; r < num_category; ++r) {
 
             (*em_model_ptr)[r]->UpdateSummaryStat(s, sum_prob, temp_stats[r]);
             all_probs(r, s) = proportion[r] * sum_prob;
+//            likelihood += log(all_probs(r, s));
         }
+        likelihood += log(all_probs(0, s)+all_probs(1, s));
         double sum = all_probs.col(s).sum();
         for (size_t r = 0; r < num_category; ++r) {
             double prob = all_probs(r,s) / sum;
             all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
         }
     }
+//    std::cout << "==Ln: " << likelihood << std::endl;
+
+
+//    printf("Ln: %.40f\n", likelihood);
+
 }
 
 void EmAlgorithm::MaximizationStep() {
@@ -223,10 +230,10 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
         std::cout <<"============ DONE. IN DEBUG mode, fix at " << EM_MAX_ITE << " ites ======= " << sum_diff << " Total ite:" << ite << "\n";
         return false;
     }
-    if (sum_diff < EM_CONVERGE_THRESHOLD) {
-        std::cout <<"============ DONE (diff ~~ 0) ======= Diff:" << sum_diff << "\tRatio:" << sum_ratio  <<" Total ite:" << ite << "\n";
-        return false;
-    }
+//    if (sum_diff < EM_CONVERGE_THRESHOLD) {
+//        std::cout <<"============ DONE (diff ~~ 0) ======= Diff:" << sum_diff << "\tRatio:" << sum_ratio  <<" Total ite:" << ite << "\n";
+//        return false;
+//    }
     if( sum_ratio < EM_CONVERGE_RATIO_THRESHOLD){
         std::cout <<"============ DONE (ratio < THRESHOLD) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
         return false;

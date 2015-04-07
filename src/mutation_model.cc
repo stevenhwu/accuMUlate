@@ -37,12 +37,22 @@ int MutationModel::GetSiteCount() const {
     std::vector<DiploidProbsIndex10> MutationModel::convert_index_key_to_diploid_10;
 //    std::array<DiploidProbs, 4> MutationModel::ref_diploid_probs;
     std::vector<SiteGenotypesIndex>  MutationModel::all_sequence_prob_index;
+    std::vector<HaploidProbs> MutationModel::convert_index_key_to_haploid_unnormalised;
+    std::vector<DiploidProbsIndex10> MutationModel::convert_index_key_to_diploid_10_unnormalised;
+
 
 void MutationModel::AddGenotypeFactory(SequencingFactory &factory) {
 
     MutationModel::convert_index_key_to_haploid = factory.GetConvertIndexKeyToHaploid();
 //    MutationModel::convert_index_key_to_diploid = factory.GetConvertIndexKeyToDiploid();
     MutationModel::convert_index_key_to_diploid_10 = factory.GetConvertIndexKeyToDiploidIndex10();
+
+    MutationModel::convert_index_key_to_haploid_unnormalised = factory.GetConvertIndexKeyToHaploidUnnormalised();
+    MutationModel::convert_index_key_to_diploid_10_unnormalised = factory.GetConvertIndexKeyToDiploidIndex10Unnormalised();
+
+//    MutationModel::convert_index_key_to_haploid = factory.GetConvertIndexKeyToHaploidUnnormalised();
+//    MutationModel::convert_index_key_to_diploid_10 = factory.GetConvertIndexKeyToDiploidIndex10Unnormalised();
+
 //    MutationModel::ref_diploid_probs = factory.GetRefDiploidProbs();
 //    all_ancestor_genotype_prior.reserve(convert_index_key_to_diploid.size());
 //    for (size_t i = 0; i < convert_index_key_to_diploid.size(); ++i) {

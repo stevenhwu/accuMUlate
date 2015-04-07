@@ -101,8 +101,6 @@ void RunEmWithRealData(boost::program_options::variables_map variable_map, Model
     clock_t t_start, t_end;
 
 
-    int trial_time = 1;
-    for (int k = 0; k < trial_time; ++k) {
 
 
         t_start = clock();
@@ -119,27 +117,26 @@ void RunEmWithRealData(boost::program_options::variables_map variable_map, Model
 
 
 //    exit(2);
-//        t_start = clock();
-//        std::vector<SequenceProb> sp;
-//        SequenceProb::CreateSequenceProbV1(sp, genome_data, params);
-//        std::vector<std::unique_ptr<EmData>> em_site_data;
-//        for (auto &seq_prob: sp) {
-//            em_site_data.emplace_back(new EmDataMutationV1(seq_prob, evo_model0));
-//        }
-//        EmModelMutationV1 em_model0(evo_model0);
-//        t_end = clock();
-//        cout << "Time old preprocess Data: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
-//
-//        t_start = clock();
-//        EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
-//        em_alg2.Run();
-//        t_end = clock();
-//        cout << "Time old: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
-//
-//        em_alg2.PrintSummary();
-//        em_alg0.PrintSummary();
+        t_start = clock();
+        std::vector<SequenceProb> sp;
+        SequenceProb::CreateSequenceProbV1(sp, genome_data, params);
+        std::vector<std::unique_ptr<EmData>> em_site_data;
+        for (auto &seq_prob: sp) {
+            em_site_data.emplace_back(new EmDataMutationV1(seq_prob, evo_model0));
+        }
+        EmModelMutationV1 em_model0(evo_model0);
+        t_end = clock();
+        cout << "Time old preprocess Data: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
 
-    }
+        t_start = clock();
+        EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
+        em_alg2.Run();
+        t_end = clock();
+        cout << "Time old: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
+
+        em_alg2.PrintSummary();
+        em_alg0.PrintSummary();
+
 
 
 }

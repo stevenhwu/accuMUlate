@@ -19,7 +19,7 @@ set(CMAKE_CXX_FLAGS_RELEASE  "-std=c++11 -O3")
 
 
 set(CMAKE_CXX_FLAGS_RelWithDebInfo "-std=c++11 -O3 -Wall -Wall -Wextra -pedantic")
-set(CMAKE_CXX_FLAGS_RelWithDebInfo "${CMAKE_CXX_FLAGS_DEBUG} -Wno-deprecated-declarations -Wno-deprecated" )
+set(CMAKE_CXX_FLAGS_RelWithDebInfo "${CMAKE_CXX_FLAGS_RelWithDebInfo} -Wno-deprecated-declarations -Wno-deprecated" )
 
 
 

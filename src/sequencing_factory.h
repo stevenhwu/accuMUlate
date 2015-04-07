@@ -22,14 +22,16 @@ public:
     std::vector<HaploidProbs> &GetConvertIndexKeyToHaploid();
     std::vector<DiploidProbsIndex10> &GetConvertIndexKeyToDiploidIndex10();
 
+    std::vector<HaploidProbs> &GetConvertIndexKeyToHaploidUnnormalised();
+    std::vector<DiploidProbsIndex10> &GetConvertIndexKeyToDiploidIndex10Unnormalised();
 
 //    void CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp, GenomeData &data);
 
 //    void CreateSequenceProbV1(std::vector<SequenceProb> &sp, GenomeData &data);
 
 
-    std::vector<DiploidProbs> &GetConvertIndexKeyToDiploid();
-    std::array<DiploidProbs, 4> &GetRefDiploidProbs();
+//    std::vector<DiploidProbs> &GetConvertIndexKeyToDiploid();
+//    std::array<DiploidProbs, 4> &GetRefDiploidProbs();
 
 
 private:
@@ -52,8 +54,10 @@ private:
     std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
 
     std::vector<HaploidProbs> convert_index_key_to_haploid;
-//    std::vector<DiploidProbs> convert_index_key_to_diploid;
     std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10;
+
+    std::vector<HaploidProbs> convert_index_key_to_haploid_unnormalised;
+    std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10_unnormalised;
 
 //
 //    void CalculateDescendantGenotypes(SiteGenotypes &seq_prob);
