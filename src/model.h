@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 #include <vector>
-
+#include <iostream>
 #include "Eigen/Dense"
 union ReadData{
     uint64_t key;
@@ -71,4 +71,14 @@ double TetMAProbOneMutation(const ModelParams &params, const ModelInput site_dat
 double TetMAProbability(const ModelParams &params, const ModelInput site_data);
 
 void SimulateGenomeData(GenomeData &genome_data, int descendant_count, size_t fake_sample_count, double fake_prop = 0);
+
+
+int parseLine(char* line);
+
+void printMemoryUsage(char const *string1 = "");
+int getMemoryUsageVmSize();
+
+int getMemoryUsageVmRSS();
+
+
 #endif

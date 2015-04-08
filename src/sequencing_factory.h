@@ -19,11 +19,11 @@ public:
 
     void CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sp, GenomeData &data);
 
-    std::vector<HaploidProbs> &GetConvertIndexKeyToHaploid();
-    std::vector<DiploidProbsIndex10> &GetConvertIndexKeyToDiploidIndex10();
+    const std::vector<HaploidProbs> GetConvertIndexKeyToHaploid();
+    const std::vector<DiploidProbsIndex10> GetConvertIndexKeyToDiploidIndex10();
 
-    std::vector<HaploidProbs> &GetConvertIndexKeyToHaploidUnnormalised();
-    std::vector<DiploidProbsIndex10> &GetConvertIndexKeyToDiploidIndex10Unnormalised();
+    const std::vector<HaploidProbs> GetConvertIndexKeyToHaploidUnnormalised();
+    const std::vector<DiploidProbsIndex10> GetConvertIndexKeyToDiploidIndex10Unnormalised();
 
 //    void CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp, GenomeData &data);
 
@@ -49,8 +49,8 @@ private:
 
     std::array<DiploidProbs, 4> ref_diploid_probs;
 
-    std::unordered_map<uint64_t, uint> map_rd_to_index;
-    std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
+//    std::unordered_map<uint64_t, uint> map_rd_to_index;
+//    std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
 
     std::vector<HaploidProbs> convert_index_key_to_haploid;
     std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10;

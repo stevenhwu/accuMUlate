@@ -21,32 +21,6 @@
 #include "string.h"
 
 
-int parseLine(char* line){
-    int i = strlen(line);
-    while (*line < '0' || *line > '9') line++;
-    line[i-3] = '\0';
-    i = atoi(line);
-    return i;
-}
-int getMemoryUsage(){ //Note: this value is in KB!
-    FILE* file = fopen("/proc/self/status", "r");
-    int result = -1;
-    char line[128];
-
-
-    while (fgets(line, 128, file) != NULL){
-//        if (strncmp(line, "VmSize:", 7) == 0){
-        if (strncmp(line, "VmRSS:", 6) == 0){
-            result = parseLine(line);
-            break;
-        }
-    }
-    fclose(file);
-    return result;
-}
-void printMemoryUsage(char const *string1 = "") {
-    std::cout << "Memory: " << string1 << " " << (getMemoryUsage()/1000.0) << std::endl;
-}
 using namespace std;
 using namespace BamTools;
 
@@ -96,7 +70,7 @@ void RunEmWithRealData(boost::program_options::variables_map variable_map, Model
     em_model2.emplace_back(new EmModelMutation(mutation_model));
     em_model2.emplace_back(new EmModelMutation(mutation_model));
     printMemoryUsage("Double object?");
-
+    std::exit(10);
     cout << "\n========================\nStart em_algorithm:" << endl;
     clock_t t_start, t_end;
 
@@ -163,9 +137,11 @@ void CreateMutationModel(MutationModel &mutation_model, GenomeData &base_counts,
 //    MutationModel mutation_model = MutationModel(evo_model0);
 
     MutationModel::AddGenotypeFactory(sequencing_factory);
-    printMemoryUsage("add genotype");
-    mutation_model.AddSequenceProb(sgi);
-    printMemoryUsage("add seq");
+    printMemoryUsage("add genotypes");
+std::cout << sgi.size() << std::endl;
+    mutation_model.MoveSequenceProb(sgi);
+    printMemoryUsage("add seq probs");
+    std::cout << sgi.size() << std::endl;
 }
 
 

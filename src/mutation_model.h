@@ -10,6 +10,8 @@
 #ifndef MUTATION_MODEL_H_
 #define MUTATION_MODEL_H_
 
+//#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+//#pragma GCC diagnostic ignored "-Wdeprecated"
 
 #include <vector>
 #include <iostream>
@@ -46,7 +48,8 @@ public:
 
 //    void CacheLoopDesAll(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
 
-    void AddSequenceProb(std::vector<SiteGenotypesIndex> &all);
+    void MoveSequenceProb(std::vector<SiteGenotypesIndex> &all);
+//    void MoveSequenceProb(std::vector<SiteGenotypesIndex> all);
 
     void InitCache();
 
@@ -76,15 +79,17 @@ private:
 
     Array4D frequency_prior;
     Array10D ancestor_prior;
+    static std::vector<SiteGenotypesIndex> a;
+    static std::vector<SiteGenotypesIndex> all_sequence_prob_index;
 
     static std::vector<HaploidProbs> convert_index_key_to_haploid;
-    static std::vector<DiploidProbs> convert_index_key_to_diploid;
     static std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10;
-//    static std::array<DiploidProbs, 4> ref_diploid_probs;
-    static std::vector<SiteGenotypesIndex>  all_sequence_prob_index;
 
-//    static std::vector<HaploidProbs> convert_index_key_to_haploid_unnormalised;
-//    static std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10_unnormalised;
+    static std::vector<HaploidProbs> convert_index_key_to_haploid_unnormalised;
+    static std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10_unnormalised;
+
+//    static std::vector<DiploidProbs> convert_index_key_to_diploid;
+//    static std::array<DiploidProbs, 4> ref_diploid_probs;
 
 
 

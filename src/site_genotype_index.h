@@ -26,13 +26,45 @@
 
 class SiteGenotypesIndex {
 public:
+//    SiteGenotypesIndex (SiteGenotypesIndex&& other) = default;
+    SiteGenotypesIndex (SiteGenotypesIndex&& other) :ancestor_index(other.ancestor_index) {
+//        std::cout << "move constructor" << std::endl;
+        other.ancestor_index = 0;
+        descendant_index = std::move(other.descendant_index);
 
+    }
+    SiteGenotypesIndex& operator= (SiteGenotypesIndex&& other) {
+//        std::cout << "move assignment" << std::endl;
+        ancestor_index = other.ancestor_index;
+        other.ancestor_index = 0;
+        descendant_index = std::move(other.descendant_index);
+//        other.descendant_index.clear();
+
+    }
+
+//    SiteGenotypesIndex (const SiteGenotypesIndex& other) : ancestor_index(other.ancestor_index){
+//        std::cout << "copy constructor" << std::endl;
+//    };
+//    SiteGenotypesIndex& operator= (const SiteGenotypesIndex& other) {
+//
+//        std::cout << "copy assignment" << std::endl;
+//        ancestor_index = other.ancestor_index;
+//    }
+    SiteGenotypesIndex (const SiteGenotypesIndex& other) = default;
+    SiteGenotypesIndex& operator= (const SiteGenotypesIndex& other)= default;
+//    SiteGenotypesIndex (const SiteGenotypesIndex& other) = delete;
+//    SiteGenotypesIndex& operator= (const SiteGenotypesIndex& other) = delete;
 
     SiteGenotypesIndex() {}
 
     explicit SiteGenotypesIndex(int descendant_count0);
 
-    ~SiteGenotypesIndex();
+    ~SiteGenotypesIndex() {}
+////        std::cout << "SiteGenotypeIndex destroctor" << std::endl;
+//        ancestor_index = 0;
+//        descendant_index.clear();
+//
+//    };
 
     void SetAncestorIndex(uint32_t index);
 

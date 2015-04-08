@@ -14,9 +14,21 @@
 
 
 int DEBUG = 0;
+//std::vector<SiteGenotypesIndex> MutationModel::a = std::vector<SiteGenotypesIndex>();
+std::vector<SiteGenotypesIndex> MutationModel::all_sequence_prob_index;
 
+std::vector<HaploidProbs> MutationModel::convert_index_key_to_haploid;
+std::vector<DiploidProbsIndex10> MutationModel::convert_index_key_to_diploid_10;
+
+
+std::vector<HaploidProbs> MutationModel::convert_index_key_to_haploid_unnormalised = std::vector<HaploidProbs> ();
+std::vector<DiploidProbsIndex10> MutationModel::convert_index_key_to_diploid_10_unnormalised;
+
+//    std::vector<DiploidProbs> MutationModel::convert_index_key_to_diploid;
+//    std::array<DiploidProbs, 4> MutationModel::ref_diploid_probs;
 
 MutationModel::MutationModel(EvolutionModel &evo_model0) {
+
 
     MutationProb mutation_prob = evo_model0.GetMutationProb();
     ancestor_prior = mutation_prob.GetAncestorPrior();
@@ -32,23 +44,16 @@ int MutationModel::GetSiteCount() const {
     return site_count;
 }
 
-    std::vector<HaploidProbs> MutationModel::convert_index_key_to_haploid;
-//    std::vector<DiploidProbs> MutationModel::convert_index_key_to_diploid;
-    std::vector<DiploidProbsIndex10> MutationModel::convert_index_key_to_diploid_10;
-//    std::array<DiploidProbs, 4> MutationModel::ref_diploid_probs;
-    std::vector<SiteGenotypesIndex>  MutationModel::all_sequence_prob_index;
-//    std::vector<HaploidProbs> MutationModel::convert_index_key_to_haploid_unnormalised;
-//    std::vector<DiploidProbsIndex10> MutationModel::convert_index_key_to_diploid_10_unnormalised;
-
-
 void MutationModel::AddGenotypeFactory(SequencingFactory &factory) {
 
     MutationModel::convert_index_key_to_haploid = factory.GetConvertIndexKeyToHaploid();
-//    MutationModel::convert_index_key_to_diploid = factory.GetConvertIndexKeyToDiploid();
+
     MutationModel::convert_index_key_to_diploid_10 = factory.GetConvertIndexKeyToDiploidIndex10();
 
-//    MutationModel::convert_index_key_to_haploid_unnormalised = factory.GetConvertIndexKeyToHaploidUnnormalised();
-//    MutationModel::convert_index_key_to_diploid_10_unnormalised = factory.GetConvertIndexKeyToDiploidIndex10Unnormalised();
+    MutationModel::convert_index_key_to_haploid_unnormalised = factory.GetConvertIndexKeyToHaploidUnnormalised();
+    MutationModel::convert_index_key_to_diploid_10_unnormalised = factory.GetConvertIndexKeyToDiploidIndex10Unnormalised();
+
+
 
 //    MutationModel::convert_index_key_to_haploid = factory.GetConvertIndexKeyToHaploidUnnormalised();
 //    MutationModel::convert_index_key_to_diploid_10 = factory.GetConvertIndexKeyToDiploidIndex10Unnormalised();
@@ -96,8 +101,9 @@ void MutationModel::AddGenotypeFactory(SequencingFactory &factory) {
 //
 //    InitCacheOld1();
 //}
-void MutationModel::AddSequenceProb(std::vector<SiteGenotypesIndex> &all) {
-    MutationModel::all_sequence_prob_index = all;
+void MutationModel::MoveSequenceProb(std::vector<SiteGenotypesIndex> &all) {
+//    std::vector<SiteGenotypesIndex> &local = all;
+    MutationModel::all_sequence_prob_index = std::move(all);
     site_count = all.size();
     descendant_count = MutationModel::all_sequence_prob_index[0].GetDescendantCount();
     std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;

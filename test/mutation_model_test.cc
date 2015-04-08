@@ -99,7 +99,7 @@ TEST_F(MutationModelTest, TestCalculateAncestorToDescendant) {
 
     sf.CreateSequenceProbsVector(sg, genome_data);
     MutationModel mm (evo_model);
-    mm.AddSequenceProb(sg);
+    mm.MoveSequenceProb(sg);
 
     double prob2;
     double diff2;
@@ -180,7 +180,7 @@ TEST_F(MutationModelTest, TestCalculateAncestorToDescendant3) {
 
     sf.CreateSequenceProbsVector(sg, genome_data);
     MutationModel mm (evo_model);
-    mm.AddSequenceProb(sg);
+    mm.MoveSequenceProb(sg);
 
     double mutation_model_prob;
     double mutation_model_stat_diff;
@@ -219,7 +219,7 @@ TEST_F(MutationModelTest, TestFullSimulatedGenome) {
     SequencingFactory sf (params_not_equal);
     sf.CreateSequenceProbsVector(sg, genome_data);
     MutationModel mm (evo_model);
-    mm.AddSequenceProb(sg);
+    mm.MoveSequenceProb(sg);
 
 
     double site_prob = 0;

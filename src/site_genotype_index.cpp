@@ -19,8 +19,8 @@
  */
 #include "site_genotypes.h"
 
-SiteGenotypesIndex::~SiteGenotypesIndex() {
-}
+//SiteGenotypesIndex::~SiteGenotypesIndex() {
+//}
 
 
 SiteGenotypesIndex::SiteGenotypesIndex(int descendant_count0) {
