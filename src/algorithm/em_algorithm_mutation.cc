@@ -34,6 +34,12 @@ void EmAlgorithmMutation::InitialiseParameters() {
     lower_bound = 1e-10;
     upper_bound = 0.9;
 
+    std::random_device rd;
+    std::mt19937 e2(rd());
+    std::uniform_int_distribution<uint16_t> uniform_dist(0, 5);
+    std::uniform_int_distribution<uint16_t> uniform3(0, 3);
+    uint16_t delta_reads = 20;
+
     if (num_category == 2) {
         parameters = {upper_bound, lower_bound};
     }
@@ -77,3 +83,4 @@ void EmAlgorithmMutation::ExpectationStepCustom(size_t data_index, size_t catego
     std::cout << "Error!! should NOT call ExpectationStepCustom here" << std::endl;
     exit(40);
 }
+

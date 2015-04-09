@@ -35,6 +35,10 @@ namespace BoostUtils {
     void ExtractInputVariables(boost::program_options::variables_map &vm, GenomeData &genome_data,
             BamTools::BamReader &experiment, BamTools::RefVector &references,
             BamTools::SamHeader &header, BamTools::Fasta &reference_genome);
+
+    ModelParams CreateModelParams(boost::program_options::variables_map variables_map);
+
+
 }
 
 #endif //BOOST_INPUT_UTILS_H_

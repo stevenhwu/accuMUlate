@@ -12,9 +12,12 @@
 #include <memory>
 #include <vector>
 #include <stddef.h>
+#include <iostream>
+#include <fstream>
 //#include <Eigen/Dense>
 #include "em_model.h"
 #include "em_data.h"
+#include "em_model_mutation.h"
 
 #ifndef EM_ALGORITHM_H_
 #define EM_ALGORITHM_H_
@@ -58,6 +61,8 @@ public:
     virtual std::vector<double> GetParameters();
 
     void PrintSummary();
+
+    void SetOutfilePrefix(const std::string &string);
 
 protected:
 
@@ -106,8 +111,8 @@ protected:
 
     bool EmStoppingCriteria(int ite);
 
-
-
+    std::ofstream outfile;
+    std::string outfile_prefix;
 };
 
 

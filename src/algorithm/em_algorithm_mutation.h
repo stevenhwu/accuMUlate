@@ -16,9 +16,6 @@
 
 #include "em_algorithm.h"
 
-#include "em_model_mutation.h"
-
-
 
 class EmAlgorithmMutation : public EmAlgorithm{
 
@@ -31,6 +28,7 @@ public:
 
     void Run();
 
+
 private:
 
 
@@ -40,8 +38,6 @@ protected:
     virtual void InitialiseSummaryStat();
 
     virtual void ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, std::vector<double> &temp_stat);
-
-
 
 
 };

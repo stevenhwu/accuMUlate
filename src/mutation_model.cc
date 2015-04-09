@@ -104,8 +104,9 @@ void MutationModel::AddGenotypeFactory(SequencingFactory &factory) {
 void MutationModel::MoveSequenceProb(std::vector<SiteGenotypesIndex> &all) {
 //    std::vector<SiteGenotypesIndex> &local = all;
     MutationModel::all_sequence_prob_index = std::move(all);
-    site_count = all.size();
+    site_count = all_sequence_prob_index.size();
     descendant_count = MutationModel::all_sequence_prob_index[0].GetDescendantCount();
+    std::cout << "site_count: " << "\t" << site_count << "\tDescendant_count: " << descendant_count  << std::endl;
     std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
 //    all_ancestor_genotype_prior.resize(all_sequence_prob_index.size());
 

@@ -48,13 +48,7 @@ public:
     static void CreateSequenceProbV1(std::vector<SequenceProb> &sp, GenomeData &genome_data, ModelParams model_params) {
         sp.reserve(genome_data.size());
         for (size_t i = 0; i < genome_data.size(); ++i) {
-//        std::cout << i << "\t" << std::endl;
-//        SequenceProbV1 ss = SequenceProbV1(genome_data[i], model_params);
-//        sp.emplace_back(ss); //copy
-//        sp.push_back(ss); //copy
-//        sp.emplace_back(SequenceProbV1(genome_data[i], model_params)); //move
             sp.emplace_back(genome_data[i], model_params);
-
         }
     }
 

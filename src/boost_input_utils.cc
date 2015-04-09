@@ -63,8 +63,9 @@ namespace BoostUtils {
                 ("phi-haploid", po::value<double>()->required(), "")
                 ("phi-diploid", po::value<double>()->required(), "")
                 ("output_binary_file,", po::value<string>()->default_value("default_binary_output.bin"),
-                        "Output the parsed BAM file to binary file");
-
+                        "Output the parsed BAM file to binary file")
+                ("outfile", po::value<string>()->required(), "outfile prefix")
+    ;
 
         po::store(po::parse_command_line(argc, argv, cmd), vm);
 
@@ -138,4 +139,17 @@ namespace BoostUtils {
     }
 
 
+    ModelParams CreateModelParams(boost::program_options::variables_map variables_map) {
+
+        ModelParams params = {
+                variables_map["theta"].as<double>(),
+                variables_map["nfreqs"].as<vector<double> >(),
+                variables_map["mu"].as<double>(),
+                variables_map["seq-error"].as<double>(),
+                variables_map["phi-haploid"].as<double>(),
+                variables_map["phi-diploid"].as<double>(),
+        };
+        return params;
+
+    }
 }

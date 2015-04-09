@@ -6,6 +6,7 @@
  */
 
 
+#include "em_algorithm_mutation.h"
 #include <iostream>
 #include "em_algorithm_mutation_v1.h"
 #include "em_algorithm_binomial.h"
@@ -21,6 +22,7 @@ const int EM_MAX_ITE = 1e6;
 int VERBOSE_ITE = 100;
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
+
     std::cout << "Old Construct: " << num_category << "\t One data, one model" << std::endl;
 }
 
@@ -257,3 +259,9 @@ void EmAlgorithm::PrintSummary(){
 }
 
 
+void EmAlgorithm::SetOutfilePrefix(const std::string & string) {
+    outfile_prefix = string;
+    outfile.open(outfile_prefix);
+    outfile << "aoeuaoeu\n";
+    outfile.close();
+}
