@@ -41,7 +41,7 @@ EmAlgorithmMutationV1::~EmAlgorithmMutationV1() {
 
 }
 
-void EmAlgorithmMutationV1::Run() {
+void EmAlgorithmMutationV1::RunEM() {
 //    em_stat_local_single->Print();
     size_t i = 0;
     bool isConverged = true;

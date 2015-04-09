@@ -95,8 +95,8 @@ TEST_F(SequenceFactorTest, TestInit){
     Array10D expected_ancestor_prior = mutation_prob.GetAncestorPrior();
 
 
-    std::vector<DiploidProbsIndex10> convertIndexToDiploidIndex10 = sequencing_factory.GetConvertIndexKeyToDiploidIndex10();
-    std::vector<HaploidProbs> convertIndexToHaploid = sequencing_factory.GetConvertIndexKeyToHaploid();
+    std::vector<DiploidProbsIndex10> convertIndexToDiploidIndex10 = sequencing_factory.RemoveConvertIndexKeyToDiploidIndex10();
+    std::vector<HaploidProbs> convertIndexToHaploid = sequencing_factory.RemoveConvertIndexKeyToHaploid();
     
     for (int i = 0; i < sp_expected.size(); ++i) {
 

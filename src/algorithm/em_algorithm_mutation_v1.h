@@ -33,7 +33,7 @@ public:
 
     virtual ~EmAlgorithmMutationV1();
 
-    void Run();
+    void RunEM();
 
     void Run2();
 

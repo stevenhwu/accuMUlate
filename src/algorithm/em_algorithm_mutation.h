@@ -26,7 +26,7 @@ public:
     EmAlgorithmMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr);
     virtual ~EmAlgorithmMutation();
 
-    void Run();
+    void RunEM();
 
 
 private:

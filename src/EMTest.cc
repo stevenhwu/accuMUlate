@@ -62,7 +62,7 @@ void RunEmWithRealDataOriginal(boost::program_options::variables_map variables_m
 
     t_start = clock();
     EmAlgorithmMutationV1 em_alg2(2, em_site_data, em_model0);
-    em_alg2.Run();
+    em_alg2.RunEM();
     t_end = clock();
     cout << "Time old: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl;
 
@@ -145,7 +145,7 @@ void RunEmWithRealDataOneStep(boost::program_options::variables_map variables_ma
     printMemoryUsage("EM");
 //        exit(2);
 
-    em_alg0.Run();
+    em_alg0.RunEM();
     em_alg0.PrintSummary();
     t_end = clock();
     cout << "Time new: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl << endl;
@@ -213,6 +213,8 @@ void RunEmWithRealData(boost::program_options::variables_map variables_map) {
     printMemoryUsage("EM");
     em_alg0.Run();
     em_alg0.PrintSummary();
+    std::string summary = em_alg0.GetEMSummary();
+    std::cout << summary;
 
     t_end = clock();
     cout << "Time new: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl << endl;

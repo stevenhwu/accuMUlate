@@ -46,17 +46,17 @@ int MutationModel::GetSiteCount() const {
 
 void MutationModel::AddGenotypeFactory(SequencingFactory &factory) {
 
-    MutationModel::convert_index_key_to_haploid = factory.GetConvertIndexKeyToHaploid();
+    MutationModel::convert_index_key_to_haploid = factory.RemoveConvertIndexKeyToHaploid();
 
-    MutationModel::convert_index_key_to_diploid_10 = factory.GetConvertIndexKeyToDiploidIndex10();
+    MutationModel::convert_index_key_to_diploid_10 = factory.RemoveConvertIndexKeyToDiploidIndex10();
 
-    MutationModel::convert_index_key_to_haploid_unnormalised = factory.GetConvertIndexKeyToHaploidUnnormalised();
-    MutationModel::convert_index_key_to_diploid_10_unnormalised = factory.GetConvertIndexKeyToDiploidIndex10Unnormalised();
+    MutationModel::convert_index_key_to_haploid_unnormalised = factory.RemoveConvertIndexKeyToHaploidUnnormalised();
+    MutationModel::convert_index_key_to_diploid_10_unnormalised = factory.RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
 
 
-
-//    MutationModel::convert_index_key_to_haploid = factory.GetConvertIndexKeyToHaploidUnnormalised();
-//    MutationModel::convert_index_key_to_diploid_10 = factory.GetConvertIndexKeyToDiploidIndex10Unnormalised();
+//
+//    MutationModel::convert_index_key_to_haploid = factory.RemoveConvertIndexKeyToHaploidUnnormalised();
+//    MutationModel::convert_index_key_to_diploid_10 = factory.RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
 
 //    MutationModel::ref_diploid_probs = factory.GetRefDiploidProbs();
 //    all_ancestor_genotype_prior.reserve(convert_index_key_to_diploid.size());
@@ -384,26 +384,22 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
     double summary_stat_diff_ancestor = 0;
     double prod_prob_ancestor = 1;
 
-    const auto &descendant_genotypes = all_sequence_prob_index[site_index].GetDescendantIndex();
-
+    const auto &descendant_genotypes_index = all_sequence_prob_index[site_index].GetDescendantIndex();
     uint32_t anc_genotype_index = all_sequence_prob_index[site_index].GetAncestorIndex();
+
 //    auto &cache =  convert_index_key_to_diploid[anc_genotype_index];
     auto &ancestor_genotype_10 =  convert_index_key_to_diploid_10[anc_genotype_index];
 
     for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
-        int index16 = LookupTable::index_converter_10_to_16[index10];
+//        int index16 = LookupTable::index_converter_10_to_16[index10];
 
-        CacheLoopDesAll2(index10, descendant_genotypes, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
+        CacheLoopDesAll2(index10, descendant_genotypes_index, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
 
 //        NoCacheCalculateDes(site_index, index10, prod_prob_ancestor, t, summary_stat_diff_ancestor);
 //        CacheLoopDesAll(site_index, index10, prod_prob_ancestor, summary_stat_diff_ancestor);
 //        CacheLoopDesAll3(index10, aa, prod_prob_ancestor, summary_stat_diff_ancestor);
 
-
-        double prob_reads_given_a = 0;
-//        if(all_ancestor_genotype_prior.size()==0) {
-//            prob_reads_given_a = cache[index16] * ancestor_prior[index10] * prod_prob_ancestor;
-        prob_reads_given_a = ancestor_genotype_10[index10] * prod_prob_ancestor;
+        double prob_reads_given_a = ancestor_genotype_10[index10] * prod_prob_ancestor;
 
         prob_reads += prob_reads_given_a;
 
@@ -417,6 +413,18 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
     }
     all_stats_diff /= prob_reads;
     all_stats_diff /= descendant_count;//TODO: need this to auto calculate stat_same. sum to 1
+
+
+
+    for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+        CacheLoopDesAll2(index10, descendant_genotypes_index, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
+        double prob_reads_given_a = ancestor_genotype_10[index10] * prod_prob_ancestor;
+
+    }
+
+
+
+
 
 #ifdef DEBUG5
     	double stat_same = 0;

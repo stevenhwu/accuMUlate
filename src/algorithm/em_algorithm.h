@@ -18,6 +18,7 @@
 #include "em_model.h"
 #include "em_data.h"
 #include "em_model_mutation.h"
+#include "em_logger.h"
 
 #ifndef EM_ALGORITHM_H_
 #define EM_ALGORITHM_H_
@@ -53,8 +54,9 @@ public:
     virtual ~EmAlgorithm() {
     }
 
+    void Run();
 
-    virtual void Run() = 0;
+    virtual void RunEM() = 0;
 
     virtual std::vector<double> GetProportion();
 
@@ -62,7 +64,9 @@ public:
 
     void PrintSummary();
 
-    void SetOutfilePrefix(const std::string &string);
+    void SetOutfilePrefix(const std::string &infile);
+
+    std::string GetEMSummary();
 
 protected:
 
@@ -71,12 +75,16 @@ protected:
     size_t site_count;
     size_t max_ite_count;
 
+    double sum_ratio;
+    double log_likelihood;
+
+    EmLogger em_logger;
+
     std::vector<std::unique_ptr<EmData>> *em_data_ptr;
     std::vector<std::unique_ptr<EmModel>> *em_model_ptr;
 
     std::vector<std::unique_ptr<EmModel>> em_model;
     std::vector<std::unique_ptr<EmSummaryStat>> all_em_stats;
-
 
     EmModel *em_model0;//Should be able to remove as well. try to finialse V1 setup
 
@@ -91,6 +99,8 @@ protected:
     void InitWithData();
 
     void InitWithModel();
+
+    void UpdateEmParameters();
 
     void ExpectationStepModel();
 
@@ -111,8 +121,8 @@ protected:
 
     bool EmStoppingCriteria(int ite);
 
-    std::ofstream outfile;
-    std::string outfile_prefix;
+
+    void LogEmSummary(int ite);
 };
 
 

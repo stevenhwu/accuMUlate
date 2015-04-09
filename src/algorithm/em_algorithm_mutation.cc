@@ -13,35 +13,42 @@ EmAlgorithmMutation::~EmAlgorithmMutation() {
 
 }
 
-void EmAlgorithmMutation::Run() {
+void EmAlgorithmMutation::RunEM() {
 
 //    em_stat_local_single->Print();
     size_t i = 0;
-    bool isConverged = true;
-    while(isConverged){
+    bool notConverged = true;
+    while(notConverged){
         ExpectationStepModelPtr();
         MaximizationStep();
-        isConverged = EmStoppingCriteria(i);
+        notConverged = EmStoppingCriteria(i);
         i++;
     }
+
 }
 
 
 void EmAlgorithmMutation::InitialiseParameters() {
-    double lower_bound = 1e-1;
-    double upper_bound = 0.5;
+    double lower_bound = 1e-10;
+    double upper_bound = 0.9;
 
     lower_bound = 1e-10;
     upper_bound = 0.9;
 
     std::random_device rd;
-    std::mt19937 e2(rd());
-    std::uniform_int_distribution<uint16_t> uniform_dist(0, 5);
-    std::uniform_int_distribution<uint16_t> uniform3(0, 3);
-    uint16_t delta_reads = 20;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> rand_real(1,9);
+    std::uniform_int_distribution<> lower(6, 10);
+    std::uniform_int_distribution<> upper(1, 4);
+    lower_bound = rand_real(gen)*pow(10, -lower(gen));
+    upper_bound = rand_real(gen)*pow(10, -upper(gen));
+
+    lower_bound = 1e-10;
+    upper_bound = 0.9;
 
     if (num_category == 2) {
         parameters = {upper_bound, lower_bound};
+        cache_parameters = {upper_bound, lower_bound};
     }
     else {
         std::cout << "Not yet implemented for more than 2 categories" << std::endl;
@@ -55,24 +62,12 @@ void EmAlgorithmMutation::InitialiseParameters() {
 
 void EmAlgorithmMutation::InitialiseSummaryStat() {
 
-//    em_stat_local_single = std::unique_ptr<EmSummaryStat>(new EmSummaryStatMutation());
-//    em_stat_local_single->Print();
 
     temp_stats = std::vector<std::vector<double>>(num_category);
     for (size_t i = 0; i < num_category; ++i) {
         all_em_stats.emplace_back(new EmSummaryStatMutation());
-//        all_em_stats.emplace_back(new EmSummaryStatMutation());
         temp_stats[i] = std::vector<double>(all_em_stats[i]->GetStatCount());
     }
-
-//    std::cout << "temp_stat_size: " << temp_stats.size() << std::endl;
-//    for (int i = 0; i < temp_stats.size(); ++i) {
-//        std::cout << "temp_stat_size[i]: " << temp_stats[i].size() << std::endl;
-//        for (int j = 0; j < temp_stats[i].size(); ++j) {
-//            std::cout << temp_stats[i][j] << "\t";
-//        }
-//        std::cout << std::endl;
-//    }
 
 
 }

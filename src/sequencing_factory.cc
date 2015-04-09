@@ -185,25 +185,25 @@ HaploidProbs SequencingFactory::HaploidSequencing(ReadData const &data) {
 
 //void SequencingFactory::CreateSequenceProb(SequenceProb &sp, ModelInput const &data, ModelParams const params){
 //
-//}std::vector<HaploidProbs> & SequencingFactory::GetConvertIndexKeyToHaploid(){
+//}std::vector<HaploidProbs> & SequencingFactory::RemoveConvertIndexKeyToHaploid(){
 //return <#initializer#>;
 //}
 
-const std::vector<HaploidProbs> SequencingFactory::GetConvertIndexKeyToHaploid() {
+const std::vector<HaploidProbs> SequencingFactory::RemoveConvertIndexKeyToHaploid() {
     return std::move(convert_index_key_to_haploid);
 }
 
-const std::vector<DiploidProbsIndex10> SequencingFactory::GetConvertIndexKeyToDiploidIndex10() {
+const std::vector<DiploidProbsIndex10> SequencingFactory::RemoveConvertIndexKeyToDiploidIndex10() {
     return std::move(convert_index_key_to_diploid_10);
 }
 
 
-const std::vector<HaploidProbs> SequencingFactory::GetConvertIndexKeyToHaploidUnnormalised() {
+const std::vector<HaploidProbs> SequencingFactory::RemoveConvertIndexKeyToHaploidUnnormalised() {
 
     return std::move(convert_index_key_to_haploid_unnormalised);
 }
 
-const std::vector<DiploidProbsIndex10> SequencingFactory::GetConvertIndexKeyToDiploidIndex10Unnormalised() {
+const std::vector<DiploidProbsIndex10> SequencingFactory::RemoveConvertIndexKeyToDiploidIndex10Unnormalised() {
 
     return std::move(convert_index_key_to_diploid_10_unnormalised);
 }

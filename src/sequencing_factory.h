@@ -21,11 +21,11 @@ public:
     void CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sgi, ModelInput &data);
     std::vector<SiteGenotypesIndex> CreateSequenceProbsVector(GenomeData &data);
 
-    const std::vector<HaploidProbs> GetConvertIndexKeyToHaploid();
-    const std::vector<DiploidProbsIndex10> GetConvertIndexKeyToDiploidIndex10();
+    const std::vector<HaploidProbs> RemoveConvertIndexKeyToHaploid();
+    const std::vector<DiploidProbsIndex10> RemoveConvertIndexKeyToDiploidIndex10();
 
-    const std::vector<HaploidProbs> GetConvertIndexKeyToHaploidUnnormalised();
-    const std::vector<DiploidProbsIndex10> GetConvertIndexKeyToDiploidIndex10Unnormalised();
+    const std::vector<HaploidProbs> RemoveConvertIndexKeyToHaploidUnnormalised();
+    const std::vector<DiploidProbsIndex10> RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
 
 //    void CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp, GenomeData &data);
 

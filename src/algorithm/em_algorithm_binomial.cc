@@ -33,7 +33,7 @@ void EmAlgorithmBinomial::InitialiseSummaryStat() {
 
 }
 
-void EmAlgorithmBinomial::Run() {
+void EmAlgorithmBinomial::RunEM() {
 
     size_t i = 0;
     bool isConverged = true;
