@@ -108,6 +108,7 @@ public:
     void End();
 
 
+    ModelInput ReadOne();
 };
 
 

@@ -17,7 +17,8 @@ public:
 
     SequencingFactory(ModelParams const &model_params) ;
 
-    void CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sp, GenomeData &data);
+    void CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sgi, GenomeData &data);
+    void CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sgi, ModelInput &data);
     std::vector<SiteGenotypesIndex> CreateSequenceProbsVector(GenomeData &data);
 
     const std::vector<HaploidProbs> GetConvertIndexKeyToHaploid();
@@ -47,6 +48,9 @@ private:
 
     double haploid_alphas[4][4];
 
+
+    uint index = 0;
+    uint index_ancestor = 0;
 
     std::array<DiploidProbs, 4> ref_diploid_probs;
 

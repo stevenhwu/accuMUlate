@@ -310,3 +310,20 @@ void GenomeDataStream::WriteModelInput(ModelInput &input) {
 //    std::cout << "\n";
 
 }
+
+ModelInput GenomeDataStream::ReadOne() {
+
+    uint16_t ref;
+    uint64_t key;
+    ReadReference(ref);
+    ModelInput model_input(read_data_count);
+    model_input.reference = ref;
+
+    for (size_t i = 0; i < read_data_count; ++i) {
+        ReadReadDataKey(key);
+        model_input.all_reads[i].key = key;
+//        model_input.all_reads.emplace_back(key);
+    }
+
+    return model_input;
+}
