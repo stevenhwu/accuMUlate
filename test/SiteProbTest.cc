@@ -26,6 +26,7 @@ protected:
         params_equal = {0.01, freq_equal, mu, 0.01, 0.01, 0.01};
         params_not_equal = {0.01, freq_not_equal, mu_4, 0.01, 0.01, 0.01};
 
+//        base_custom1(2);
         base_custom1.reference = 0;
         ReadData r;
         for (int j = 0; j < 4; ++j) {

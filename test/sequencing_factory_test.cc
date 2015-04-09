@@ -81,7 +81,7 @@ TEST_F(SequenceFactorTest, TestInit){
 //    sequencing_factory_v1.CreateSequenceProbV1(sp1, base_counts);
 //    cout << "Time init seq v1: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 //    cout <<  std::numeric_limits<double>::epsilon() << endl;
-    std::vector<SiteGenotypes> sp;
+    std::vector<SiteGenotypesIndex> sp;
     SequencingFactory sequencing_factory (params_not_equal);
     sequencing_factory.CreateSequenceProbsVector(sp, genome_data);
 //    cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
@@ -91,20 +91,33 @@ TEST_F(SequenceFactorTest, TestInit){
     for (auto data : genome_data) {
         sp_expected.emplace_back(data, params_not_equal);
     }
+    MutationProb mutation_prob (params_not_equal);
+    Array10D expected_ancestor_prior = mutation_prob.GetAncestorPrior();
 
+
+    std::vector<DiploidProbsIndex10> convertIndexToDiploidIndex10 = sequencing_factory.GetConvertIndexKeyToDiploidIndex10();
+    std::vector<HaploidProbs> convertIndexToHaploid = sequencing_factory.GetConvertIndexKeyToHaploid();
+    
     for (int i = 0; i < sp_expected.size(); ++i) {
 
         ModelInput &site_data = genome_data[i];
 
-        SiteGenotypes &factory = sp[i];
+        SiteGenotypesIndex &factory = sp[i];
         auto &expected = sp_expected[i];
-        auto foctory_genotype = factory.GetAncestorGenotypes();
-        auto expected_genotype = expected.GetAncestorGenotypes();
-        ASSERT_GENOTYPES(expected_genotype, foctory_genotype);
-        for (int j = 0; j < expected.GetDescendantCount(); ++j) {
-            auto foctory_genotype = factory.GetDescendantGenotypes(j);
-            auto expected_genotype = expected.GetDescendantGenotypes(j);
+        auto expected_genotype_16 = expected.GetAncestorGenotypes();
+        DiploidProbsIndex10 expected_genotype;
+        for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+            int index16 = LookupTable::index_converter_10_to_16[index10];
+            expected_genotype[index10] = expected_genotype_16[index16] * expected_ancestor_prior[index10];
+        }
 
+        auto foctory_genotype = convertIndexToDiploidIndex10[factory.GetAncestorIndex()];
+        ASSERT_GENOTYPES(expected_genotype, foctory_genotype);
+
+        std::vector<uint32_t> const &descendantIndex = factory.GetDescendantIndex();
+        for (int j = 0; j < expected.GetDescendantCount(); ++j) {
+            auto foctory_genotype = convertIndexToHaploid[descendantIndex[j]];
+            auto expected_genotype = expected.GetDescendantGenotypes(j);
             ASSERT_GENOTYPES(expected_genotype, foctory_genotype);
         }
     }

@@ -94,11 +94,12 @@ TEST_F(MutationModelTest, TestCalculateAncestorToDescendant) {
 
     //MutationModel
     SequencingFactory sf (params_not_equal);
-    std::vector<SiteGenotypes> sg;
+    std::vector<SiteGenotypesIndex> sg;
     GenomeData genome_data {{base_custom1}};
 
     sf.CreateSequenceProbsVector(sg, genome_data);
     MutationModel mm (evo_model);
+    mm.AddGenotypeFactory(sf);
     mm.MoveSequenceProb(sg);
 
     double prob2;
@@ -175,11 +176,12 @@ TEST_F(MutationModelTest, TestCalculateAncestorToDescendant3) {
 
     //MutationModel
     SequencingFactory sf (params_not_equal);
-    std::vector<SiteGenotypes> sg;
+    std::vector<SiteGenotypesIndex> sg;
     GenomeData genome_data {{base_custom3}};
 
     sf.CreateSequenceProbsVector(sg, genome_data);
     MutationModel mm (evo_model);
+    mm.AddGenotypeFactory(sf);
     mm.MoveSequenceProb(sg);
 
     double mutation_model_prob;
@@ -215,10 +217,12 @@ TEST_F(MutationModelTest, TestFullSimulatedGenome) {
         site_prob_vector.emplace_back(sp_vector[i], evo_model);
     }
 
-    std::vector<SiteGenotypes> sg;
+    std::vector<SiteGenotypesIndex> sg;
     SequencingFactory sf (params_not_equal);
     sf.CreateSequenceProbsVector(sg, genome_data);
+
     MutationModel mm (evo_model);
+    mm.AddGenotypeFactory(sf);
     mm.MoveSequenceProb(sg);
 
 

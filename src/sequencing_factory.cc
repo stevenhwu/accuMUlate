@@ -207,9 +207,9 @@ const std::vector<DiploidProbsIndex10> SequencingFactory::GetConvertIndexKeyToDi
 
 void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sgi, GenomeData &genome_data) {
 
-
-    std::unordered_map<uint64_t, uint> map_rd_to_index;
-    std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
+//
+//    std::unordered_map<uint64_t, uint> map_rd_to_index;
+//    std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
 
 
     sgi.reserve(genome_data.size());
@@ -221,15 +221,15 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
     uint index_ancestor = 0;
 
 
-    sgi.reserve(genome_data.size());
+//    sgi.reserve(genome_data.size());
 
     for (size_t i = 0; i < genome_data.size(); ++i) {
 
 //        uint16_t ref = genome_data[i].reference;
 //        int descendant_conut = genome_data[i].all_reads.size()-1;
 
-//        ModelInput data = std::move(genome_data[i]);//FIXME:: This can reduce the memeory even further
-        ModelInput &data = genome_data[i];
+        ModelInput data = std::move(genome_data[i]);//FIXME:: This can reduce the memeory even further
+//        ModelInput data = genome_data[i];
         int descendant_conut = data.all_reads.size() - 1;
 
 //        sgi.emplace_back(descendant_conut);
@@ -366,4 +366,10 @@ DiploidProbsIndex10 SequencingFactory::ConvertDiploid16ToDiploid10(DiploidProbs 
     }
 
     return temp_diploid_10;
+}
+
+std::vector<SiteGenotypesIndex> SequencingFactory::CreateSequenceProbsVector(GenomeData &data) {
+    std::vector<SiteGenotypesIndex> sp;
+    CreateSequenceProbsVector(sp, data);
+    return sp;
 }

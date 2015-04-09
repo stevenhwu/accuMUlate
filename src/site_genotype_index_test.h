@@ -39,7 +39,7 @@ public:
         other.ancestor_index = 0;
         descendant_index = std::move(other.descendant_index);
 //        other.descendant_index.clear();
-
+        return *this;
     }
 
 //    SiteGenotypesIndex (const SiteGenotypesIndex& other) : ancestor_index(other.ancestor_index){
@@ -55,11 +55,11 @@ public:
 //    SiteGenotypesIndex (const SiteGenotypesIndex& other) = delete;
 //    SiteGenotypesIndex& operator= (const SiteGenotypesIndex& other) = delete;
 
-    SiteGenotypesIndex() {}
+
 
     explicit SiteGenotypesIndex(int descendant_count0);
 
-    ~SiteGenotypesIndex() {}
+//    ~SiteGenotypesIndex() {}
 ////        std::cout << "SiteGenotypeIndex destroctor" << std::endl;
 //        ancestor_index = 0;
 //        descendant_index.clear();

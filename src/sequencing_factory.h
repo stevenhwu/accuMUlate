@@ -8,7 +8,7 @@
 #include "model.h"
 #include "site_genotypes.h"
 #include "sequence_prob_v1.h"
-#include "site_genotype_index.h"
+#include "site_genotype_index_test.h"
 
 class SequencingFactory{
 
@@ -18,6 +18,7 @@ public:
     SequencingFactory(ModelParams const &model_params) ;
 
     void CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sp, GenomeData &data);
+    std::vector<SiteGenotypesIndex> CreateSequenceProbsVector(GenomeData &data);
 
     const std::vector<HaploidProbs> GetConvertIndexKeyToHaploid();
     const std::vector<DiploidProbsIndex10> GetConvertIndexKeyToDiploidIndex10();
@@ -49,8 +50,8 @@ private:
 
     std::array<DiploidProbs, 4> ref_diploid_probs;
 
-//    std::unordered_map<uint64_t, uint> map_rd_to_index;
-//    std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
+    std::unordered_map<uint64_t, uint> map_rd_to_index;
+    std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
 
     std::vector<HaploidProbs> convert_index_key_to_haploid;
     std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10;

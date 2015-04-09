@@ -22,6 +22,12 @@ SET(SOURCE_FILES ${SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/sequence_prob_v1.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/site_prob.cc
+${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.h
+${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.cc
+${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.h
+${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.h
+${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index_test.h
 
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantVisitor.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/variant_visitor_two.cc
@@ -50,7 +56,7 @@ endif()
 add_executable(accuMUlate main.cc ${SOURCE_FILES})
 target_link_libraries(accuMUlate ${LIBS} )
 
-add_executable(EMTest EMTest.cc ${SOURCE_FILES} sequencing_factory.h sequencing_factory.cc sequencing_factory.h sequencing_factory.h site_genotype_index.cpp site_genotype_index.h)
+add_executable(EMTest EMTest.cc ${SOURCE_FILES} )
 target_link_libraries(EMTest ${LIBS} )
 target_link_libraries(EMTest profiler)
 

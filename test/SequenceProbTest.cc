@@ -35,10 +35,10 @@ protected:
 TEST_F(SequenceProbTest, EqualFreqsGenotypes) {
 
 
-//    F81 evo_model = F81(mu_prob.GetMu0(), mu_prob.GetFrequencyPrior());
+    int read_count = 2;
     ModelInput base_custom;
     base_custom.reference = 0;
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < read_count; ++i) {
         ReadData r;
 
         for (int j = 0; j < 4; ++j) {
@@ -167,10 +167,10 @@ result_ref = vector(length=16)
 TEST_F(SequenceProbTest, NotEqualFreqsGenotypes) {
 
 
-
+    int read_count = 2;
     ModelInput base_custom;
     base_custom.reference = 0;
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < read_count; ++i) {
         ReadData r;
 
         for (int j = 0; j < 4; ++j) {

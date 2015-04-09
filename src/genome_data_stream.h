@@ -100,7 +100,7 @@ public:
 
     void ReadHeader(uint64_t &site_count0, uint64_t &read_data_count0);
 
-    void ReadGenomeData(std::vector<ModelInput> &data);
+    void ReadGenomeData(GenomeData &data);
 
     uint64_t read_data_count;
     uint64_t site_count;

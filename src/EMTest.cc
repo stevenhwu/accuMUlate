@@ -70,6 +70,7 @@ void RunEmWithRealData(boost::program_options::variables_map variable_map, Model
     em_model2.emplace_back(new EmModelMutation(mutation_model));
     em_model2.emplace_back(new EmModelMutation(mutation_model));
     printMemoryUsage("Double object?");
+
     std::exit(10);
     cout << "\n========================\nStart em_algorithm:" << endl;
     clock_t t_start, t_end;
@@ -121,7 +122,6 @@ void CreateMutationModel(MutationModel &mutation_model, GenomeData &base_counts,
     clock_t t1;
     t1 = clock();
 
-    printMemoryUsage();
 
     std::vector<SiteGenotypesIndex> sgi;
     printMemoryUsage("Before factory");

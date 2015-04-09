@@ -9,7 +9,7 @@
 // Created by steven on 4/5/15.
 //
 
-#include "site_genotype_index.h"
+#include "site_genotype_index_test.h"
 
 /*
  * sequence_prob.cc

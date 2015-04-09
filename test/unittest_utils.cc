@@ -16,3 +16,16 @@ void ASSERT_GENOTYPES(DiploidProbs expected, DiploidProbs data) {
     }
 }
 
+void ASSERT_GENOTYPES(DiploidProbsIndex10 expected, DiploidProbsIndex10 data) {
+    for (int i = 0; i < expected.size(); ++i) {
+        ASSERT_NEAR(expected[i], data[i], ERROR_THRESHOLD );
+    }
+}
+//TODO: should be a  template for this??
+//template <typename T>
+//void ASSERT_VECTOR_LIKE(T expected, T data) {
+//    ASSERT_EQ(expected.size(), data.size() );
+//    for (int i = 0; i < expected.size(); ++i) {
+//        ASSERT_NEAR(expected[i], data[i], ERROR_THRESHOLD );
+//    }
+//}

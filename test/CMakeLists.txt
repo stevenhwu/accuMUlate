@@ -19,14 +19,15 @@ SET(TEST_SOURCE_FILES ${TEST_SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/SiteProbTest.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory_test.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/mutation_model_test.cc
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index_test.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/unittest_utils.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/model_test.cc
     )
 
 ADD_SUBDIRECTORY("evolution_models")
 ADD_SUBDIRECTORY("algorithm")
 
-add_executable( UnitTests ${TEST_SOURCE_FILES} ${SOURCE_FILES})
+add_executable( UnitTests ${TEST_SOURCE_FILES} ${SOURCE_FILES} )
 
 
 # Link test executable against gtest & gtest_main
