@@ -1,3 +1,4 @@
+#pragma once
 #ifndef parsers_H
 #define parsers_H
 

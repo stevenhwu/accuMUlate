@@ -14,37 +14,34 @@
 #include "evolution_models/EvolutionModel.h"
 #include "em_model.h"
 
-class EmModelMutationV1 : public EmModel {
+class [[deprecated]] EmModelMutationV1 : public EmModel {
 
 public:
-    virtual size_t GetDataCount();
+
 
     EmModelMutationV1(EvolutionModel &evo_model0);
 
     EmModelMutationV1(const EmModelMutationV1 &em_model);
 
-    virtual ~EmModelMutationV1() {
-    }
+    virtual ~EmModelMutationV1() {}
 
     virtual void UpdateParameter(double param);
 
-    void GetParameterInfo();
+    virtual void GetParameterInfo();
+
+    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat, double &log_likelihood_scaler);
+
+    virtual size_t GetDataCount();
 
     EvolutionModel * GetEvoModel();
-//    EvolutionModel * GetEvoModel() const;
+
 
 
 protected:
     EvolutionModel *evo_model;
 
-//
-//public:
-//    virtual EmModelMutationV1 *GetModel();
-//
-//    std::unique_ptr<EvolutionModel> CopyEvoModel() const;
-//    EvolutionModel* CopyEvoModel2()const ;
-public:
-    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat);
+
+
 };
 
 

@@ -1,10 +1,11 @@
 #include <evolution_models/F81.h>
 #include "gtest/gtest.h"
-#include "sequence_prob.h"
+#include "site_genotypes.h"
+#include "sequence_prob_v1.h"
 
 class SequenceProbTest : public ::testing::Test {
 public:
-    const double ERROR_THRESHOLD = 1e-15;
+
 protected:
     int foo;
     ModelParams params_equal;
@@ -34,10 +35,10 @@ protected:
 TEST_F(SequenceProbTest, EqualFreqsGenotypes) {
 
 
-//    F81 evo_model = F81(mu_prob.GetMu0(), mu_prob.GetFrequencyPrior());
+    int read_count = 2;
     ModelInput base_custom;
     base_custom.reference = 0;
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < read_count; ++i) {
         ReadData r;
 
         for (int j = 0; j < 4; ++j) {
@@ -166,10 +167,10 @@ result_ref = vector(length=16)
 TEST_F(SequenceProbTest, NotEqualFreqsGenotypes) {
 
 
-
+    int read_count = 2;
     ModelInput base_custom;
     base_custom.reference = 0;
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < read_count; ++i) {
         ReadData r;
 
         for (int j = 0; j < 4; ++j) {

@@ -1,6 +1,7 @@
-#include <model.h>
-#include <mutation_prob.h>
 #include <memory>
+#include "model.h"
+#include "mutation_prob.h"
+
 #pragma once
 #ifndef __EvolutionModel_H_
 #define __EvolutionModel_H_

@@ -16,9 +16,6 @@
 
 #include "em_algorithm.h"
 
-#include "em_model_mutation.h"
-
-
 
 class EmAlgorithmMutation : public EmAlgorithm{
 
@@ -29,7 +26,8 @@ public:
     EmAlgorithmMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr);
     virtual ~EmAlgorithmMutation();
 
-    void Run();
+    void RunEM();
+
 
 private:
 
@@ -40,20 +38,6 @@ protected:
     virtual void InitialiseSummaryStat();
 
     virtual void ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, std::vector<double> &temp_stat);
-
-
-private:
-    //TODO These will be gone soon
-    std::vector<double> all_stats_same;
-    std::vector<double> all_stats_diff;
-
-    std::vector<SiteProb> em_data_old;
-    EvolutionModel *em_model_old;
-    std::vector<double> parameters_old;
-
-    Eigen::ArrayXXd all_probs_old;
-
-
 
 
 };

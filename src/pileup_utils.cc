@@ -212,7 +212,7 @@ namespace PileupUtils{
                 sum += diff;
                 total += ref_base_count;
 //            cout << diff << " -- " << max << " " << ref_base_count << "\t== ";
-//            SequenceProb::printReadData(base_counts[i].all_reads[j]) ;
+//            SequenceProbV1::printReadData(base_counts[i].all_reads[j]) ;
 
             }
             double prop = (double) sum / total;
@@ -222,12 +222,12 @@ namespace PileupUtils{
                 std::cout << "\t==" << sum << " " << total << " " << prop << std::endl;
 
                 for (size_t j = 0; j < base_counts[i].all_reads.size(); ++j) {
-//                SequenceProb::printReadData(base_counts[i].all_reads[j]);
+//                SequenceProbV1::printReadData(base_counts[i].all_reads[j]);
                 }
             }
 //        cout << "================================="<< endl;
         }
-//    cout << "================Done: SequenceProb. Total: " << site_count << endl;
+//    cout << "================Done: SequenceProbV1. Total: " << site_count << endl;
 
 
         /*
@@ -248,6 +248,27 @@ namespace PileupUtils{
         */
 
     }
+
+
+//    void ReadGenomeDataFromBinaryInit(std::string file_name) {
+//
+//        GenomeDataStream gd_stream_read = GenomeDataStream( file_name, false);
+//
+//        uint64_t total_base_count2 = 0;
+//        uint64_t sequence_count2 = 0;
+//        gd_stream_read.ReadHeader(total_base_count2, sequence_count2);
+//        std::cout << "Sequence count: " << sequence_count2 << std::endl;
+//
+//        gd_stream_read.ReadGenomeData();
+//
+////        std::cout << "========= conut: " << genome_data.size() << std::endl;
+//        gd_stream_read.close();
+//
+//    }
+//
+//    void ReadOneRead(){
+//        ModelInput m (read_data_count)
+//    }
 
 }
 

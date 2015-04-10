@@ -7,48 +7,90 @@
 #include <map>
 #include <fstream>
 #include <memory>
+#include <random>
+#include "distributions/DirichletMultinomialDistribution.h"
 #include "Eigen/Dense"
 
 #include "model.h"
 
 
+void SimulateGenomeData(GenomeData &genome_data, int descendant_count, size_t fake_sample_count, double fake_prop) {
+
+	std::random_device rd;
+	std::mt19937 e2(rd());
+	std::uniform_int_distribution<uint16_t> uniform_dist(0, 5);
+	std::uniform_int_distribution<uint16_t> uniform3(0, 3);
+	uint16_t delta_reads = 20;
+
+	size_t fake_diff_count = fake_sample_count * fake_prop;
+	descendant_count++;// for ancestor
+
+	for (size_t s = 0; s < fake_sample_count; ++s) {
+
+		ReadDataVector bcalls(descendant_count, ReadData{0});
+		uint16_t ref_index = uniform3(e2);
+		for (int i = 0; i < descendant_count; ++i) {
+			bcalls[i].key=0;
+			for (int j = 0; j < 4; ++j) {
+				bcalls[i].reads[j] = uniform_dist(e2);
+			}
+			bcalls[i].reads[ref_index] = delta_reads + uniform_dist(e2);
+		}
+
+
+		if(s < fake_diff_count) { //diff ref
+			uint16_t old_ref = ref_index;
+			do{
+				ref_index = uniform3(e2);
+			}while (ref_index == old_ref);
+			for (int j = 0; j < 4; ++j) {
+				bcalls[0].reads[j] = uniform_dist(e2);
+			}
+			bcalls[0].reads[ref_index] = delta_reads + uniform_dist(e2);
+		}
+
+		genome_data.emplace_back( ModelInput{ref_index, bcalls} ) ;
+	}
+
+}
+
 //using namespace std;
 
-double DirichletMultinomialLogProbability(double alphas[4], ReadData data) {
-	// TODO: Cache most of the math here
-	// TODO: Does not include the multinomail coefficient
-
-//	for (int i = 0; i < 4; ++i) {
-//			data.reads[i] = 0;
-//			cout << alphas[i] << endl;
-//			alphas[i] = 0.25;
+//double DirichletMultinomialLogProbability(double (&alphas)[4], ReadData &data) {
+//	// TODO: Cache most of the math here
+//	// TODO: Does not include the multinomail coefficient
+//
+////	for (int i = 0; i < 4; ++i) {
+////			data.reads[i] = 0;
+////			cout << alphas[i] << endl;
+////			alphas[i] = 0.25;
+////		}
+////	data.reads[0] = 3;
+//
+//	int read_count = data.reads[0]+data.reads[1]+data.reads[2]+data.reads[3];
+//
+////	printf("RC:%d\n",read_count);
+//	double alpha_total = alphas[0]+alphas[1]+alphas[2]+alphas[3];
+//	double result = 0.0;
+//	for(int i : {0,1,2,3}) {
+//		for(int x = 0; x < data.reads[i]; ++x) {
+//			result += log(alphas[i]+x);
+////			cout << alphas[i]+x << "\t";
+////			cout << lgamma(alphas[i]+x) << endl;
+//
 //		}
-//	data.reads[0] = 3;
-
-	int read_count = data.reads[0]+data.reads[1]+data.reads[2]+data.reads[3];
-
-//	printf("RC:%d\n",read_count);
-	double alpha_total = alphas[0]+alphas[1]+alphas[2]+alphas[3];
-	double result = 0.0;
-	for(int i : {0,1,2,3}) {
-		for(int x = 0; x < data.reads[i]; ++x) {
-			result += log(alphas[i]+x);
-//			cout << alphas[i]+x << "\t";
-//			cout << lgamma(alphas[i]+x) << endl;
-
-		}
-//		cout<< result << "\n";
-	}
-//	double sum = 0;
-	for(int x = 0; x < read_count; ++x){
-		result -= log(alpha_total+x);
-//		sum += log(alpha_total+x);
-	}
-//	cout<< result << "\n";
-//	exit(-1);
-//	printf("sum denom:%f\n",sum);
-	return result;
-}
+////		cout<< result << "\n";
+//	}
+////	double sum = 0;
+//	for(int x = 0; x < read_count; ++x){
+//		result -= log(alpha_total+x);
+////		sum += log(alpha_total+x);
+//	}
+////	cout<< result << "\n";
+////	exit(-1);
+////	printf("sum denom:%f\n",sum);
+//	return result;
+//}
 
 DiploidProbs DiploidPopulation(const ModelParams &params, int ref_allele) {
 	ReadData d;
@@ -126,6 +168,7 @@ MutationMatrix MutationAccumulation(const ModelParams &params, bool and_mut) {
 }
 
 
+
 DiploidProbs DiploidSequencing(const ModelParams &params, int ref_allele, ReadData data) {
 	DiploidProbs result;
 	double alphas_total = (1.0-params.phi_diploid)/params.phi_diploid;
@@ -155,20 +198,20 @@ DiploidProbs DiploidSequencing(const ModelParams &params, int ref_allele, ReadDa
 }
 
 HaploidProbs HaploidSequencing(const ModelParams &params, int ref_allele, ReadData data) {
-	HaploidProbs result;
-	double alphas_total = (1.0-params.phi_haploid)/params.phi_haploid;
-	for(int i : {0,1,2,3}) {
-		double alphas[4];
-		for(int k : {0,1,2,3}) {
-			if(k == i)
-				alphas[k] = (1.0-params.error_prob)*alphas_total;
-			else
-				alphas[k] = params.error_prob/3.0*alphas_total;
-		}
-		result[i] = DirichletMultinomialLogProbability(alphas, data);
-	}
-	double scale = result.maxCoeff();
-	return (result - scale).exp();
+    HaploidProbs result;
+    double alphas_total = (1.0-params.phi_haploid)/params.phi_haploid;
+    for(int i : {0,1,2,3}) {
+        double alphas[4];
+        for(int k : {0,1,2,3}) {
+            if(k == i)
+                alphas[k] = (1.0-params.error_prob)*alphas_total;
+            else
+                alphas[k] = params.error_prob/3.0*alphas_total;
+        }
+        result[i] = DirichletMultinomialLogProbability(alphas, data);
+    }
+    double scale = result.maxCoeff();
+    return (result - scale).exp();
 }
 
 double TetMAProbability(const ModelParams &params, const ModelInput site_data) {
@@ -176,7 +219,7 @@ double TetMAProbability(const ModelParams &params, const ModelInput site_data) {
 	MutationMatrix mt = MutationAccumulation(params, true);
 
 
-	MutationMatrix mn = m-mt;	
+	MutationMatrix mn = m-mt;
 	DiploidProbs pop_genotypes = DiploidPopulation(params, site_data.reference);
 
 	auto it = site_data.all_reads.begin();
@@ -189,9 +232,9 @@ double TetMAProbability(const ModelParams &params, const ModelInput site_data) {
 		anc_genotypes *= (m.matrix()*p.matrix()).array();
 		num_genotypes *= (mn.matrix()*p.matrix()).array();
 	}
-	
+
     //cerr << "\n" << ancestor_genotypes/ancestor_genotypes.sum() << endl;
-	
+
 	return 1.0 - num_genotypes.sum()/anc_genotypes.sum();
 }
 void printMatrix(DiploidProbs d){
@@ -320,3 +363,46 @@ double TetMAProbOneMutation(const ModelParams &params, const ModelInput site_dat
 
 
 
+void printMemoryUsage(char const *string1) {
+	std::cout << "Memory: " << string1 << " " << getMemoryUsageVmRSS()/1000.0 << "\t" << getMemoryUsageVmSize()/1000.0 << std::endl;
+}
+
+
+int getMemoryUsageVmSize() { //Note: this value is in KB!
+	FILE* file = fopen("/proc/self/status", "r");
+	int result = -1;
+	char line[128];
+
+
+	while (fgets(line, 128, file) != NULL){
+		if (strncmp(line, "VmSize:", 7) == 0){
+			result = parseLine(line);
+			break;
+		}
+	}
+	return result;
+};
+
+int getMemoryUsageVmRSS() { //Note: this value is in KB!
+	FILE* file = fopen("/proc/self/status", "r");
+	int result = -1;
+	char line[128];
+
+
+	while (fgets(line, 128, file) != NULL){
+		if (strncmp(line, "VmRSS:", 6) == 0){
+			result = parseLine(line);
+			break;
+		}
+
+	}
+	return result;
+};
+
+int parseLine(char* line) {
+	int i = strlen(line);
+	while (*line < '0' || *line > '9') line++;
+	line[i-3] = '\0';
+	i = atoi(line);
+	return i;
+}

@@ -15,12 +15,7 @@
 
 #include <boost/program_options.hpp>
 #include <time.h>
-//#include <algorithm/em_model_binomial.h>
-//#include <algorithm/em_data_mutation.h>
-//#include <algorithm/em_algorithm_binomial.h>
-//#include <stdint.h>
-//#include <fcntl.h>
-//#include <sys/socket.h>
+
 
 #include "parsers.h"
 #include "api/BamReader.h"
@@ -40,6 +35,10 @@ namespace BoostUtils {
     void ExtractInputVariables(boost::program_options::variables_map &vm, GenomeData &genome_data,
             BamTools::BamReader &experiment, BamTools::RefVector &references,
             BamTools::SamHeader &header, BamTools::Fasta &reference_genome);
+
+    ModelParams CreateModelParams(boost::program_options::variables_map variables_map);
+
+
 }
 
 #endif //BOOST_INPUT_UTILS_H_

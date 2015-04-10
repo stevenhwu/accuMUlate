@@ -216,6 +216,7 @@ GenomeDataStream::~GenomeDataStream()
         free (buffer); //buffer =NULL;
     }
 
+
 }
 
 void GenomeDataStream::WriteHeader(uint64_t const &sequence_count) {
@@ -251,13 +252,14 @@ void GenomeDataStream::ReadHeader(uint64_t &site_count0, uint64_t &read_data_cou
         off_t total = file_size();
         total -= sizeof(uint64_t) * 2; //2 refs
         size_t each_model_input = sizeof(uint16_t) + sizeof(uint64_t) * read_data_count; //ref base + n*key
+
         site_count = total / each_model_input;
     }
     site_count0 = site_count;
     read_data_count0 = read_data_count;
 }
 
-void GenomeDataStream::ReadGenomeData(std::vector<ModelInput> &data) {
+void GenomeDataStream::ReadGenomeData(GenomeData &data) {
 
     if(site_count == 0 | read_data_count == 0){
         ReadHeader(site_count, read_data_count);
@@ -269,7 +271,7 @@ void GenomeDataStream::ReadGenomeData(std::vector<ModelInput> &data) {
     for (size_t i = 0; i < site_count; ++i) {
         ModelInput m(read_data_count);
         ReadModelInput(m);
-        data.push_back(m);
+        data.push_back(std::move(m));
     }
 
 }
@@ -284,6 +286,7 @@ void GenomeDataStream::ReadModelInput(ModelInput &model_input) {
     for (size_t i = 0; i < read_data_count; ++i) {
         ReadReadDataKey(key);
         model_input.all_reads[i].key = key;
+//        model_input.all_reads.emplace_back(key);
     }
 
 }
@@ -306,4 +309,21 @@ void GenomeDataStream::WriteModelInput(ModelInput &input) {
     }
 //    std::cout << "\n";
 
+}
+
+ModelInput GenomeDataStream::ReadOne() {
+
+    uint16_t ref;
+    uint64_t key;
+    ReadReference(ref);
+    ModelInput model_input(read_data_count);
+    model_input.reference = ref;
+
+    for (size_t i = 0; i < read_data_count; ++i) {
+        ReadReadDataKey(key);
+        model_input.all_reads[i].key = key;
+//        model_input.all_reads.emplace_back(key);
+    }
+
+    return model_input;
 }

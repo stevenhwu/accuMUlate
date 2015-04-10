@@ -15,14 +15,17 @@ class EmModel {
 public:
 
 
+    virtual ~EmModel() {
+    }
+
     virtual void UpdateParameter(double param) = 0; //TODO: implement multi parameters later
 
-    virtual void GetParameterInfo() = 0;
+    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat, double &log_likelihood_scaler) =0;
 
     virtual size_t GetDataCount() = 0;
 
+    [[deprecated]] virtual void GetParameterInfo(){}
 
-    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat) =0;
 };
 
 

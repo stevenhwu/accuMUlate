@@ -12,15 +12,30 @@
 #include <memory>
 #include <vector>
 #include <stddef.h>
-#include <Eigen/Dense>
+#include <iostream>
+#include <fstream>
+//#include <Eigen/Dense>
 #include "em_model.h"
 #include "em_data.h"
+#include "em_model_mutation.h"
+#include "em_logger.h"
 
 #ifndef EM_ALGORITHM_H_
 #define EM_ALGORITHM_H_
 
 extern const double EM_CONVERGE_THRESHOLD;
 
+/*
+Try to be generic, but doesn't work out too well at moment.
+Approach 1: completely separate data and model. 1 copy each.
+ - repeat data leads to repeated calculation, hard to reuse data
+ - hard to pass things around (generically). either non-generic method to pass the parameters or use casting(bad!?)
+
+Approach 2: model incluede data
+ - What happen with huge data and huge number of cagetoires. n category = n models
+
+try?? m x d (category x datapoint) strcuture, to avoid any duplications
+*/
 class EmAlgorithm {
 
 
@@ -39,14 +54,19 @@ public:
     virtual ~EmAlgorithm() {
     }
 
+    void Run();
 
-    virtual void Run() = 0;
+    virtual void RunEM() = 0;
 
     virtual std::vector<double> GetProportion();
 
     virtual std::vector<double> GetParameters();
 
     void PrintSummary();
+
+    void SetOutfilePrefix(const std::string &infile);
+
+    std::string GetEMSummary();
 
 protected:
 
@@ -55,17 +75,18 @@ protected:
     size_t site_count;
     size_t max_ite_count;
 
+    double sum_ratio;
+    double log_likelihood;
+
+    EmLogger em_logger;
+
     std::vector<std::unique_ptr<EmData>> *em_data_ptr;
     std::vector<std::unique_ptr<EmModel>> *em_model_ptr;
 
     std::vector<std::unique_ptr<EmModel>> em_model;
-    EmModel *em_model0;
-
     std::vector<std::unique_ptr<EmSummaryStat>> all_em_stats;
 
-    std::vector<std::unique_ptr<EmSummaryStat>> em_stat_local_ptr;
-    std::unique_ptr<EmSummaryStat> em_stat_local_single;
-
+    EmModel *em_model0;//Should be able to remove as well. try to finialse V1 setup
 
     std::vector<double> parameters;
     std::vector<double> proportion;
@@ -78,6 +99,8 @@ protected:
     void InitWithData();
 
     void InitWithModel();
+
+    void UpdateEmParameters();
 
     void ExpectationStepModel();
 
@@ -99,7 +122,7 @@ protected:
     bool EmStoppingCriteria(int ite);
 
 
-
+    void LogEmSummary(int ite);
 };
 
 

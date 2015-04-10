@@ -18,23 +18,24 @@ class EmModelBinomial : public EmModel {
 
 public:
 
-
     EmModelBinomial(int n0, double prob0);
 
-    virtual ~EmModelBinomial(){};
+    virtual ~EmModelBinomial(){}
 
-    void UpdateParameter(double param);
-
-    double GetParameter();
-
-    virtual void GetParameterInfo();
-
-    int n;
-    double prob;
+    virtual void UpdateParameter(double param);
 
     virtual size_t GetDataCount();
 
-    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat);
+    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat, double &log_likelihood_scaler);
+
+//    virtual void GetParameterInfo();
+
+    double GetParameter();
+
+protected:
+    int n;
+    double prob;
+
 };
 
 

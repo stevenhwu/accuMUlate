@@ -11,19 +11,28 @@
 
 
 #include <iostream>
-
-//#include <unordered_map>
 #include "em_summary_stat.h"
 #include "em_model.h"
 #include "em_model_mutation_v1.h"
 #include "em_model_binomial.h"
+/*
+EmData was used with original version of EmModel, where model doesn't contains data,
+i.e. keep model and data completely separate
+This turns out might not be a good idea
+1) many identical data needs to be recalculated
+2) hard to be generic, might (at least to my knowledge) needs some sort of casting
+3) some strange pointers usage.
 
+maybe removed the whole structure later.
+It's is currently used for testing the original implementations
+*/
 class EmData {
+
 
 public:
 
     virtual ~EmData() {
-    };
+    }
     virtual void UpdateSummaryStat(double &prob, std::vector<double> &temp_stat) = 0;
     virtual void UpdateSummaryStat(double &prob, std::unique_ptr<EmSummaryStat> &summaryStat) = 0;
 //    virtual void UpdateEmModel(EmModel &em_model) = 0;
