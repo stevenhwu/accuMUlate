@@ -135,15 +135,15 @@ void EmAlgorithm::ExpectationStepModelPtr() {
 
 
     UpdateEmParameters();
-
+    double log_likelihood_scaler = 0;
     log_likelihood = 0;
     for (size_t s = 0; s < site_count; ++s) {
         double sum_prob = 0;
         for (size_t r = 0; r < num_category; ++r) {
-            (*em_model_ptr)[r]->UpdateSummaryStat(s, sum_prob, temp_stats[r]);
+            (*em_model_ptr)[r]->UpdateSummaryStat(s, sum_prob, temp_stats[r], log_likelihood_scaler);
             all_probs(r, s) = proportion[r] * sum_prob;
         }
-        log_likelihood += log(all_probs(0, s)+all_probs(1, s));
+        log_likelihood += log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler;
         double sum = all_probs.col(s).sum();
         for (size_t r = 0; r < num_category; ++r) {
             double prob = all_probs(r,s) / sum;
@@ -269,7 +269,7 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 
 void EmAlgorithm::PrintSummary(){
 //    std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << "\tsum_ratio: " << sum_ratio << std::endl;
-    printf("EM Summary\nParameters: ");
+    printf("EM Summary: Ln:%.10f\nParameters: ", log_likelihood);
      for (auto &item :parameters) {
         printf("%.40e\t", item);
     }
@@ -278,6 +278,7 @@ void EmAlgorithm::PrintSummary(){
     for (auto &item :proportion) {
         printf("%.40e\t", item);
     }
+
     printf("\n================= END SUMMARY ============\n");
     fflush(stdout);
 }

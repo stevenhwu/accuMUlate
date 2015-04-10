@@ -26,7 +26,7 @@ public:
 
     virtual size_t GetDataCount();
 
-    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat);
+    virtual void UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat, double &log_likelihood_scaler);
 
 //    virtual void GetParameterInfo();
 

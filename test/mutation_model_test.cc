@@ -104,7 +104,7 @@ TEST_F(MutationModelTest, TestCalculateAncestorToDescendant) {
 
     double prob2;
     double diff2;
-    mm.CalculateAncestorToDescendant(0, prob2, diff2);
+    mm.CalculateAncestorToDescendant(0, prob2, diff2, <#initializer#>);
     ASSERT_DOUBLE_EQ(expected_prob, prob2);
     ASSERT_DOUBLE_EQ(expected_diff, diff2);
 }
@@ -186,7 +186,7 @@ TEST_F(MutationModelTest, TestCalculateAncestorToDescendant3) {
 
     double mutation_model_prob;
     double mutation_model_stat_diff;
-    mm.CalculateAncestorToDescendant(0, mutation_model_prob, mutation_model_stat_diff);
+    mm.CalculateAncestorToDescendant(0, mutation_model_prob, mutation_model_stat_diff, <#initializer#>);
     ASSERT_DOUBLE_EQ(expected_prob, mutation_model_prob);
     ASSERT_DOUBLE_EQ(expected_diff, mutation_model_stat_diff);
 
@@ -283,7 +283,7 @@ TEST_F(MutationModelTest, TestFullSimulatedGenome) {
 
         double mutation_model_prob;
         double mutation_model_stat_diff;
-        mm.CalculateAncestorToDescendant(i, mutation_model_prob, mutation_model_stat_diff);
+        mm.CalculateAncestorToDescendant(i, mutation_model_prob, mutation_model_stat_diff, <#initializer#>);
         ASSERT_DOUBLE_EQ(site_prob, mutation_model_prob);
         ASSERT_DOUBLE_EQ(site_diff, mutation_model_stat_diff);
         ASSERT_NEAR(expected_prob, mutation_model_prob, ERROR_THRESHOLD);

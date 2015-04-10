@@ -24,6 +24,10 @@ public:
     const std::vector<HaploidProbs> RemoveConvertIndexKeyToHaploid();
     const std::vector<DiploidProbsIndex10> RemoveConvertIndexKeyToDiploidIndex10();
 
+    std::vector<double> && RemoveConvertIndexKeyToDiploidIndex10Scaler();
+    std::vector<double> && RemoveConvertIndexKeyToHaploidScaler();
+
+
     const std::vector<HaploidProbs> RemoveConvertIndexKeyToHaploidUnnormalised();
     const std::vector<DiploidProbsIndex10> RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
 
@@ -59,6 +63,9 @@ private:
 
     std::vector<HaploidProbs> convert_index_key_to_haploid;
     std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10;
+
+    std::vector<double> convert_index_key_to_haploid_scaler;
+    std::vector<double> convert_index_key_to_diploid_10_scaler;
 
     std::vector<HaploidProbs> convert_index_key_to_haploid_unnormalised;
     std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10_unnormalised;

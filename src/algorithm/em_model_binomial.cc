@@ -16,7 +16,7 @@ EmModelBinomial::EmModelBinomial(int n0, double prob0) : n(n0), prob(prob0){
 }
 
 
-void EmModelBinomial::UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat) {
+void EmModelBinomial::UpdateSummaryStat(int site_index, double &prob, std::vector<double> &temp_stat, double &log_likelihood_scaler) {
     std::cout << "Error!! Not yet implemented" << std::endl;
     exit(44);
 }

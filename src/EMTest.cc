@@ -36,7 +36,7 @@ void AddSimulatedData(ModelParams &params, std::vector<SequenceProb> &sp, int de
 void SummariseReadsData(GenomeData base_counts);
 
 
-void CreateMutationModel(MutationModel &model, GenomeData &data, ModelParams &params);
+void CreateMutationModel(MutationModel &model, GenomeData &genome_data, ModelParams &params);
 
 GenomeData getGenomeData(boost::program_options::variables_map variables_map);
 
@@ -224,7 +224,7 @@ void RunEmWithRealData(boost::program_options::variables_map variables_map) {
 
 }
 
-void CreateMutationModel(MutationModel &mutation_model, GenomeData &base_counts, ModelParams &params) {
+void CreateMutationModel(MutationModel &mutation_model, GenomeData &genome_data, ModelParams &params) {
 
 
     clock_t t1;
@@ -237,7 +237,7 @@ void CreateMutationModel(MutationModel &mutation_model, GenomeData &base_counts,
     printMemoryUsage("init factory");
 
     t1 = clock();
-    sequencing_factory.CreateSequenceProbsVector(sgi, base_counts);
+    sequencing_factory.CreateSequenceProbsVector(sgi, genome_data);
     cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
     printMemoryUsage("after factory");
 

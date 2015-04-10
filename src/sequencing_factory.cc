@@ -197,6 +197,13 @@ const std::vector<DiploidProbsIndex10> SequencingFactory::RemoveConvertIndexKeyT
     return std::move(convert_index_key_to_diploid_10);
 }
 
+std::vector<double> && SequencingFactory::RemoveConvertIndexKeyToHaploidScaler() {
+    return std::move(convert_index_key_to_haploid_scaler);
+}
+
+std::vector<double> && SequencingFactory::RemoveConvertIndexKeyToDiploidIndex10Scaler() {
+    return std::move(convert_index_key_to_diploid_10_scaler);
+}
 
 const std::vector<HaploidProbs> SequencingFactory::RemoveConvertIndexKeyToHaploidUnnormalised() {
 
@@ -259,12 +266,13 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
                 }
 
                 double scale = prob.maxCoeff();
+                convert_index_key_to_haploid_scaler.push_back(scale);
                 prob = (prob - scale).exp();
                 convert_index_key_to_haploid.push_back(prob);
 
                 map_rd_to_index[rd_key] = index;
                 index++;
-//                std::cout << map_rd_to_index[rd_key] << std::endl;
+
             }
             item.SetDescendantIndex(j, map_rd_to_index[rd_key]);
         }
@@ -284,6 +292,7 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
             }
 
             double scale = temp_prob.maxCoeff();
+            convert_index_key_to_diploid_10_scaler.push_back(scale);
             temp_prob = (temp_prob - scale).exp();
             DiploidProbsIndex10 temp_dip_10 = ConvertDiploid16ToDiploid10(temp_prob, data.reference);
             convert_index_key_to_diploid_10.push_back(temp_dip_10);
@@ -295,16 +304,7 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
         }
         item.SetAncestorIndex(map_ancestor_to_index[data.reference][rd_key]);
 
-//        std::cout << "TEST: " << i << std::endl;
-//        CalculateDescendantGenotypesIndex(item);
-//        CalculateAncestorGenotypeIndex(item);
-//        SiteGenotypesIndex tt = std::move(item);
         sgi.push_back(std::move(item));
-//        sgi.push_back(item);
-//        sgi.emplace_back(item);
-//        std::cout << sgi[i].GetDescendantIndex(0) << "\t" << item.GetDescendantIndex(0) << std::endl;
-//        std::cout << sgi[i].GetAncestorIndex() << "\t" << sgi[i].GetDescendantIndex().size() << "\t" << std::endl;
-//        std::cout << item.GetAncestorIndex() << "\t" << item.GetDescendantIndex().size() << "\t" << std::endl;
 
 //        if(i==5){
 //            break;

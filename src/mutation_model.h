@@ -57,7 +57,7 @@ public:
 
     void UpdateExpBeta(double expBeta);
 
-    void CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff);
+    void CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff, double &log_likelihood_scaler);
 
     void NoCacheCalculateDes(int site_index, int a, double &product_prob_given_ancestor, double &stat_same, double &summary_stat_diff_ancestor);
     void CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs &prob_reads_given_descent, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff);
@@ -84,6 +84,9 @@ private:
 
     static std::vector<HaploidProbs> convert_index_key_to_haploid;
     static std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10;
+
+    static std::vector<double> convert_index_key_to_haploid_scaler;
+    static std::vector<double> convert_index_key_to_diploid_10_scaler;
 
     static std::vector<HaploidProbs> convert_index_key_to_haploid_unnormalised;
     static std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10_unnormalised;
@@ -140,6 +143,7 @@ public:
     static void AddGenotypeFactory(SequencingFactory &factory);
 
 //    void AddSequenceProbOld1(std::vector<SiteGenotypes> &all);
+    void CalculateLikelihoodUnnormalised(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
 };
 
 

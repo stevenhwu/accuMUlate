@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <strings.h>
+#include <tgmath.h>
 
 #include "mutation_model.h"
 
@@ -20,6 +21,8 @@ std::vector<SiteGenotypesIndex> MutationModel::all_sequence_prob_index;
 std::vector<HaploidProbs> MutationModel::convert_index_key_to_haploid;
 std::vector<DiploidProbsIndex10> MutationModel::convert_index_key_to_diploid_10;
 
+std::vector<double> MutationModel::convert_index_key_to_haploid_scaler;
+std::vector<double> MutationModel::convert_index_key_to_diploid_10_scaler;
 
 std::vector<HaploidProbs> MutationModel::convert_index_key_to_haploid_unnormalised = std::vector<HaploidProbs> ();
 std::vector<DiploidProbsIndex10> MutationModel::convert_index_key_to_diploid_10_unnormalised;
@@ -47,16 +50,25 @@ int MutationModel::GetSiteCount() const {
 void MutationModel::AddGenotypeFactory(SequencingFactory &factory) {
 
     MutationModel::convert_index_key_to_haploid = factory.RemoveConvertIndexKeyToHaploid();
-
     MutationModel::convert_index_key_to_diploid_10 = factory.RemoveConvertIndexKeyToDiploidIndex10();
 
-    MutationModel::convert_index_key_to_haploid_unnormalised = factory.RemoveConvertIndexKeyToHaploidUnnormalised();
-    MutationModel::convert_index_key_to_diploid_10_unnormalised = factory.RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
+    convert_index_key_to_haploid_scaler = factory.RemoveConvertIndexKeyToHaploidScaler();
+    convert_index_key_to_diploid_10_scaler = factory.RemoveConvertIndexKeyToDiploidIndex10Scaler();
 
 
-//
+//    MutationModel::convert_index_key_to_haploid_unnormalised = factory.RemoveConvertIndexKeyToHaploidUnnormalised();
+//    MutationModel::convert_index_key_to_diploid_10_unnormalised = factory.RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
+
+
+
 //    MutationModel::convert_index_key_to_haploid = factory.RemoveConvertIndexKeyToHaploidUnnormalised();
 //    MutationModel::convert_index_key_to_diploid_10 = factory.RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
+
+//    MutationModel::convert_index_key_to_haploid_unnormalised = factory.RemoveConvertIndexKeyToHaploid();
+//    MutationModel::convert_index_key_to_diploid_10_unnormalised = factory.RemoveConvertIndexKeyToDiploidIndex10();
+
+
+
 
 //    MutationModel::ref_diploid_probs = factory.GetRefDiploidProbs();
 //    all_ancestor_genotype_prior.reserve(convert_index_key_to_diploid.size());
@@ -376,23 +388,24 @@ void MutationModel::UpdateCache() {
 }
 
 
-void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff) {
+void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff, double &log_likelihood_scaler) {
 
     prob_reads = 0;
     all_stats_diff = 0;
 
-    double summary_stat_diff_ancestor = 0;
-    double prod_prob_ancestor = 1;
-
     const auto &descendant_genotypes_index = all_sequence_prob_index[site_index].GetDescendantIndex();
     uint32_t anc_genotype_index = all_sequence_prob_index[site_index].GetAncestorIndex();
-
-//    auto &cache =  convert_index_key_to_diploid[anc_genotype_index];
     auto &ancestor_genotype_10 =  convert_index_key_to_diploid_10[anc_genotype_index];
+//    auto &cache =  convert_index_key_to_diploid[anc_genotype_index];
 
+    log_likelihood_scaler = convert_index_key_to_diploid_10_scaler[anc_genotype_index]; //TODO: constant for size, ++ memory vs ++ time??
+    for (auto &genotypes_index : descendant_genotypes_index) {
+        log_likelihood_scaler += convert_index_key_to_haploid_scaler[genotypes_index];
+    }
+    log_likelihood_scaler=0;
+    double summary_stat_diff_ancestor = 0;
+    double prod_prob_ancestor = 1;
     for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
-//        int index16 = LookupTable::index_converter_10_to_16[index10];
-
         CacheLoopDesAll2(index10, descendant_genotypes_index, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
 
 //        NoCacheCalculateDes(site_index, index10, prod_prob_ancestor, t, summary_stat_diff_ancestor);
@@ -400,30 +413,59 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
 //        CacheLoopDesAll3(index10, aa, prod_prob_ancestor, summary_stat_diff_ancestor);
 
         double prob_reads_given_a = ancestor_genotype_10[index10] * prod_prob_ancestor;
-
         prob_reads += prob_reads_given_a;
-
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
 
-
-#ifdef DEBUG1
-        std::cout << "==A: " << index10 << " " << all_ancestor_genotype_prior[site_index][index10] << "\t" << "Diff:" <<
-        		all_stats_diff << "\t" << summary_stat_diff_ancestor << "\tProb:" << prod_prob_ancestor  << "\t" << prob_reads_given_a << std::endl ;
-#endif
     }
     all_stats_diff /= prob_reads;
     all_stats_diff /= descendant_count;//TODO: need this to auto calculate stat_same. sum to 1
 
+#ifdef DEBUG7
+    if(site_index >0) {
+        double likelihood = 0;
+        auto &ancestor_genotype_10_unnormalised =  convert_index_key_to_diploid_10_unnormalised[anc_genotype_index];
+        for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+            double prob = 0.0;
+            double temp = 0.0;
+            CalculateLikelihoodUnnormalised(site_index, index10, prob, temp);
+//        CacheLoopDesAll2(index10, descendant_genotypes_index, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
+            double prob_reads_given_a = ancestor_genotype_10_unnormalised[index10] * prob;
+            likelihood += prob_reads_given_a;
+//            std::cout << (ancestor_genotype_10_unnormalised[index10]/ancestor_genotype_10[index10]) << "\t";
 
+        }
+//        std::cout << "" << std::endl;
+        double temp_s = 1;
+        double temp_2 = 0;
+        std::vector<uint32_t> const &descendant_index = all_sequence_prob_index[site_index].GetDescendantIndex();
+        for (int d = 0; d < descendant_count; ++d) {//TODO: Check descendant info, merge some of them together
+            HaploidProbs pune = convert_index_key_to_haploid_unnormalised[descendant_index[d]];//UNTESTED:
+            HaploidProbs pp = convert_index_key_to_haploid[descendant_index[d]];//UNTESTED:
+//            for (int i = 0; i < pp.size(); ++i) {
+//                std::cout << (pune[i]/pp[i]) << "\t" ;
+//            }std::cout << "" << std::endl;
+            temp_s *= (pune[0]/pp[0]);
+            temp_2 += convert_index_key_to_haploid_scaler[descendant_index[d]];
+        }
 
-    for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
-        CacheLoopDesAll2(index10, descendant_genotypes_index, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
-        double prob_reads_given_a = ancestor_genotype_10[index10] * prod_prob_ancestor;
+        temp_2 += convert_index_key_to_diploid_10_scaler[anc_genotype_index];
 
+//        std::cout << temp_s << std::endl;
+        temp_s *= (ancestor_genotype_10_unnormalised[0]/ancestor_genotype_10[0]);
+//        std::cout << temp_s << std::endl;
+        temp_s = 1/temp_s;
+//        std::cout << temp_s << std::endl;
+//            std::cout << site_index << "\t" << prob_reads << "\t" << likelihood << "\t" << (prob_reads/likelihood) << "\t" << std::endl;
+        if( log(prob_reads)+ temp_2 - log(likelihood) > 1e-13 ) {
+            std::cout << site_index << "\t" << log(prob_reads) << "\t" << (log(prob_reads)+ temp_2) << "\t" <<
+                    log(likelihood) << "\t" << ( (log(prob_reads)+ temp_2) - log(likelihood)) << "\t" << log(temp_s) << "\t" << temp_2 << std::endl;
+        }//        std::cout << temp_2 << std::endl;
+//        std::exit(4);
+        if(log_likelihood_scaler == temp_2){
+            std::cout << log_likelihood_scaler << "\t" << temp_2 << std::endl;
+        }
     }
-
-
-
+#endif
 
 
 #ifdef DEBUG5
@@ -588,6 +630,25 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
     }
 }
 
+void MutationModel::CalculateLikelihoodUnnormalised(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
+    product_prob_given_ancestor = 1;
+    summary_stat_diff_ancestor = 0;
+    double stat_same = 0;
+    std::vector<uint32_t> const &descendant_index = all_sequence_prob_index[site_index].GetDescendantIndex();
+    for (int d = 0; d < descendant_count; ++d) {//TODO: Check descendant info, merge some of them together
+        double summary_stat_same = 0;
+        double summary_stat_diff = 0;
+        double sum_over_probs = 1;
+
+//        HaploidProbs prob_reads_given_descent = all_sequence_prob[site_index].GetDescendantGenotypes(d);
+        HaploidProbs prob_reads_given_descent = convert_index_key_to_haploid_unnormalised[descendant_index [d]];//UNTESTED:
+        CalculateOneDescendantGivenAncestor(anc_index, prob_reads_given_descent, sum_over_probs, summary_stat_same, summary_stat_diff);
+
+        summary_stat_diff_ancestor += summary_stat_diff;
+        product_prob_given_ancestor *= sum_over_probs;
+
+    }
+}
 
 //void MutationModel::CacheLoopMap(int a, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
 //    product_prob_given_ancestor = 1;
@@ -824,4 +885,6 @@ void MutationModel::CalculateOneDescendantGivenAncestor(int anc_index10, Haploid
 //    cache_read_data_to_all = all_2;
 //
 //}
+
+
 
