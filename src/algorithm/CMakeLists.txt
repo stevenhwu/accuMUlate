@@ -13,6 +13,8 @@ SET(SOURCE_FILES ${SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/em_model_mutation_v1.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/em_model_mutation.cc
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/em_logger.cpp #algorithm/em_logger.h
+
     ${CMAKE_CURRENT_SOURCE_DIR}/em_summary_stat.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/em_summary_stat_binomial.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/em_summary_stat_mutation.cc

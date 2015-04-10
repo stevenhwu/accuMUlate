@@ -56,7 +56,7 @@ endif()
 add_executable(accuMUlate main.cc ${SOURCE_FILES})
 target_link_libraries(accuMUlate ${LIBS} )
 
-add_executable(EMTest EMTest.cc ${SOURCE_FILES} algorithm/em_logger.cpp algorithm/em_logger.h)
+add_executable(EMTest EMTest.cc ${SOURCE_FILES} )
 target_link_libraries(EMTest ${LIBS} )
 target_link_libraries(EMTest profiler)
 

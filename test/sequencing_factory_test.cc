@@ -68,7 +68,7 @@ TEST_F(SequenceFactorTest, TestInit){
     int descendant_count = 5;
     int site_count = 1000;
     SimulateGenomeData(genome_data, descendant_count, site_count, 0.5);
-
+    GenomeData genome_data2 = genome_data;
 //    for (auto data: genome_data) {
 //        std::cout << data.reference << std::endl;
 //        for (auto readdata : data.all_reads) {
@@ -87,8 +87,8 @@ TEST_F(SequenceFactorTest, TestInit){
 //    cout << "Time init seq latest: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
     std::vector<SequenceProb> sp_expected;
-    sp_expected.reserve(genome_data.size());
-    for (auto data : genome_data) {
+    sp_expected.reserve(genome_data2.size());
+    for (auto data : genome_data2) {
         sp_expected.emplace_back(data, params_not_equal);
     }
     MutationProb mutation_prob (params_not_equal);
@@ -100,7 +100,7 @@ TEST_F(SequenceFactorTest, TestInit){
     
     for (int i = 0; i < sp_expected.size(); ++i) {
 
-        ModelInput &site_data = genome_data[i];
+        ModelInput &site_data = genome_data2[i];
 
         SiteGenotypesIndex &factory = sp[i];
         auto &expected = sp_expected[i];

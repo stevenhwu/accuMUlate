@@ -33,12 +33,13 @@ TEST_F(SiteGenotypeIndexTest, TestInit){
     int descendant_count = 5;
     int site_count = 10;
     SimulateGenomeData(genome_data, descendant_count, site_count, 0.5);
+    GenomeData genome_data2 = genome_data;
 
     std::vector<SiteGenotypesIndex> sp;
     SequencingFactory sequencing_factory (params_not_equal);
     sequencing_factory.CreateSequenceProbsVector(sp, genome_data);
 
-    std::vector<SiteGenotypesIndex> sp2 = sequencing_factory.CreateSequenceProbsVector(genome_data);
+    std::vector<SiteGenotypesIndex> sp2 = sequencing_factory.CreateSequenceProbsVector(genome_data2);
 
     for (int i = 0; i < sp.size(); ++i) {
         ASSERT_EQ(sp[i].GetAncestorIndex(), sp2[i].GetAncestorIndex());
