@@ -5,7 +5,11 @@ EmSummaryStat::EmSummaryStat() : EmSummaryStat(EM_SUMMARY_STAT_STATS_COUNT){
 
 
 EmSummaryStat::EmSummaryStat(int const stat_count0) : stat_count(stat_count0) {
-    stat.assign(stat_count, 0);
+//    stat.assign(stat_count, std::atomic<double> {0});
+//    stat.resize(stat_count);
+    for (int i = 0; i < stat_count; ++i) {
+        stat.emplace_back(0);
+    }
 }
 
 size_t EmSummaryStat::GetStatCount(){
@@ -40,7 +44,7 @@ void EmSummaryStat::UpdateSumWithProportion(double &d, std::unique_ptr<EmSummary
 //        std::cout << "VECTOR STAT: " << stat.size() << "\t" << i<<"\t" << temp << "\t" << stat[i] <<std::endl;
 //    }
     for (int i = 0; i < summary_stat->stat_count; ++i) {
-        stat[i] += d * summary_stat->GetStat(i);
+//        stat[i] += d * summary_stat->GetStat(i);
         double temp = d * summary_stat->GetStat(i);
         std::cout << "VECTOR STAT: " << stat.size() << "\t" << i<<"\t" << d << "\t" <<  summary_stat->GetStat(i) << "\t" <<
 
@@ -65,8 +69,16 @@ double EmSummaryStat::MaximiseStats() {
     exit(-100);
 }
 
-void EmSummaryStat::UpdateSumWithProportion(double d, std::vector<double> &temp_stats) {
+void EmSummaryStat::UpdateSumWithProportion(double proportion, std::vector<double> &temp_stats) {
+//    stat_mutex.lock();
     for (int i = 0; i < stat_count; ++i) {
-        stat[i] += d * temp_stats[i];
+//        std::cout << proportion << "\t" << temp_stats[i] << std::endl;
+//        stat[i] += proportion * temp_stats[i];
+
+        auto current = stat[i].load();
+        auto temp = proportion * temp_stats[i];
+        while (!stat[i].compare_exchange_weak(current, current + temp));
+
     }
+//    stat_mutex.unlock();
 }

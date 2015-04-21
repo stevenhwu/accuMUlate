@@ -8,20 +8,21 @@
 
 #pragma once
 
+#ifndef EM_ALGORITHM_H_
+#define EM_ALGORITHM_H_
 #include <iostream>
 #include <memory>
 #include <vector>
 #include <stddef.h>
 #include <iostream>
 #include <fstream>
-//#include <Eigen/Dense>
+#include <atomic>
+#include <Eigen/Dense>
 #include "em_model.h"
 #include "em_data.h"
 #include "em_model_mutation.h"
 #include "em_logger.h"
 
-#ifndef EM_ALGORITHM_H_
-#define EM_ALGORITHM_H_
 
 extern const double EM_CONVERGE_THRESHOLD;
 
@@ -76,7 +77,7 @@ protected:
     size_t max_ite_count;
 
     double sum_ratio;
-    double log_likelihood;
+    std::atomic<double> log_likelihood;
 
     EmLogger em_logger;
 

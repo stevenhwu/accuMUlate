@@ -14,10 +14,10 @@
 //#include <stddef.h>
 //#include "site_prob.h"
 
-#include "em_algorithm.h"
+#include "em_algorithm_multithread.h"
 
 
-class EmAlgorithmMutation : public EmAlgorithm{
+class EmAlgorithmMutation : public EmAlgorithmMultiThreading{
 
 public:
 

@@ -2,7 +2,7 @@
 #include "em_summary_stat_mutation.h"
 
 
-EmAlgorithmMutation::EmAlgorithmMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr) : EmAlgorithm(model_ptr) {
+EmAlgorithmMutation::EmAlgorithmMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr) : EmAlgorithmMultiThreading(model_ptr) {
 
     InitWithModel();
 
@@ -15,11 +15,20 @@ EmAlgorithmMutation::~EmAlgorithmMutation() {
 
 void EmAlgorithmMutation::RunEM() {
 
+    size_t block_size = site_count/num_thread;
+    std::cout << num_thread << "\t" << block_size << "\t" << site_count << std::endl;
+    for (int i = 0; i < num_thread-1; ++i) {
+        t[i] = boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, i * block_size, (i + 1) * block_size);
+    }
+    t[num_thread-1] = boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, (num_thread-1)*block_size,site_count);
+
+
 //    em_stat_local_single->Print();
     size_t i = 0;
     bool notConverged = true;
     while(notConverged){
-        ExpectationStepModelPtr();
+//        ExpectationStepModelPtr();
+        ExpectationStepModelPtrMT();
         MaximizationStep();
         notConverged = EmStoppingCriteria(i);
         i++;

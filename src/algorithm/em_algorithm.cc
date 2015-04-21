@@ -13,15 +13,12 @@
 #include "em_algorithm.h"
 #include "em_summary_stat_mutation.h"
 
-#include <boost/thread.hpp>
-#include <boost/thread/scoped_thread.hpp>
-//#include <boost/chrono.hpp>
 #include <stddef.h>
 #include <glob.h>
 
 const double EM_CONVERGE_THRESHOLD = 1e-10;
 const double EM_CONVERGE_RATIO_THRESHOLD = 1e-10;
-const int EM_MAX_ITE = 1e6;
+const int EM_MAX_ITE = 50;
 int VERBOSE_ITE = 100;
 int LOG_ITE = 10;
 
@@ -147,13 +144,17 @@ void EmAlgorithm::ExpectationStepModelPtr() {
             (*em_model_ptr)[r]->UpdateSummaryStat(s, sum_prob, temp_stats[r], log_likelihood_scaler);
             all_probs(r, s) = proportion[r] * sum_prob;
         }
-        log_likelihood += log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler;
+        log_likelihood = log_likelihood + log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler;
         double sum = all_probs.col(s).sum();
+
         for (size_t r = 0; r < num_category; ++r) {
             double prob = all_probs(r,s) / sum;
             all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
         }
     }
+//    for (size_t r = 0; r < num_category; ++r) {
+//        all_em_stats[r]->Print();
+//    }
 //    std::cout << "==Ln: " << log_likelihood << std::endl;
 //    printf("Ln: %.40f\n", log_likelihood);
 
@@ -273,7 +274,7 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 
 void EmAlgorithm::PrintSummary(){
 //    std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << "\tsum_ratio: " << sum_ratio << std::endl;
-    printf("EM Summary: Ln:%.10f\nParameters: ", log_likelihood);
+//    printf("EM Summary: Ln:%.10f\nParameters: ", log_likelihood.); //TODO: Add this back
      for (auto &item :parameters) {
         printf("%.40e\t", item);
     }
@@ -298,7 +299,7 @@ std::string EmAlgorithm::GetEMSummary(){
         sprintf(temp, "%.12e\t", item);
         out.append(temp);
     }
-    sprintf(temp, "%.12f\t%.12e\t", log_likelihood, sum_ratio);
+//    sprintf(temp, "%.12f\t%.12e\t", log_likelihood, sum_ratio);//TODO: add this back
     out.append(temp);
     return out;
 

@@ -307,6 +307,7 @@ GenomeData getGenomeData(boost::program_options::variables_map variables_map) {
 }
 
 int main(int argc, char** argv){
+    Eigen::initParallel();//TODO: triple check this!!
 
     boost::program_options::variables_map variables_map;
     BoostUtils::ParseCommandLinkeInput(argc, argv, variables_map);
