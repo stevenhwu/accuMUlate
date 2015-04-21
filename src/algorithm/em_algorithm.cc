@@ -13,15 +13,19 @@
 #include "em_algorithm.h"
 #include "em_summary_stat_mutation.h"
 
-
+#include <boost/thread.hpp>
+#include <boost/thread/scoped_thread.hpp>
+//#include <boost/chrono.hpp>
 #include <stddef.h>
 #include <glob.h>
 
-const double EM_CONVERGE_THRESHOLD = 1e-11;
-const double EM_CONVERGE_RATIO_THRESHOLD = 1e-11;
+const double EM_CONVERGE_THRESHOLD = 1e-10;
+const double EM_CONVERGE_RATIO_THRESHOLD = 1e-10;
 const int EM_MAX_ITE = 1e6;
 int VERBOSE_ITE = 100;
 int LOG_ITE = 10;
+
+
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
 

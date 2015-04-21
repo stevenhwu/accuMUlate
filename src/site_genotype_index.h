@@ -38,7 +38,7 @@ public:
         ancestor_index = other.ancestor_index;
         other.ancestor_index = 0;
         descendant_index = std::move(other.descendant_index);
-//        other.descendant_index.clear();
+
         return *this;
     }
 
@@ -50,8 +50,10 @@ public:
 //        std::cout << "copy assignment" << std::endl;
 //        ancestor_index = other.ancestor_index;
 //    }
+
     SiteGenotypesIndex (const SiteGenotypesIndex& other) = default;
     SiteGenotypesIndex& operator= (const SiteGenotypesIndex& other)= default;
+
 //    SiteGenotypesIndex (const SiteGenotypesIndex& other) = delete;
 //    SiteGenotypesIndex& operator= (const SiteGenotypesIndex& other) = delete;
 

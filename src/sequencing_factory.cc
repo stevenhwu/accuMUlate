@@ -372,10 +372,10 @@ DiploidProbsIndex10 SequencingFactory::ConvertDiploid16ToDiploid10(DiploidProbs 
     return temp_diploid_10;
 }
 
-std::vector<SiteGenotypesIndex> SequencingFactory::CreateSequenceProbsVector(GenomeData &data) {
-    std::vector<SiteGenotypesIndex> sgi;
+void SequencingFactory::CreateSequenceProbsVector(GenomeData &data) {
+
     CreateSequenceProbsVector(sgi, data);
-    return sgi;
+//    return std::move(sgi);
 }
 
 void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sgi, ModelInput &data) {
@@ -450,4 +450,8 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 //        if(i==5){
 //            break;
 //        }
+}
+
+std::vector<SiteGenotypesIndex> &&SequencingFactory::MoveSiteGenotypeIndexVector() {
+    return std::move(sgi);
 }

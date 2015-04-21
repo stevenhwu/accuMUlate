@@ -113,7 +113,7 @@ void MutationModel::AddGenotypeFactory(SequencingFactory &factory) {
 //
 //    InitCacheOld1();
 //}
-void MutationModel::MoveSequenceProb(std::vector<SiteGenotypesIndex> &all) {
+void MutationModel::MoveSequenceProb(std::vector<SiteGenotypesIndex> &&all) {
 //    std::vector<SiteGenotypesIndex> &local = all;
     MutationModel::all_sequence_prob_index = std::move(all);
     site_count = all_sequence_prob_index.size();

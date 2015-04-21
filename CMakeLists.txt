@@ -112,7 +112,7 @@ SET( CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
 ########## FIND_PACKAGE ##########
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakeModule/")
-find_package( Boost COMPONENTS program_options REQUIRED )
+find_package( Boost COMPONENTS program_options thread REQUIRED )
 find_package( Eigen3 3 REQUIRED )
 find_package( Bamtools REQUIRED )
 #find_package( gsl REQUIRED )

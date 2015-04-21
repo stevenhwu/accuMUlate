@@ -40,6 +40,7 @@ class MutationModel {
 
 public:
 
+    MutationModel(EvolutionModel &evo_model0, std::vector<SiteGenotypesIndex> &all_index);
     MutationModel(EvolutionModel &evo_model0);
     MutationModel() {
     }
@@ -48,7 +49,7 @@ public:
 
 //    void CacheLoopDesAll(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
 
-    void MoveSequenceProb(std::vector<SiteGenotypesIndex> &all);
+    void MoveSequenceProb(std::vector<SiteGenotypesIndex> &&all);
 //    void MoveSequenceProb(std::vector<SiteGenotypesIndex> all);
 
     void InitCache();

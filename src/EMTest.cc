@@ -21,6 +21,9 @@
 #include "string.h"
 //#include "em_algorithm.h"
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic ignored "-Wdeprecated"
+
 
 using namespace std;
 using namespace BamTools;
@@ -124,7 +127,7 @@ void RunEmWithRealDataOneStep(boost::program_options::variables_map variables_ma
     MutationModel::AddGenotypeFactory(sequencing_factory);
     printMemoryUsage("add genotypes");
     std::cout << sgi.size() << std::endl;
-    mutation_model.MoveSequenceProb(sgi);
+    mutation_model.MoveSequenceProb(std::move(sgi));
     printMemoryUsage("add seq probs");
     std::cout << sgi.size() << std::endl;
 
@@ -179,7 +182,7 @@ void RunEmWithRealData(boost::program_options::variables_map variables_map) {
     ModelParams params = BoostUtils::CreateModelParams(variables_map);
     MutationProb mutation_prob (params);
     F81 evo_model0(mutation_prob);
-    MutationModel mutation_model = (evo_model0);
+    MutationModel mutation_model (evo_model0);
 
     printMemoryUsage("Start Basic");
     clock_t t1;
@@ -247,10 +250,10 @@ void CreateMutationModel(MutationModel &mutation_model, GenomeData &genome_data,
     MutationModel::AddGenotypeFactory(sequencing_factory);
     std::cout << "SiteGenotypeIndex Size: " << sgi.size() << std::endl;
     printMemoryUsage("add genotypes");
-    mutation_model.MoveSequenceProb(sgi);
+    mutation_model.MoveSequenceProb(std::move(sgi));
     printMemoryUsage("add seq probs");
 
-    std::vector<SiteGenotypesIndex>().swap( sgi );
+//    std::vector<SiteGenotypesIndex>().swap( sgi );
 }
 
 

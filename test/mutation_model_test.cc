@@ -100,7 +100,7 @@ TEST_F(MutationModelTest, TestCalculateAncestorToDescendant) {
     sf.CreateSequenceProbsVector(sg, genome_data);
     MutationModel mm (evo_model);
     mm.AddGenotypeFactory(sf);
-    mm.MoveSequenceProb(sg);
+    mm.MoveSequenceProb(std::move(sg));
 
     double prob2;
     double diff2;
@@ -183,7 +183,7 @@ TEST_F(MutationModelTest, TestCalculateAncestorToDescendant3) {
     sf.CreateSequenceProbsVector(sg, genome_data);
     MutationModel mm (evo_model);
     mm.AddGenotypeFactory(sf);
-    mm.MoveSequenceProb(sg);
+    mm.MoveSequenceProb(std::move(sg));
 
     double mutation_model_prob;
     double mutation_model_stat_diff;
@@ -225,7 +225,7 @@ TEST_F(MutationModelTest, TestFullSimulatedGenome) {
 
     MutationModel mm (evo_model);
     mm.AddGenotypeFactory(sf);
-    mm.MoveSequenceProb(sg);
+    mm.MoveSequenceProb(std::move(sg));
 
 
     double site_prob = 0;
