@@ -150,7 +150,7 @@ void EmAlgorithmMultiThreading::ExpectationStepModelPtrMT() {
 //    threads.join_all();
 
     {
-        ThreadPool tp(3);
+        ThreadPool tp(4);
         for (int i = 0; i < num_blocks - 1; ++i) {
             tp.enqueue(boost::bind(&EmAlgorithmMultiThreading::WorkingThread, this, i * block_size, (i + 1) * block_size));
         }
@@ -230,11 +230,14 @@ void EmAlgorithmMultiThreading::EmptyThread(size_t site_start, size_t site_end) 
     for (size_t s = site_start; s < site_end; ++s) {
 //        std::cout << s << std::endl;
         double sum_prob = 1.0;//*s*site_start/site_end;;
-        for (size_t r = 0; r < 1; ++r) {
+        for (size_t r = 0; r < 2; ++r) {
             (*em_model_ptr)[r]->UpdateSummaryStat(s, sum_prob, temp_stats[r], log_likelihood_scaler);
-//            all_probs(r, s) = proportion[r] * sum_prob;
+            all_probs(r, s) = proportion[r] * sum_prob;
         }
-
+//        pModel0->UpdateSummaryStat(s, sum_prob, temp_stats[0], log_likelihood_scaler);
+//        lock.lock();// 142 vs 40
+//        pModel1->UpdateSummaryStat(s, sum_prob, temp_stats[1], log_likelihood_scaler);
+//    lock.unlock();
 //        log_likelihood = log_likelihood + log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler  ;
         temp_likelihood += log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler;
 //        double temp = log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler  ;
@@ -246,7 +249,7 @@ void EmAlgorithmMultiThreading::EmptyThread(size_t site_start, size_t site_end) 
         for (size_t r = 0; r < num_category; ++r) {
             double prob = all_probs(r,s) / sum;
 
-//            all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
+            all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
         }
     }
 
@@ -259,11 +262,12 @@ void EmAlgorithmMultiThreading::WorkingThread(size_t site_start, size_t site_end
 //    std::cout << "GetID: " << boost::this_thread::get_id() << std::dec<<  "\t" << ((int) site_start )<< "\t" << (int) site_end  << std::endl;
 
     double log_likelihood_scaler = 0;
-    std::vector<std::vector<double>> temp_stats (2);
-    for (size_t i = 0; i < num_category; ++i) {
-        temp_stats[i] = std::vector<double>(2);
-//        temp_stats[i].assign(2,0);
-    }
+    double temp_likelihood = 0;
+    int stat_count = 2;
+    std::vector<std::vector<double>> temp_stats (num_category, std::vector<double>(2, 0));
+    std::vector<EmSummaryStat> local_stat (num_category, stat_count);
+
+
 
 //    for (size_t s = 0; s < site_count; ++s) {
     for (size_t s = site_start; s < site_end; ++s) {
@@ -273,24 +277,30 @@ void EmAlgorithmMultiThreading::WorkingThread(size_t site_start, size_t site_end
             (*em_model_ptr)[r]->UpdateSummaryStat(s, sum_prob, temp_stats[r], log_likelihood_scaler);
             all_probs(r, s) = proportion[r] * sum_prob;
         }
+//        std::exit(3);
 
 //        log_likelihood = log_likelihood + log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler  ;
-        double temp = log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler;
-        auto current = log_likelihood.load();
-        while (!log_likelihood.compare_exchange_weak(current, current + temp));
-
+//        double temp = log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler;
+//        auto current = log_likelihood.load();
+//        while (!log_likelihood.compare_exchange_weak(current, current + temp));
+        temp_likelihood += log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler;
 
         double sum = all_probs.col(s).sum();
 //        auto a = all_probs.col(s);
 //        auto aa = a.sum();
-
 //        std::cout << "P: "<<all_probs(0,s) << "\t" << all_probs(1,s)<<  "\t" << sum << std::endl;
 //        std::cout << a(0) << "\t" << a[1] << "\t" << aa << std::endl;
         for (size_t r = 0; r < num_category; ++r) {
             double prob = all_probs(r,s) / sum;
 //            std::cout << all_probs(r,s) << "\t" <<  sum << std::endl;
-            all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
+//            all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
+            local_stat[r].UpdateSumWithProportion(prob, temp_stats[r]);
         }
+    }
+    auto current = log_likelihood.load();
+    while (!log_likelihood.compare_exchange_weak(current, current + temp_likelihood));
+    for (size_t r = 0; r < num_category; ++r) {
+        all_em_stats[r]->UpdateSumWithProportionSynchronized(local_stat[r].GetStats());
     }
 
 //    for (size_t r = 0; r < num_category; ++r) {

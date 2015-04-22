@@ -65,12 +65,17 @@ public:
 
 
     EmAlgorithmMultiThreading(std::vector<std::unique_ptr<EmModel>> &model_ptr) : EmAlgorithm(model_ptr) {
+
+
     }
     static const int num_thread = 40;
     boost::thread t[num_thread];
     std::vector<boost::thread> thread_vector;
 
+//    EmModel *pModel0;
+//    EmModel *pModel1;
 
+    std::mutex lock;
     void ExpectationStepModelPtrMT();
     void WorkingThread(size_t site_start, size_t site_end);
 

@@ -22,7 +22,8 @@ void EmAlgorithmMutation::RunEM() {
 //    }
 //    t[num_thread-1] = boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, (num_thread-1)*block_size,site_count);
 
-
+//    pModel0 = (*em_model_ptr)[0].release();
+//    pModel1 = (*em_model_ptr)[1].release();
 //    em_stat_local_single->Print();
     size_t i = 0;
     bool notConverged = true;

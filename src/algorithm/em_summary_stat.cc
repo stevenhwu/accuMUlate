@@ -7,9 +7,11 @@ EmSummaryStat::EmSummaryStat() : EmSummaryStat(EM_SUMMARY_STAT_STATS_COUNT){
 EmSummaryStat::EmSummaryStat(int const stat_count0) : stat_count(stat_count0) {
 //    stat.assign(stat_count, std::atomic<double> {0});
 //    stat.resize(stat_count);
-    for (int i = 0; i < stat_count; ++i) {
-        stat.emplace_back(0);
-    }
+//    std::cout << "creat stat:" << "\t" << stat_count << std::endl;
+    stat.assign(stat_count, 0);
+//    for (int i = 0; i < stat_count; ++i) {
+//        stat.emplace_back(0);
+//    }
 }
 
 size_t EmSummaryStat::GetStatCount(){
@@ -27,6 +29,10 @@ void EmSummaryStat::Print() {
 
 double EmSummaryStat::GetStat(int index) {
     return stat[index];
+}
+
+std::vector<double>& EmSummaryStat::GetStats() {
+    return stat;
 }
 
 void EmSummaryStat::Reset() {
@@ -73,12 +79,25 @@ void EmSummaryStat::UpdateSumWithProportion(double proportion, std::vector<doubl
 //    stat_mutex.lock();
     for (int i = 0; i < stat_count; ++i) {
 //        std::cout << proportion << "\t" << temp_stats[i] << std::endl;
-//        stat[i] += proportion * temp_stats[i];
+        stat[i] += proportion * temp_stats[i];
 
-        auto current = stat[i].load();
-        auto temp = proportion * temp_stats[i];
-        while (!stat[i].compare_exchange_weak(current, current + temp));
+//        auto current = stat[i].load();
+//        auto temp = proportion * temp_stats[i];
+//        while (!stat[i].compare_exchange_weak(current, current + temp));
 
     }
 //    stat_mutex.unlock();
+}
+
+void EmSummaryStat::UpdateSumWithProportionSynchronized(std::vector<double> &temp_stats) {
+    std::lock_guard<std::mutex> lock(stat_mutex);
+    for (int i = 0; i < stat_count; ++i) {
+        stat[i] += temp_stats[i];
+    }
+}
+
+void EmSummaryStat::ChangeStatCount(int new_count) {
+    stat_count = new_count;
+    stat.assign(stat_count, 0);
+
 }

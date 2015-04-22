@@ -389,7 +389,7 @@ void MutationModel::UpdateCache() {
 
 
 void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff, double &log_likelihood_scaler) {
-
+//lock.lock();
     prob_reads = 0;
     all_stats_diff = 0;
 
@@ -407,6 +407,8 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
     double prod_prob_ancestor = 1;
     for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
         CacheLoopDesAll2(index10, descendant_genotypes_index, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
+//            prod_prob_ancestor = 0.1/(index10+1);
+//            summary_stat_diff_ancestor = (index10+1)*1.0/12;
 
 //        NoCacheCalculateDes(site_index, index10, prod_prob_ancestor, t, summary_stat_diff_ancestor);
 //        CacheLoopDesAll(site_index, index10, prod_prob_ancestor, summary_stat_diff_ancestor);
@@ -417,9 +419,11 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
 
     }
+
     all_stats_diff /= prob_reads;
     all_stats_diff /= descendant_count;//TODO: need this to auto calculate stat_same. sum to 1
 
+//lock.unlock();
 #ifdef DEBUG7
     if(site_index >0) {
         double likelihood = 0;
@@ -537,10 +541,9 @@ void MutationModel::CacheLoopDesAll2(int anc_index, const std::vector<uint32_t> 
 //    for (int d = 0; d < descendant_count; ++d) {
 
     for (auto &item : aa) {
-        if(item > vv.size()) {
-            std::cout << aa.size() << "\t" << vv.size() << "\t" << item << "\t" << anc_index << std::endl;
-
-        }
+//        if(item > vv.size()) {
+//            std::cout << aa.size() << "\t" << vv.size() << "\t" << item << "\t" << anc_index << std::endl;
+//        }
         std::pair<double, double> &cp = vv[item];
         product_prob_given_ancestor *= cp.first;
         summary_stat_diff_ancestor += cp.second;

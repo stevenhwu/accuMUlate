@@ -165,6 +165,8 @@ void EmAlgorithm::UpdateEmParameters() {
         all_em_stats[r]->Reset();
         em_model_ptr->at(r)->UpdateParameter(parameters[r]); //exp_beta
     }
+
+
 }
 
 void EmAlgorithm::MaximizationStep() {

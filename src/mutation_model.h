@@ -17,6 +17,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <map>
+#include <mutex>
 
 #include "model.h"
 #include "mutation_prob.h"
@@ -71,6 +72,7 @@ public:
 
 private:
 
+//    std::mutex lock;
 //    DiploidProbs ancestor_genotypes;
 //    std::vector<HaploidProbs> all_descendant_genotypes;
 
