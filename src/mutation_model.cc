@@ -535,8 +535,12 @@ void MutationModel::CacheLoopDesAll2(int anc_index, const std::vector<uint32_t> 
 
     auto &vv = cache_read_data_to_all_index_rev[anc_index];
 //    for (int d = 0; d < descendant_count; ++d) {
-    for (auto &item : aa) {
 
+    for (auto &item : aa) {
+        if(item > vv.size()) {
+            std::cout << aa.size() << "\t" << vv.size() << "\t" << item << "\t" << anc_index << std::endl;
+
+        }
         std::pair<double, double> &cp = vv[item];
         product_prob_given_ancestor *= cp.first;
         summary_stat_diff_ancestor += cp.second;

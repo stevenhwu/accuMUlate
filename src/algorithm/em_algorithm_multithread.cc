@@ -100,25 +100,81 @@ void EmAlgorithmMultiThreading::ExpectationStepModelPtrMT() {
 
 //    size_t block_size = 5000;
 
-    const int num_thread = 4;
-    size_t block_size = site_count/num_thread;
+//    const int num_thread = 4;
 
+    char temp[1000];
     UpdateEmParameters();
 //
 //    boost::thread t[num_thread];
     log_likelihood = 0;
 //    std::cout << num_thread << "\t" << block_size<< std::endl;
-    for (int i = 0; i < num_thread-1; ++i) {
-        t[i] = boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, i * block_size, (i + 1) * block_size);
-    }
-    t[num_thread-1] = boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, (num_thread-1)*block_size,site_count);
-//    t[0] = boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, 0,31321);
-//    t[0] = boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, 0,15660);
-//    t[1] = boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, 15660, 31321);
+
+//    size_t block_size = site_count/num_thread;
+//    for (int i = 0; i < num_thread-1; ++i) {
+//        t[i] = boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, i * block_size, (i + 1) * block_size);
+//    }
+//    t[num_thread-1] = boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, (num_thread-1)*block_size,site_count);
+////    std::cout << "==All Ln: " << log_likelihood << std::endl;
+//    for (int i = 0; i < num_thread; ++i)
+//        t[i].join();
+
+//    size_t block_size = site_count/num_thread;
+//    thread_vector.clear();
+//    for (int i = 0; i < num_thread-1; ++i) {
+//        thread_vector.push_back(
+//                boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, i * block_size, (i + 1) * block_size));
+//    }
+//    thread_vector.push_back(boost::thread(&EmAlgorithmMultiThreading::WorkingThread, this, (num_thread-1)*block_size,site_count));
 //
-//    std::cout << "==All Ln: " << log_likelihood << std::endl;
-    for (int i = 0; i < num_thread; ++i)
-        t[i].join();
+//    for (int i = 0; i < num_thread; ++i){
+//        thread_vector[i].join();
+//    }
+
+
+
+//    boost::asio::io_service io_service;
+//    boost::asio::io_service::work work(io_service);
+//    boost::thread_group threads;
+//    int num_thread  = 2;
+//    for (std::size_t i = 0; i < num_thread; ++i) {
+//        threads.create_thread(boost::bind(&boost::asio::io_service::run, &io_service));
+//    }
+    size_t num_blocks = 1000;
+    size_t block_size = site_count / num_blocks;
+//     for (int i = 0; i < num_blocks-1; ++i) {
+//         std::cout << i << "\t" << block_size << std::endl;
+//         io_service.post(boost::bind(&EmAlgorithmMultiThreading::WorkingThread, this, i * block_size, (i + 1) * block_size)  );
+//     }
+//    io_service.post(boost::bind(&EmAlgorithmMultiThreading::WorkingThread, this, (num_blocks-1)*block_size,site_count) );
+//    io_service.stop();
+//    threads.join_all();
+
+    {
+        ThreadPool tp(3);
+        for (int i = 0; i < num_blocks - 1; ++i) {
+            tp.enqueue(boost::bind(&EmAlgorithmMultiThreading::WorkingThread, this, i * block_size, (i + 1) * block_size));
+        }
+        tp.enqueue(boost::bind(&EmAlgorithmMultiThreading::WorkingThread, this, (num_blocks - 1) * block_size, site_count));
+
+//        for (int i = 0; i < num_blocks - 1; ++i) {
+//            tp.enqueue(boost::bind(&EmAlgorithmMultiThreading::EmptyThread, this, i * block_size, (i + 1) * block_size));
+//        }
+//        tp.enqueue(boost::bind(&EmAlgorithmMultiThreading::EmptyThread, this, (num_blocks - 1) * block_size, site_count));
+    }
+
+
+//    boost::this_thread::sleep_for(boost::chrono::seconds{3});
+
+
+    sprintf(temp, "%.15f\t", log_likelihood.load());
+//    sprintf(temp, "%.15f\t", log_likelihood);
+    std::cout << "\n==MT==All Ln: " << temp << std::endl;
+//    for (size_t r = 0; r < num_category; ++r) {
+//        all_em_stats[r]->Print();
+//    }
+
+
+
 
 
 //    for (size_t r = 0; r < num_category; ++r) {
@@ -127,32 +183,91 @@ void EmAlgorithmMultiThreading::ExpectationStepModelPtrMT() {
 
 //    UpdateEmParameters();
 //    log_likelihood = 0;
-//    WorkingThread(0,num_thread*block_size);
-////    WorkingThread(0,31321);
-//    std::cout << "\n\nSingle\n==All Ln: " << log_likelihood << std::endl;
+//    WorkingThread(0,site_count);
+//////    WorkingThread(0,31321);
+//
+//    sprintf(temp, "%.15f\t", log_likelihood.load());
+//    std::cout << "\n==Single==All Ln: " << temp << std::endl;
 //    for (size_t r = 0; r < num_category; ++r) {
 //        all_em_stats[r]->Print();
 //    }
 //    std::exit(12);
+//7.204842241669e-01	9.095599810937e-07	1.305992121779e-04	9.998694007878e-01	9.998694007878e-01	Time new: 61	61484826
 
 }
-
-//static void WorkingThread(size_t site_start, size_t site_end);
-
-void EmAlgorithmMultiThreading::WorkingThread(size_t site_start, size_t site_end) {
-
-//    std::cout << "GetID: " << boost::this_thread::get_id() << "\t" << site_start << "\t" << site_end << '\n';
+void EmAlgorithmMultiThreading::EmptyThread(size_t site_start, size_t site_end) {
+//    double temp = site_start + site_end;
+//    auto current = log_likelihood.load();
+//    while (!log_likelihood.compare_exchange_weak(current, current + temp));
+//
+//    std::vector<double> temp_v;
+//    temp_v.push_back(site_start);
+//    temp_v.push_back(site_end);
+//    for (size_t r = 0; r < num_category; ++r) {
+////        double prob = all_probs(r,s) / sum;
+////            std::cout << all_probs(r,s) << "\t" <<  sum << std::endl;
+//
+//        all_em_stats[r]->UpdateSumWithProportion( (double) (site_start/(site_end*1.0)), temp_v);
+//    }
+//    for (size_t s = site_start; s < site_end; ++s) {
+////        std::cout << s << std::endl;
+//
+//        for (size_t r = 0; r < num_category; ++r) {
+//
+//            all_probs(r, s) = (site_start/(site_end*1.0))*(1.0/s);
+//        }
+//    }
 
     double log_likelihood_scaler = 0;
-//    std::vector<std::vector<double>> temp_stats (2);
-//    for (size_t i = 0; i < num_category; ++i) {
-//        std::cout << i << std::endl;
-//        temp_stats[i] = std::vector<double>(2);
+    std::vector<std::vector<double>> temp_stats (2);
+    for (size_t i = 0; i < num_category; ++i) {
+        temp_stats[i] = std::vector<double>(2);
 //        temp_stats[i].assign(2,0);
-//        std::cout << temp_stats[i][0] << "\t" << temp_stats[i][1] << std::endl;
-//    }
+    }
+
+//    for (size_t s = 0; s < site_count; ++s) {
+    double temp_likelihood = 0;
+    for (size_t s = site_start; s < site_end; ++s) {
+//        std::cout << s << std::endl;
+        double sum_prob = 1.0;//*s*site_start/site_end;;
+        for (size_t r = 0; r < 1; ++r) {
+            (*em_model_ptr)[r]->UpdateSummaryStat(s, sum_prob, temp_stats[r], log_likelihood_scaler);
+//            all_probs(r, s) = proportion[r] * sum_prob;
+        }
+
+//        log_likelihood = log_likelihood + log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler  ;
+        temp_likelihood += log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler;
+//        double temp = log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler  ;
+//        auto current = log_likelihood.load();
+//        while (!log_likelihood.compare_exchange_weak(current, current + temp));
+
+        double sum = all_probs.col(s).sum();
+
+        for (size_t r = 0; r < num_category; ++r) {
+            double prob = all_probs(r,s) / sum;
+
+//            all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
+        }
+    }
+
+    auto current = log_likelihood.load();
+    while (!log_likelihood.compare_exchange_weak(current, current + temp_likelihood));
+
+}
+void EmAlgorithmMultiThreading::WorkingThread(size_t site_start, size_t site_end) {
+
+//    std::cout << "GetID: " << boost::this_thread::get_id() << std::dec<<  "\t" << ((int) site_start )<< "\t" << (int) site_end  << std::endl;
+
+    double log_likelihood_scaler = 0;
+    std::vector<std::vector<double>> temp_stats (2);
+    for (size_t i = 0; i < num_category; ++i) {
+        temp_stats[i] = std::vector<double>(2);
+//        temp_stats[i].assign(2,0);
+    }
+
 //    for (size_t s = 0; s < site_count; ++s) {
     for (size_t s = site_start; s < site_end; ++s) {
+//        std::cout << s << std::endl;
         double sum_prob = 0;
         for (size_t r = 0; r < num_category; ++r) {
             (*em_model_ptr)[r]->UpdateSummaryStat(s, sum_prob, temp_stats[r], log_likelihood_scaler);
@@ -163,6 +278,7 @@ void EmAlgorithmMultiThreading::WorkingThread(size_t site_start, size_t site_end
         double temp = log(all_probs(0, s)+all_probs(1, s))+log_likelihood_scaler;
         auto current = log_likelihood.load();
         while (!log_likelihood.compare_exchange_weak(current, current + temp));
+
 
         double sum = all_probs.col(s).sum();
 //        auto a = all_probs.col(s);
@@ -176,10 +292,12 @@ void EmAlgorithmMultiThreading::WorkingThread(size_t site_start, size_t site_end
             all_em_stats[r]->UpdateSumWithProportion(prob, temp_stats[r]);
         }
     }
+
 //    for (size_t r = 0; r < num_category; ++r) {
 //        all_em_stats[r]->Print();
 //    }
 //    std::cout << "====Ln: " << log_likelihood << std::endl;
+
 ////    printf("Ln: %.40f\n", log_likelihood);
 
 }

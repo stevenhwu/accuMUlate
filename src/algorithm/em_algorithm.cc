@@ -262,11 +262,13 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 //    }
     if( sum_ratio < EM_CONVERGE_RATIO_THRESHOLD){
         std::cout <<"============ DONE (ratio < THRESHOLD) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
+        return true;
         return false;
     }
 
     if( std::isnan(sum_ratio) ){
         std::cout <<"============ FAIL (ratio == -nan) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
+        return true;
         return false;
     }
     return true;

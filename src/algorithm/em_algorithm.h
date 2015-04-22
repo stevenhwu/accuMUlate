@@ -78,11 +78,13 @@ protected:
 
     double sum_ratio;
     std::atomic<double> log_likelihood;
+//    double log_likelihood;
 
     EmLogger em_logger;
 
     std::vector<std::unique_ptr<EmData>> *em_data_ptr;
     std::vector<std::unique_ptr<EmModel>> *em_model_ptr;
+//    std::vector<std::shared_ptr<EmModel>> *em_model_ptr;
 
     std::vector<std::unique_ptr<EmModel>> em_model;
     std::vector<std::unique_ptr<EmSummaryStat>> all_em_stats;
