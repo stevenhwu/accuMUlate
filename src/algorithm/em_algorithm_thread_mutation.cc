@@ -1,25 +1,34 @@
-#include "em_algorithm_mutation.h"
+#include "em_algorithm_thread_mutation.h"
 #include "em_summary_stat_mutation.h"
 
+EmAlgorithmThreadMutation::EmAlgorithmThreadMutation(MutationModelMultiCategories &model_multi0)
+        : EmAlgorithmMultiThreading(model_multi0){
 
-EmAlgorithmMutation::EmAlgorithmMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr) : EmAlgorithm(model_ptr) {
+    site_count = model_multi.GetSiteCount();
+    std::cout << "EM Site_count: " << site_count << std::endl;
+    all_probs = Eigen::ArrayXXd::Zero(num_category, site_count);
+    parameters = std::vector<double>(num_category);
+    cache_parameters = std::vector<double>(num_category, 0);
 
-    InitWithModel();
+    InitialiseProportion();
+
+    InitialiseParameters();
+
+    InitialiseSummaryStat();
+}
+
+EmAlgorithmThreadMutation::~EmAlgorithmThreadMutation() {
 
 }
 
 
-EmAlgorithmMutation::~EmAlgorithmMutation() {
 
-}
-
-void EmAlgorithmMutation::RunEM() {
+void EmAlgorithmThreadMutation::RunEM() {
 
     size_t i = 0;
     bool notConverged = true;
     while(notConverged){
-        ExpectationStepModelPtr();
-
+        ExpectationStepModelPtrMTMulti();
         MaximizationStep();
         notConverged = EmStoppingCriteria(i);
         i++;
@@ -27,7 +36,8 @@ void EmAlgorithmMutation::RunEM() {
 
 }
 
-void EmAlgorithmMutation::InitialiseParameters() {
+
+void EmAlgorithmThreadMutation::InitialiseParameters() {
     double lower_bound = 1e-10;
     double upper_bound = 0.9;
 
@@ -59,7 +69,7 @@ void EmAlgorithmMutation::InitialiseParameters() {
 }
 
 
-void EmAlgorithmMutation::InitialiseSummaryStat() {
+void EmAlgorithmThreadMutation::InitialiseSummaryStat() {
 
 
     temp_stats = std::vector<std::vector<double>>(num_category);
@@ -72,7 +82,7 @@ void EmAlgorithmMutation::InitialiseSummaryStat() {
 }
 
 
-void EmAlgorithmMutation::ExpectationStepCustom(size_t data_index, size_t category_index,
+void EmAlgorithmThreadMutation::ExpectationStepCustom(size_t data_index, size_t category_index,
         double &sum_prob, std::vector<double> &temp_stat) {
     std::cout << "Error!! should NOT call ExpectationStepCustom here" << std::endl;
     exit(40);

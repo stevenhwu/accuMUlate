@@ -184,11 +184,10 @@ namespace PileupUtils{
         uint64_t total_base_count2 = 0;
         uint64_t sequence_count2 = 0;
         gd_stream_read.ReadHeader(total_base_count2, sequence_count2);
-        std::cout << "Sequence count: " << sequence_count2 << std::endl;
 
         gd_stream_read.ReadGenomeData(genome_data);
 
-        std::cout << "========= conut: " << genome_data.size() << std::endl;
+        std::cout << "========= Sequence conut: " << sequence_count2  << "\tSite count:" << genome_data.size() << std::endl;
         gd_stream_read.close();
 
     }

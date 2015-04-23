@@ -284,14 +284,14 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 
 void EmAlgorithm::PrintSummary(){
 //    std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << "\tsum_ratio: " << sum_ratio << std::endl;
-//    printf("EM Summary: Ln:%.10f\nParameters: ", log_likelihood.); //TODO: Add this back
+    printf("EM Summary: Ln:%.10f\nParameters: ", log_likelihood.load()); //TODO: Add this back
      for (auto &item :parameters) {
-        printf("%.40e\t", item);
+        printf("%.15e\t", item);
     }
 
     printf("\nProportions: ");
     for (auto &item :proportion) {
-        printf("%.40e\t", item);
+        printf("%.15e\t", item);
     }
 
     printf("\n================= END SUMMARY ============\n");
