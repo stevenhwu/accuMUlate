@@ -410,9 +410,9 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
 //            prod_prob_ancestor = 0.1/(index10+1);
 //            summary_stat_diff_ancestor = (index10+1)*1.0/12;
 
-//        NoCacheCalculateDes(site_index, index10, prod_prob_ancestor, t, summary_stat_diff_ancestor);
-//        CacheLoopDesAll(site_index, index10, prod_prob_ancestor, summary_stat_diff_ancestor);
-//        CacheLoopDesAll3(index10, aa, prod_prob_ancestor, summary_stat_diff_ancestor);
+////        NoCacheCalculateDes(site_index, index10, prod_prob_ancestor, t, summary_stat_diff_ancestor);
+////        CacheLoopDesAll(site_index, index10, prod_prob_ancestor, summary_stat_diff_ancestor);
+////        CacheLoopDesAll3(index10, aa, prod_prob_ancestor, summary_stat_diff_ancestor);
 
         double prob_reads_given_a = ancestor_genotype_10[index10] * prod_prob_ancestor;
         prob_reads += prob_reads_given_a;

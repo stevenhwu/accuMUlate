@@ -1,6 +1,22 @@
 #include "em_algorithm_mutation.h"
 #include "em_summary_stat_mutation.h"
 
+EmAlgorithmMutation::EmAlgorithmMutation(MutationModelMultiCategories &model_multi0) : EmAlgorithmMultiThreading(model_multi0){
+
+
+
+    site_count = model_multi.GetSiteCount();
+    std::cout << "Site_count: " << site_count << std::endl;
+    all_probs = Eigen::ArrayXXd::Zero(num_category, site_count);
+    parameters = std::vector<double>(num_category);
+    cache_parameters = std::vector<double>(num_category, 0);
+
+    InitialiseProportion();
+
+    InitialiseParameters();
+
+    InitialiseSummaryStat();
+}
 
 EmAlgorithmMutation::EmAlgorithmMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr) : EmAlgorithmMultiThreading(model_ptr) {
 
@@ -13,7 +29,7 @@ EmAlgorithmMutation::~EmAlgorithmMutation() {
 
 }
 
-void EmAlgorithmMutation::RunEM() {
+void EmAlgorithmMutation::RunEM_O() {
 
 //    size_t block_size = site_count/num_thread;
 //    std::cout << num_thread << "\t" << block_size << "\t" << site_count << std::endl;
@@ -30,6 +46,21 @@ void EmAlgorithmMutation::RunEM() {
     while(notConverged){
 //        ExpectationStepModelPtr();
         ExpectationStepModelPtrMT();
+        MaximizationStep();
+        notConverged = EmStoppingCriteria(i);
+        i++;
+    }
+
+}
+
+
+
+void EmAlgorithmMutation::RunEM() {
+//MULTI ONLY
+    size_t i = 0;
+    bool notConverged = true;
+    while(notConverged){
+        ExpectationStepModelPtrMTMulti();
         MaximizationStep();
         notConverged = EmStoppingCriteria(i);
         i++;

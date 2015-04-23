@@ -41,7 +41,7 @@ TEST_F(SiteGenotypeIndexTest, TestInit){
 
     SequencingFactory sequencing_factory2 (params_not_equal);
     sequencing_factory2.CreateSequenceProbsVector(genome_data2);
-    std::vector<SiteGenotypesIndex> sp2 = sequencing_factory2.MoveSiteGenotypeIndexVector();
+    std::vector<SiteGenotypesIndex> sp2 = sequencing_factory2.RemoveSiteGenotypeIndexVector();
 
     for (int i = 0; i < sp.size(); ++i) {
         ASSERT_EQ(sp[i].GetAncestorIndex(), sp2[i].GetAncestorIndex());

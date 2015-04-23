@@ -63,7 +63,9 @@ class EmAlgorithmMultiThreading : public EmAlgorithm {
 
 public:
 
+    EmAlgorithmMultiThreading(MutationModelMultiCategories &model_multi0) : EmAlgorithm(model_multi0){
 
+    }
     EmAlgorithmMultiThreading(std::vector<std::unique_ptr<EmModel>> &model_ptr) : EmAlgorithm(model_ptr) {
 
 
@@ -75,12 +77,17 @@ public:
 //    EmModel *pModel0;
 //    EmModel *pModel1;
 
-    std::mutex lock;
+    std::mutex lock_stat;
     void ExpectationStepModelPtrMT();
+    void ExpectationStepModelPtrMTMulti();
     void WorkingThread(size_t site_start, size_t site_end);
 
 
     void EmptyThread(size_t site_start, size_t site_end);
+
+    void MultiCateg(size_t site_start, size_t site_end);
+
+    void MultiCategories(size_t site_start, size_t site_end);
 };
 
 

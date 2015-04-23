@@ -84,7 +84,6 @@ void thread2()
 
 
 
-
 void EmAlgorithmMultiThreading::ExpectationStepModelPtrMT() {
 
 
@@ -150,7 +149,7 @@ void EmAlgorithmMultiThreading::ExpectationStepModelPtrMT() {
 //    threads.join_all();
 
     {
-        ThreadPool tp(4);
+        ThreadPool tp(1);
         for (int i = 0; i < num_blocks - 1; ++i) {
             tp.enqueue(boost::bind(&EmAlgorithmMultiThreading::WorkingThread, this, i * block_size, (i + 1) * block_size));
         }
@@ -166,9 +165,9 @@ void EmAlgorithmMultiThreading::ExpectationStepModelPtrMT() {
 //    boost::this_thread::sleep_for(boost::chrono::seconds{3});
 
 
-    sprintf(temp, "%.15f\t", log_likelihood.load());
-//    sprintf(temp, "%.15f\t", log_likelihood);
-    std::cout << "\n==MT==All Ln: " << temp << std::endl;
+//    sprintf(temp, "%.15f\t", log_likelihood.load());
+////    sprintf(temp, "%.15f\t", log_likelihood);
+//    std::cout << "\n==MT==All Ln: " << temp << std::endl;
 //    for (size_t r = 0; r < num_category; ++r) {
 //        all_em_stats[r]->Print();
 //    }
@@ -309,5 +308,75 @@ void EmAlgorithmMultiThreading::WorkingThread(size_t site_start, size_t site_end
 //    std::cout << "====Ln: " << log_likelihood << std::endl;
 
 ////    printf("Ln: %.40f\n", log_likelihood);
+
+}
+
+void EmAlgorithmMultiThreading::ExpectationStepModelPtrMTMulti() {
+    char temp[1000];
+//    UpdateEmParameters();
+    for (size_t r = 0; r < num_category; ++r) {
+        all_em_stats[r]->Reset();
+        model_multi.UpdateExpBeta(r,parameters[r]); //exp_beta
+    }
+    log_likelihood = 0;
+    size_t num_blocks = 120;
+    size_t block_size = site_count / num_blocks;
+    {
+        ThreadPool tp(3);
+        for (int i = 0; i < num_blocks - 1; ++i) {
+            tp.enqueue(boost::bind(&EmAlgorithmMultiThreading::MultiCategories, this, i * block_size, (i + 1) * block_size));
+        }
+        tp.enqueue(boost::bind(&EmAlgorithmMultiThreading::MultiCategories, this, (num_blocks - 1) * block_size, site_count));
+    }
+//    sprintf(temp, "%.15f\t", log_likelihood.load());
+//    sprintf(temp, "%.15f\t", log_likelihood);
+//    std::cout << "\n==MultiCategories==All Ln: " << temp << std::endl;
+//7.204842241669e-01	9.095599810937e-07	1.305992121779e-04	9.998694007878e-01	9.998694007878e-01	Time new: 61	61484826
+}
+
+void EmAlgorithmMultiThreading::MultiCategories(size_t site_start, size_t site_end) {
+
+//    std::cout << "GetID: " << boost::this_thread::get_id() << std::dec<<  "\t" << ((int) site_start )<< "\t" << (int) site_end  << std::endl;
+
+    double log_likelihood_scaler = 0;
+    double temp_likelihood = 0;
+    int stat_count = 2;
+
+    double prob = 0;
+    double stat_diff = 0;
+
+    std::vector<std::vector<double>> temp_stats (num_category, std::vector<double>(2, 0));
+    std::vector<std::vector<double>> local_stats (num_category, std::vector<double>(2, 0));
+    std::vector<double> local_probs (num_category, 0);
+
+    for (size_t s = site_start; s < site_end; ++s) {
+        double sum_prob = 0;
+        for (size_t r = 0; r < num_category; ++r) {
+
+            model_multi.CalculateAncestorToDescendant(r, s, prob, stat_diff, log_likelihood_scaler);
+            temp_stats[r][0] = 1-stat_diff;
+            temp_stats[r][1] = stat_diff;
+
+            local_probs[r] = proportion[r] * prob;
+        }
+//        std::exit(3);
+
+        double sum = local_probs[0]+local_probs[1];
+        temp_likelihood += log(sum) + log_likelihood_scaler;
+
+        for (size_t r = 0; r < num_category; ++r) {
+            double prob = local_probs[r] / sum;
+            local_stats[r][0] += prob * temp_stats[r][0];
+            local_stats[r][1] += prob * temp_stats[r][1];
+        }
+        all_probs(0,s) = local_probs[0];
+        all_probs(1,s) = local_probs[1];
+
+    }
+    auto current = log_likelihood.load();
+    while (!log_likelihood.compare_exchange_weak(current, current + temp_likelihood));
+    for (size_t r = 0; r < num_category; ++r) {
+        all_em_stats[r]->UpdateSumWithProportionSynchronized(local_stats[r]);
+    }
 
 }

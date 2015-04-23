@@ -452,6 +452,6 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 //        }
 }
 
-std::vector<SiteGenotypesIndex> &&SequencingFactory::MoveSiteGenotypeIndexVector() {
+std::vector<SiteGenotypesIndex> &&SequencingFactory::RemoveSiteGenotypeIndexVector() {
     return std::move(sgi);
 }

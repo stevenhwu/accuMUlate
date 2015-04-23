@@ -22,6 +22,12 @@ const int EM_MAX_ITE = 50;
 int VERBOSE_ITE = 100;
 int LOG_ITE = 10;
 
+EmAlgorithm::EmAlgorithm(MutationModelMultiCategories &model_multi0) : model_multi(model_multi0){
+    num_category = model_multi.GetCategoriesCount();
+    std::cout << "ModelMultiCategories Construct: " << num_category << "\t One data, one model" << std::endl;
+
+}
+
 
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
@@ -269,7 +275,7 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
     }
 
     if( std::isnan(sum_ratio) ){
-        std::cout <<"============ FAIL (ratio == -nan) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
+//        std::cout <<"============ FAIL (ratio == -nan) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
         return true;
         return false;
     }
@@ -342,3 +348,4 @@ void EmAlgorithm::LogEmSummary(int ite) {
     std::string summary = GetEMSummary();
     em_logger.LogLine(ite, summary);
 }
+

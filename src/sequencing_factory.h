@@ -27,7 +27,8 @@ public:
     std::vector<double> && RemoveConvertIndexKeyToDiploidIndex10Scaler();
     std::vector<double> && RemoveConvertIndexKeyToHaploidScaler();
 
-    std::vector<SiteGenotypesIndex> && MoveSiteGenotypeIndexVector();
+    std::vector<SiteGenotypesIndex> &&RemoveSiteGenotypeIndexVector();
+
     const std::vector<HaploidProbs> RemoveConvertIndexKeyToHaploidUnnormalised();
     const std::vector<DiploidProbsIndex10> RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
 

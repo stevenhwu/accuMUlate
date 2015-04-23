@@ -104,6 +104,7 @@ void F81::UpdateTransitionMatrix() {
 
 
 void F81::UpdateExpBeta(double exp_beta) {
+
 	double mu = mu_prob.ConvertExpBetaToMu(exp_beta);
 	UpdateMu(mu);
 }

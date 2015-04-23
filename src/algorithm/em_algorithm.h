@@ -22,7 +22,7 @@
 #include "em_data.h"
 #include "em_model_mutation.h"
 #include "em_logger.h"
-
+#include "mutation_model_multi_categories.h"
 
 extern const double EM_CONVERGE_THRESHOLD;
 
@@ -41,6 +41,8 @@ class EmAlgorithm {
 
 
 public:
+
+    EmAlgorithm(MutationModelMultiCategories &model_multi0);// : model_multi(model_multi0);
 
     EmAlgorithm(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0);
 
@@ -98,6 +100,7 @@ protected:
     std::vector<std::vector<double>> temp_stats;
     std::vector<double> cache_parameters;
 
+    MutationModelMultiCategories model_multi;
 
     void InitWithData();
 

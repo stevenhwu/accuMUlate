@@ -18,6 +18,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <map>
+#include <evolution_models/F81.h>
 
 #include "model.h"
 #include "mutation_prob.h"
@@ -43,6 +44,9 @@ public:
 
     MutationModelMultiCategories(SequencingFactory &factory);
 
+
+    MutationModelMultiCategories(int num_categories, EvolutionModel &evo_model0, SequencingFactory &factory);
+
     virtual ~MutationModelMultiCategories() {
     }
 //TODO: Current plan, one EvolutionModel,  one sets of data. Two/multi updateExpBeta => Multi mutation rate, multi transition matrix
@@ -58,7 +62,8 @@ public:
 
     void UpdateExpBeta(int category_index, double expBeta);
 
-    void CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff, double &log_likelihood_scaler);
+    void CalculateAncestorToDescendant(int category_index, int site_index, double &prob_reads,
+                                                                     double &all_stats_diff, double &log_likelihood_scaler);
 
     void NoCacheCalculateDes(int site_index, int a, double &product_prob_given_ancestor, double &stat_same, double &summary_stat_diff_ancestor);
 
@@ -77,11 +82,12 @@ private:
 //    std::vector<HaploidProbs> all_descendant_genotypes;
 
     EvolutionModel *evo_model;
-    double mutation_rate_single;
-    MutationMatrix transition_matrix_a_to_d_single;
 
-    std::vector<double> mutation_rate;
-    std::vector<MutationMatrix> transition_matrix_a_to_d;
+    std::vector<double> mutation_rate_single;
+    std::vector<MutationMatrix> transition_matrix_a_to_d_single;
+
+//    std::vector<double> mutation_rate;
+//    std::vector<MutationMatrix> transition_matrix_a_to_d;
 
     Array4D frequency_prior;
     Array10D ancestor_prior;
@@ -96,14 +102,16 @@ private:
 
     std::vector<HaploidProbs> convert_index_key_to_haploid_unnormalised;
     std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10_unnormalised;
-    std::array<std::vector<std::pair<double, double>>, 10> cache_read_data_to_all_index_rev;
+    std::vector<std::array<std::vector<std::pair<double, double>>, 10>> cache_read_data_to_all_index_rev;//TODO: turn this into a class
 
     int site_count;
     int descendant_count;
 
 
 
-    void CacheLoopDesAll2(int anc_index, std::vector<uint32_t> const &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
+    void CacheLoopDesAll2(int category_index, int anc_index, const std::vector<uint32_t> &aa,
+                                                        double &product_prob_given_ancestor,
+                                                        double &summary_stat_diff_ancestor);
 
 
     void CalculateLikelihoodUnnormalised(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
