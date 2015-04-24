@@ -8,6 +8,9 @@
 #ifndef SITE_GENOTYPES_H_
 #define SITE_GENOTYPES_H_
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic ignored "-Wdeprecated"
+
 //#ifdef __GNUC__
 //#define DEPRECATED(func) func __attribute__ ((deprecated))
 //#elif defined(_MSC_VER)

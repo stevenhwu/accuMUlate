@@ -44,14 +44,11 @@ namespace BoostUtils {
                 ("reference,r", po::value<string>(&ref_file)->required(), "Path to reference genome")
 //       ("ancestor,a", po::value<string>(&anc_tag), "Ancestor RG sample ID")
 //        ("sample-name,s", po::value<vector <string> >()->required(), "Sample tags")
-                ("qual,q", po::value<int>()->default_value(13),
-                        "Base quality cuttoff")
+                ("qual,q", po::value<int>()->default_value(13), "Base quality cuttoff")
 
-                ("mapping-qual,m", po::value<int>()->default_value(13),
-                        "Mapping quality cuttoff")
+                ("mapping-qual,m", po::value<int>()->default_value(13), "Mapping quality cuttoff")
 
-                ("prob,p", po::value<double>()->default_value(0.1),
-                        "Mutaton probability cut-off")
+                ("prob,p", po::value<double>()->default_value(0.1), "Mutaton probability cut-off")
                 ("out,o", po::value<string>()->default_value("acuMUlate_result.tsv"),
                         "Out file name")
                 ("intervals,i", po::value<string>(), "Path to bed file")
@@ -65,6 +62,7 @@ namespace BoostUtils {
                 ("output_binary_file,", po::value<string>()->default_value("default_binary_output.bin"),
                         "Output the parsed BAM file to binary file")
                 ("outfile", po::value<string>()->required(), "outfile prefix")
+                ("thread,t", po::value<int>()->default_value(1), "thread count")
     ;
 
         po::store(po::parse_command_line(argc, argv, cmd), vm);

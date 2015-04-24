@@ -12,6 +12,7 @@ SET(SOURCE_FILES ${SOURCE_FILES}
 
     ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/mutation_model.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/mutation_model_multi_categories.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/mutation_prob.cc
 
     ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc
@@ -27,7 +28,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.cc
 ${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.h
 ${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.h
 ${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index.cpp
-${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index_test.h
+${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index.h
 
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantVisitor.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/variant_visitor_two.cc
@@ -35,6 +36,8 @@ ${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index_test.h
     CACHE INTERNAL "Global"
     )
 
+#subdirs(${CMAKE_CURRENT_SOURCE_DIR})
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 #list (APPEND SOURCE_LIST ${SOURCE_FILES})
 #file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
@@ -56,6 +59,9 @@ endif()
 add_executable(accuMUlate main.cc ${SOURCE_FILES})
 target_link_libraries(accuMUlate ${LIBS} )
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+link_directories(${CMAKE_CURRENT_SOURCE_DIR})
+message(${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(EMTest EMTest.cc ${SOURCE_FILES} )
 target_link_libraries(EMTest ${LIBS} )
 target_link_libraries(EMTest profiler)

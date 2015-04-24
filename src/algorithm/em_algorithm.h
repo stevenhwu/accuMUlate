@@ -8,20 +8,21 @@
 
 #pragma once
 
+#ifndef EM_ALGORITHM_H_
+#define EM_ALGORITHM_H_
 #include <iostream>
 #include <memory>
 #include <vector>
 #include <stddef.h>
 #include <iostream>
 #include <fstream>
-//#include <Eigen/Dense>
+#include <atomic>
+#include <Eigen/Dense>
 #include "em_model.h"
 #include "em_data.h"
 #include "em_model_mutation.h"
 #include "em_logger.h"
-
-#ifndef EM_ALGORITHM_H_
-#define EM_ALGORITHM_H_
+#include "mutation_model_multi_categories.h"
 
 extern const double EM_CONVERGE_THRESHOLD;
 
@@ -41,13 +42,11 @@ class EmAlgorithm {
 
 public:
 
+    EmAlgorithm(int num_category0);
+
     EmAlgorithm(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0);
 
     EmAlgorithm(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &model_ptr);
-
-//    EmAlgorithm() ;
-
-//    EmAlgorithm(int category_count);
 
     EmAlgorithm(std::vector<std::unique_ptr<EmModel>> &model_ptr);
 
@@ -75,13 +74,17 @@ protected:
     size_t site_count;
     size_t max_ite_count;
 
+    size_t stat_count;
+
     double sum_ratio;
-    double log_likelihood;
+    std::atomic<double> log_likelihood;
+//    double log_likelihood;
 
     EmLogger em_logger;
 
     std::vector<std::unique_ptr<EmData>> *em_data_ptr;
     std::vector<std::unique_ptr<EmModel>> *em_model_ptr;
+//    std::vector<std::shared_ptr<EmModel>> *em_model_ptr;
 
     std::vector<std::unique_ptr<EmModel>> em_model;
     std::vector<std::unique_ptr<EmSummaryStat>> all_em_stats;
@@ -94,6 +97,7 @@ protected:
 
     std::vector<std::vector<double>> temp_stats;
     std::vector<double> cache_parameters;
+
 
 
     void InitWithData();
@@ -123,6 +127,8 @@ protected:
 
 
     void LogEmSummary(int ite);
+
+
 };
 
 

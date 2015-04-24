@@ -24,6 +24,7 @@ public:
     EmAlgorithmMutation(int num_category0,  EmModelMutation &em_model);
 
     EmAlgorithmMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr);
+
     virtual ~EmAlgorithmMutation();
 
     void RunEM();
@@ -38,7 +39,6 @@ protected:
     virtual void InitialiseSummaryStat();
 
     virtual void ExpectationStepCustom(size_t data_index, size_t category_index, double &sum_prob, std::vector<double> &temp_stat);
-
 
 };
 

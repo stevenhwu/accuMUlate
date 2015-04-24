@@ -15,18 +15,17 @@ EmAlgorithmMutation::~EmAlgorithmMutation() {
 
 void EmAlgorithmMutation::RunEM() {
 
-//    em_stat_local_single->Print();
     size_t i = 0;
     bool notConverged = true;
     while(notConverged){
         ExpectationStepModelPtr();
+
         MaximizationStep();
         notConverged = EmStoppingCriteria(i);
         i++;
     }
 
 }
-
 
 void EmAlgorithmMutation::InitialiseParameters() {
     double lower_bound = 1e-10;
