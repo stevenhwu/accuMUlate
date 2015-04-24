@@ -48,7 +48,7 @@ GenomeData getGenomeData(boost::program_options::variables_map variables_map);
 
 MutationModelMultiCategories CreateMutationModelMulti(GenomeData genome_data, ModelParams params);
 
-void RunEmWithRealDataMultiThread(boost::program_options::variables_map map, int count);
+void RunEmWithRealDataMultiThread(boost::program_options::variables_map map, size_t thread_count);
 
 void RunEmWithRealDataOriginal(boost::program_options::variables_map variables_map) {
     ModelParams params = BoostUtils::CreateModelParams(variables_map);
@@ -245,14 +245,16 @@ void RunEmWithRealData(boost::program_options::variables_map variables_map) {
 }
 
 
-void RunEmWithRealDataMultiThread(boost::program_options::variables_map variables_map, int count) {
+void RunEmWithRealDataMultiThread(boost::program_options::variables_map variables_map, size_t thread_count) {
+
     printMemoryUsage("Start ");
     ModelParams params = BoostUtils::CreateModelParams(variables_map);
     MutationProb mutation_prob (params);
     F81 evo_model0(mutation_prob);
-    MutationModel mutation_model (evo_model0);
+//    MutationModel mutation_model (evo_model0);
 
     printMemoryUsage("Start Basic");
+
     clock_t t1;
     t1 = clock();
 
@@ -261,55 +263,49 @@ void RunEmWithRealDataMultiThread(boost::program_options::variables_map variable
 
     cout << "Time: read genome data: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
     cout << "===== Setup EmData. Init site_count: " << genome_data.size() << endl;
+
     t1 = clock();
-
-//        CreateMutationModel(mutation_model, genome_data, params);
-//        MutationModelMultiCategories modelMulti = CreateMutationModelMulti(genome_data, params);
-
 
     SequencingFactory sequencing_factory(params);
     printMemoryUsage("init factory");
     sequencing_factory.CreateSequenceProbsVector(genome_data);
     MutationModelMultiCategories modelMulti (2, evo_model0, sequencing_factory);
 
+    cout << "Time Create Mutation Model: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
 
-
-    cout << "===== Done preprocess. Final site count: " << mutation_model.GetSiteCount() << endl;
+    cout << "===== Done preprocess. Final site count: " << modelMulti.GetSiteCount() << endl;
     printMemoryUsage("Created Mutation Model");
-//        GenomeData().swap( genome_data );
-
-    cout << "===== Setup EM" << endl;
+    cout << "======= Setup EM ======" << endl;
 
     const string &outfile_prefix = variables_map["outfile"].as<string>();
 
     clock_t t_start, t_end;
+    t_start = clock();
 
     std::chrono::time_point<std::chrono::system_clock> start, end;
     start = std::chrono::system_clock::now();
 
-    t_start = clock();
-
-    EmAlgorithmThreadMutation em_algM(modelMulti);
+    EmAlgorithmThreadMutation em_algM(modelMulti, thread_count);
     em_algM.SetOutfilePrefix(outfile_prefix);
     printMemoryUsage("EM");
     em_algM.Run();
     em_algM.PrintSummary();
     std::string summary = em_algM.GetEMSummary();
-    std::cout << summary;
+    std::cout << "FinalSummary: " << summary << std::endl;
 
 
     t_end = clock();
-    cout << "Time new: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl << endl;
+    cout << "EM Clock time: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl << endl;
 
     end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end-start;
+    std::time_t start_time = std::chrono::system_clock::to_time_t(start);
     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
-    std::cout << "finished computation at " << std::ctime(&end_time)
-    << "elapsed time: " << elapsed_seconds.count() << "s\n";
-
+    std::cout << "EM started at "<< std::ctime(&start_time) << "EM finished at " << std::ctime(&end_time)  << "EM elapsed time: " << elapsed_seconds.count() << "s\n";
 
     printMemoryUsage("End EM");
+
 }
 
 
@@ -429,9 +425,9 @@ int main(int argc, char** argv){
 //        RunEmWithRealData(genome_data, params);
 //        RunEmWithRealDataOneStep(variables_map);
 
-        RunEmWithRealData(variables_map);
-        int thread_count = 4;
-//        RunEmWithRealDataMultiThread(variables_map, thread_count);
+//        RunEmWithRealData(variables_map);
+        int thread_count = variables_map["thread"].as<int>();
+        RunEmWithRealDataMultiThread(variables_map, thread_count);
 
 //        RunEmWithRealDataOriginal(variables_map);
 

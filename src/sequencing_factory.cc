@@ -31,8 +31,8 @@ SequencingFactory::SequencingFactory(ModelParams const &model_params2) :model_pa
     }
     CalculateAncestorPrior();
 
-    index = 0;
-    index_ancestor = 0;
+//    index = 0;
+//    index_ancestor = 0;
 
 }
 
@@ -228,9 +228,8 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 //        sgi.emplace_back(genome_data[i]);
 //    }
 
-    uint index = 0;
-    uint index_ancestor = 0;
-
+    uint32_t index = 0;
+    uint32_t index_ancestor = 0;
 
 //    sgi.reserve(genome_data.size());
 
@@ -239,7 +238,7 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 //        uint16_t ref = genome_data[i].reference;
 //        int descendant_conut = genome_data[i].all_reads.size()-1;
 
-        ModelInput data = std::move(genome_data[i]);//FIXME:: This can reduce the memeory even further
+        ModelInput data = std::move(genome_data[i]);
 //        ModelInput data = genome_data[i];
         int descendant_conut = data.all_reads.size() - 1;
 
@@ -381,6 +380,8 @@ void SequencingFactory::CreateSequenceProbsVector(GenomeData &data) {
 void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sgi, ModelInput &data) {
 
 
+    uint32_t index = 0;
+    uint32_t index_ancestor = 0;
 
     int descendant_conut = data.all_reads.size() - 1;
     SiteGenotypesIndex item (descendant_conut);

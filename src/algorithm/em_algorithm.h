@@ -42,15 +42,11 @@ class EmAlgorithm {
 
 public:
 
-    EmAlgorithm(MutationModelMultiCategories &model_multi0);// : model_multi(model_multi0);
+    EmAlgorithm(int num_category0);
 
     EmAlgorithm(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0);
 
     EmAlgorithm(std::vector<std::unique_ptr<EmData>> &data_ptr, std::vector<std::unique_ptr<EmModel>> &model_ptr);
-
-//    EmAlgorithm() ;
-
-//    EmAlgorithm(int category_count);
 
     EmAlgorithm(std::vector<std::unique_ptr<EmModel>> &model_ptr);
 
@@ -78,6 +74,8 @@ protected:
     size_t site_count;
     size_t max_ite_count;
 
+    size_t stat_count;
+
     double sum_ratio;
     std::atomic<double> log_likelihood;
 //    double log_likelihood;
@@ -100,7 +98,7 @@ protected:
     std::vector<std::vector<double>> temp_stats;
     std::vector<double> cache_parameters;
 
-    MutationModelMultiCategories model_multi;
+
 
     void InitWithData();
 
@@ -129,6 +127,8 @@ protected:
 
 
     void LogEmSummary(int ite);
+
+
 };
 
 

@@ -16,7 +16,9 @@
 
 class EmSummaryStatMutation : public EmSummaryStatBinomial{
 
+
 public:
+    static const int EM_SUMMARY_STAT_MUTATION_STATS_COUNT = 2;
     EmSummaryStatMutation() : EmSummaryStatBinomial(){}
 
     virtual ~EmSummaryStatMutation() {}

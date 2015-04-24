@@ -38,14 +38,7 @@ struct ThreadPool {
     void enqueue(F f){
         service.post(f);
     }
-//    void Start(){
-//        service = boost::asio::io_service();
-//    }
-//    void Run(){
-//        working.reset(); //allow run() to exit
-//        g.join_all();
-//        service.stop();
-//    }
+
     ~ThreadPool() {
         working.reset(); //allow run() to exit
         g.join_all();
@@ -63,31 +56,29 @@ class EmAlgorithmMultiThreading : public EmAlgorithm {
 
 public:
 
-    EmAlgorithmMultiThreading(MutationModelMultiCategories &model_multi0) : EmAlgorithm(model_multi0){
-
-    }
-    EmAlgorithmMultiThreading(std::vector<std::unique_ptr<EmModel>> &model_ptr) : EmAlgorithm(model_ptr) {
+    EmAlgorithmMultiThreading(MutationModelMultiCategories &model_multi0, uint32_t thread_count0);
 
 
-    }
-    static const int num_thread = 40;
-    boost::thread t[num_thread];
-    std::vector<boost::thread> thread_vector;
-
-//    EmModel *pModel0;
-//    EmModel *pModel1;
-
-    std::mutex lock_stat;
-    void ExpectationStepModelPtrMT();
     void ExpectationStepModelPtrMTMulti();
+
+    void MultiCategories(size_t site_start, size_t site_end);
+
+
+
+    void ExpectationStepModelPtrMT();
     void WorkingThread(size_t site_start, size_t site_end);
 
 
-    void EmptyThread(size_t site_start, size_t site_end);
 
-    void MultiCateg(size_t site_start, size_t site_end);
+protected:
+    uint32_t thread_count;
+    size_t num_blocks = 120;
+    std::vector<std::pair<size_t, size_t>> blocks_info;
 
-    void MultiCategories(size_t site_start, size_t site_end);
+    MutationModelMultiCategories model_multi;
+
+    std::mutex lock_stat;
+
 };
 
 

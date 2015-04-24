@@ -402,7 +402,7 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
     for (auto &genotypes_index : descendant_genotypes_index) {
         log_likelihood_scaler += convert_index_key_to_haploid_scaler[genotypes_index];
     }
-    log_likelihood_scaler=0;
+//    log_likelihood_scaler=0;
     double summary_stat_diff_ancestor = 0;
     double prod_prob_ancestor = 1;
     for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {

@@ -9,11 +9,6 @@
 #ifndef EM_ALGORITHM_THREAD_MUTATION_H_
 #define EM_ALGORITHM_THREAD_MUTATION_H_
 
-
-#include <memory>
-//#include <stddef.h>
-//#include "site_prob.h"
-
 #include "em_algorithm_multithread.h"
 
 
@@ -21,11 +16,8 @@ class EmAlgorithmThreadMutation : public EmAlgorithmMultiThreading{
 
 public:
 
-    EmAlgorithmThreadMutation(int num_category0,  EmModelMutation &em_model);
 
-    EmAlgorithmThreadMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr);
-
-    EmAlgorithmThreadMutation(MutationModelMultiCategories &model_multi);
+    EmAlgorithmThreadMutation(MutationModelMultiCategories &model_multi, uint32_t thread_count);
 
     virtual ~EmAlgorithmThreadMutation();
 
@@ -34,6 +26,7 @@ public:
 
 
 protected:
+
 
     virtual void InitialiseParameters();
     virtual void InitialiseSummaryStat();

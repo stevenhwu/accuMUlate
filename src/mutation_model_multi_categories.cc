@@ -5,31 +5,9 @@
  *      Author: Steven Wu
  */
 
-//
-// Created by steven on 4/10/15.
-//
+
 
 #include "mutation_model_multi_categories.h"
-
-#include <strings.h>
-#include <evolution_models/F81.h>
-
-
-
-////std::vector<SiteGenotypesIndex> MutationModelMultiCategories::a = std::vector<SiteGenotypesIndex>();
-//std::vector<SiteGenotypesIndex> MutationModelMultiCategories::all_sequence_prob_index;
-//
-//std::vector<HaploidProbs> MutationModelMultiCategories::convert_index_key_to_haploid;
-//std::vector<DiploidProbsIndex10> MutationModelMultiCategories::convert_index_key_to_diploid_10;
-//
-//std::vector<double> MutationModelMultiCategories::convert_index_key_to_haploid_scaler;
-//std::vector<double> MutationModelMultiCategories::convert_index_key_to_diploid_10_scaler;
-//
-//std::vector<HaploidProbs> MutationModelMultiCategories::convert_index_key_to_haploid_unnormalised = std::vector<HaploidProbs> ();
-//std::vector<DiploidProbsIndex10> MutationModelMultiCategories::convert_index_key_to_diploid_10_unnormalised;
-//
-////    std::vector<DiploidProbs> MutationModelMultiCategories::convert_index_key_to_diploid;
-//    std::array<DiploidProbs, 4> MutationModelMultiCategories::ref_diploid_probs;
 
 
 MutationModelMultiCategories::MutationModelMultiCategories(int num_categories, EvolutionModel &evo_model0, SequencingFactory &factory)
@@ -64,53 +42,10 @@ MutationModelMultiCategories::MutationModelMultiCategories(int num_categories, E
         UpdateCache(i);
     }
 
-    std::cout << "site_count: " << "\t" << site_count << "\tDescendant_count: " << descendant_count  << std::endl;
+    std::cout << "Site_count: " << "\t" << site_count << "\tDescendant_count: " << descendant_count  << std::endl;
     std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
 
 }
-
-//
-//MutationModelMultiCategories::MutationModelMultiCategories(int num_categories, EvolutionModel &evo_model0)
-//        :categories_count(num_categories){
-//
-//    MutationProb mutation_prob = evo_model0.GetMutationProb();
-//    ancestor_prior = mutation_prob.GetAncestorPrior();
-//    frequency_prior = mutation_prob.GetFrequencyPrior();
-//    evo_model = &evo_model0;
-//
-//    transition_matrix_a_to_d_single = evo_model->GetTranstionMatirxAToD();
-//    mutation_rate_single = evo_model->GetMutationRate();
-//
-//}
-
-//MutationModelMultiCategories::MutationModelMultiCategories(SequencingFactory &factory) {
-//
-//    convert_index_key_to_haploid = factory.RemoveConvertIndexKeyToHaploid();
-//    convert_index_key_to_diploid_10 = factory.RemoveConvertIndexKeyToDiploidIndex10();
-//
-//    convert_index_key_to_haploid_scaler = factory.RemoveConvertIndexKeyToHaploidScaler();
-//    convert_index_key_to_diploid_10_scaler = factory.RemoveConvertIndexKeyToDiploidIndex10Scaler();
-//
-////    all_sequence_prob_index = std::move(all);
-//    all_sequence_prob_index = factory.RemoveSiteGenotypeIndexVector();
-//    site_count = all_sequence_prob_index.size();
-//    descendant_count = all_sequence_prob_index[0].GetDescendantCount();
-//    std::cout << "site_count: " << "\t" << site_count << "\tDescendant_count: " << descendant_count  << std::endl;
-//    std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
-//
-////    MutationModelMultiCategories::convert_index_key_to_haploid_unnormalised = factory.RemoveConvertIndexKeyToHaploidUnnormalised();
-////    MutationModelMultiCategories::convert_index_key_to_diploid_10_unnormalised = factory.RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
-//
-//
-//
-////    MutationModelMultiCategories::convert_index_key_to_haploid = factory.RemoveConvertIndexKeyToHaploidUnnormalised();
-////    MutationModelMultiCategories::convert_index_key_to_diploid_10 = factory.RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
-//
-////    MutationModelMultiCategories::convert_index_key_to_haploid_unnormalised = factory.RemoveConvertIndexKeyToHaploid();
-////    MutationModelMultiCategories::convert_index_key_to_diploid_10_unnormalised = factory.RemoveConvertIndexKeyToDiploidIndex10();
-//
-//}
-
 
 int MutationModelMultiCategories::GetCategoriesCount() const {
     return categories_count;
@@ -120,19 +55,6 @@ int MutationModelMultiCategories::GetSiteCount() const {
     return site_count;
 }
 
-//
-//void MutationModelMultiCategories::MoveSequenceProb(std::vector<SiteGenotypesIndex> &&all) {
-////    std::vector<SiteGenotypesIndex> &local = all;
-//    all_sequence_prob_index = std::move(all);
-//    site_count = all_sequence_prob_index.size();
-//    descendant_count = all_sequence_prob_index[0].GetDescendantCount();
-//    std::cout << "site_count: " << "\t" << site_count << "\tDescendant_count: " << descendant_count  << std::endl;
-//    std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
-//
-//
-////    InitCache();//TODO: call this somewhere elseS
-//}
-//
 
 void MutationModelMultiCategories::UpdateExpBeta(int category_index, double expBeta) {
 
@@ -144,20 +66,9 @@ void MutationModelMultiCategories::UpdateExpBeta(int category_index, double expB
     UpdateCache(category_index);
 
 }
-//void MutationModelMultiCategories::SummaryIndexToHaploid() {
-//    std::cout << "sum index2Hap" << std::endl;
-//    for (int i = 0; i < 5; ++i) {
-//        std::cout << convert_index_key_to_haploid[i].format(nice_row) << std::endl;
-//    }
-//    std::cout << convert_index_key_to_haploid[convert_index_key_to_haploid.size()-1].format(nice_row) << std::endl;
-//    std::cout << convert_index_key_to_haploid[convert_index_key_to_haploid.size()-2].format(nice_row) << std::endl;
-//}
 
 void MutationModelMultiCategories::InitCache(int category_index) {
     size_t index_size = convert_index_key_to_haploid.size();
-//    std::cout << map_rd_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << index_size << std::endl;
-//    std::cout << "INDEX size: " << convert_index_key_to_haploid.size() << "\t" << cache_read_data_to_all.size() << "\t" << map_rd_key_to_haploid.size() << "\t" <<
-//            index_size << std::endl;
 
     cache_read_data_to_all_index_rev.reserve(categories_count);
     for (int i = 0; i < categories_count; ++i) {
@@ -182,7 +93,6 @@ void MutationModelMultiCategories::UpdateCache(int category_index) {
     for (int b = 0; b < BASE_COUNT; ++b) {
         temp_base_prob[b] = mutation_rate_single[category_index] * frequency_prior[b];
     }
-
 
 
     for (size_t i = 0; i < convert_index_key_to_haploid.size(); ++i) {
@@ -237,10 +147,7 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
     }
     all_stats_diff /= prob_reads;
-    all_stats_diff /= descendant_count;//TODO: need this to auto calculate stat_same. sum to 1
-//    std::cout << site_index << "\t" << all_stats_diff << "\t" << prob_reads << std::endl;
-//    prob_reads = 0.1/(site_index+1);
-//    all_stats_diff = 0.1/(category_index+2);
+    all_stats_diff /= descendant_count;//NOTE: need this to auto calculate stat_same. sum to 1
 
 }
 

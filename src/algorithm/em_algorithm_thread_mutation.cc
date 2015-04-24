@@ -1,13 +1,14 @@
 #include "em_algorithm_thread_mutation.h"
 #include "em_summary_stat_mutation.h"
 
-EmAlgorithmThreadMutation::EmAlgorithmThreadMutation(MutationModelMultiCategories &model_multi0)
-        : EmAlgorithmMultiThreading(model_multi0){
+EmAlgorithmThreadMutation::EmAlgorithmThreadMutation(MutationModelMultiCategories &model_multi0, uint32_t thread_count0)
+        : EmAlgorithmMultiThreading(model_multi0, thread_count0) {
 
     site_count = model_multi.GetSiteCount();
-    std::cout << "EM Site_count: " << site_count << std::endl;
+    stat_count = EmSummaryStatMutation::EM_SUMMARY_STAT_MUTATION_STATS_COUNT;
+    std::cout << "EM Site_count: " << site_count << "\t" << "Thread_count" << "\t" << thread_count << std::endl;
     all_probs = Eigen::ArrayXXd::Zero(num_category, site_count);
-    parameters = std::vector<double>(num_category);
+    parameters = std::vector<double>(num_category, 0);
     cache_parameters = std::vector<double>(num_category, 0);
 
     InitialiseProportion();
@@ -15,6 +16,14 @@ EmAlgorithmThreadMutation::EmAlgorithmThreadMutation(MutationModelMultiCategorie
     InitialiseParameters();
 
     InitialiseSummaryStat();
+
+    num_blocks = 1000;
+    size_t block_size = site_count / num_blocks;
+    for (int i = 0; i < num_blocks - 1; ++i) {
+        blocks_info.emplace_back(i * block_size, (i + 1) * block_size);
+    }
+    blocks_info.emplace_back( (num_blocks - 1) * block_size, site_count);
+
 }
 
 EmAlgorithmThreadMutation::~EmAlgorithmThreadMutation() {
@@ -41,41 +50,37 @@ void EmAlgorithmThreadMutation::InitialiseParameters() {
     double lower_bound = 1e-10;
     double upper_bound = 0.9;
 
-    lower_bound = 1e-10;
-    upper_bound = 0.9;
+
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> rand_real(1,9);
-    std::uniform_int_distribution<> lower(6, 10);
-    std::uniform_int_distribution<> upper(1, 4);
-    lower_bound = rand_real(gen)*pow(10, -lower(gen));
-    upper_bound = rand_real(gen)*pow(10, -upper(gen));
+    std::uniform_int_distribution<> lower(3, 10);
 
-    lower_bound = 1e-10;
-    upper_bound = 0.9;
+    const int lower_power = lower(gen);
+    lower_bound = rand_real(gen)*pow(10, -lower_power);
 
-    if (num_category == 2) {
-        parameters = {upper_bound, lower_bound};
-        cache_parameters = {upper_bound, lower_bound};
-    }
-    else {
-        std::cout << "Not yet implemented for more than 2 categories" << std::endl;
-        exit(222);
-        //TODO: Should throw exception instead of exit, this will do for now
-    }
+    do {
+        std::uniform_int_distribution<> upper(1, lower_power);
+        upper_bound = rand_real(gen) * pow(10, -upper(gen));
+    } while (upper_bound < lower_bound);
 
-//    em_model_ptr->at(0)->
+//    lower_bound = 1e-10;
+//    upper_bound = 0.9;
+
+    parameters = {upper_bound, lower_bound};
+    cache_parameters = {upper_bound, lower_bound};
+
 }
 
 
 void EmAlgorithmThreadMutation::InitialiseSummaryStat() {
 
-
-    temp_stats = std::vector<std::vector<double>>(num_category);
+//    stat_count = EmSummaryStatMutation::EM_SUMMARY_STAT_MUTATION_STATS_COUNT;
+//    temp_stats = std::vector<std::vector<double>>(num_category);
     for (size_t i = 0; i < num_category; ++i) {
         all_em_stats.emplace_back(new EmSummaryStatMutation());
-        temp_stats[i] = std::vector<double>(all_em_stats[i]->GetStatCount());
+//        temp_stats[i] = std::vector<double>(all_em_stats[i]->GetStatCount());
     }
 
 
@@ -87,4 +92,3 @@ void EmAlgorithmThreadMutation::ExpectationStepCustom(size_t data_index, size_t 
     std::cout << "Error!! should NOT call ExpectationStepCustom here" << std::endl;
     exit(40);
 }
-

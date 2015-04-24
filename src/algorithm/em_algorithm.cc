@@ -18,21 +18,29 @@
 
 const double EM_CONVERGE_THRESHOLD = 1e-10;
 const double EM_CONVERGE_RATIO_THRESHOLD = 1e-10;
-const int EM_MAX_ITE = 50;
-int VERBOSE_ITE = 100;
-int LOG_ITE = 10;
+const size_t EM_MAX_ITE = 1e9;
+const size_t VERBOSE_ITE = 100;
+const size_t LOG_ITE = 100;
+const double DOUBLE_MIN = std::numeric_limits<double>::min();
 
-EmAlgorithm::EmAlgorithm(MutationModelMultiCategories &model_multi0) : model_multi(model_multi0){
-    num_category = model_multi.GetCategoriesCount();
-    std::cout << "ModelMultiCategories Construct: " << num_category << "\t One data, one model" << std::endl;
+EmAlgorithm::EmAlgorithm(int num_category0) : num_category(num_category0) {
+    if (num_category != 2) {
+        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
+        exit(222);
+    }
 
 }
+
 
 
 EmAlgorithm::EmAlgorithm(int num_category0, std::vector <std::unique_ptr<EmData>> &data_ptr, EmModel &em_model0) :
         num_category(num_category0), em_data_ptr(&data_ptr), em_model0(&em_model0) {
 
     std::cout << "Old Construct: " << num_category << "\t One data, one model" << std::endl;
+    if (num_category != 2) {
+        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
+        exit(222);
+    }
 }
 
 
@@ -41,6 +49,10 @@ EmAlgorithm::EmAlgorithm(std::vector<std::unique_ptr<EmData>> &data_ptr, std::ve
     num_category = em_model_ptr->size();
 
     std::cout << "New Construct: " << num_category << std::endl;
+    if (num_category != 2) {
+        std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
+        exit(222);
+    }
 }
 
 
@@ -49,14 +61,14 @@ EmAlgorithm::EmAlgorithm(std::vector<std::unique_ptr<EmModel>> &model_ptr):
     num_category = em_model_ptr->size();
 
     std::cout << "New Construct model only: " << num_category << std::endl;
-}
-
-void EmAlgorithm::InitWithModel() {
-
     if (num_category != 2) {
         std::cout << "Not yet implemented for more than 2 categories: input_cat: " << "\t" << num_category<< std::endl;
         exit(222);
     }
+}
+
+void EmAlgorithm::InitWithModel() {
+
 
     std::vector<int> temp_data_count(num_category);
     for (size_t i = 0; i < num_category; ++i) {
@@ -133,7 +145,7 @@ void EmAlgorithm::ExpectationStepModel() {
         total += log(total_site);
 
     }
-    fflush(stdout);
+
 }
 
 
@@ -183,8 +195,22 @@ void EmAlgorithm::MaximizationStep() {
 //        double new_mu = mutation_prob.ConvertExpBetaToMu(new_exp_beta);
 //        double new_one_minus_mu = mutation_prob.ConvertExpBetaToMu(-(new_one_minus_exp_beta - 1));
         parameters[r] = new_parameter;
-    }
 
+        if(parameters[r] ==0 && (parameters[r] < DOUBLE_MIN) ){
+//        if( (parameters[r] < std::numeric_limits<double>::min()) ){
+//            std::cout << "==WARNING!:: parameters[r]==0" << "\t" << r << "\t" << cache_parameters[r] << std::endl;
+//            parameters[r] =  std::numeric_limits<double>::epsilon();
+//            parameters[r] = DOUBLE_MIN;;
+            parameters[r] = 1e-17; //log(1-x) > 0, x=5.56e-17
+        }
+    }
+//EM Summary: Ln:-1471696.416905
+//Parameters: 7.030866e-01	1.000000e-20
+//Proportions: 6.842129e-04	9.993158e-01
+//EM Summary: Ln:-1471696.416905
+//Parameters: 7.030866e-01	2.225074e-308
+//Proportions: 6.842129e-04	9.993158e-01
+//================= END SUMMARY ============
 //    printf("======= NEM_MU_r: %zu \tMu: %.5e %.5f =expBeta=  %.5f %.5f \t =prop= %.5f %.5f "
 //                    "\t =stat= %.5f %.5f \n", r,
 //            new_mu, new_one_minus_mu,
@@ -196,10 +222,10 @@ void EmAlgorithm::MaximizationStep() {
 
 void EmAlgorithm::CalculateProportion() {
 
-    if (num_category != 2) {
-        std::cout << "Not yet implemented for more than 2 categories" << std::endl;
-        exit(222);
-    }
+//    if (num_category != 2) {
+//        std::cout << "Not yet implemented for more than 2 categories" << std::endl;
+//        exit(222);
+//    }
 
     auto sum_col = all_probs.colwise().sum();
     auto prop_col = all_probs.row(0) / sum_col;
@@ -207,22 +233,23 @@ void EmAlgorithm::CalculateProportion() {
     proportion[0] = proportion_sum / site_count;
     proportion[1] = 1 - proportion[0];
 
-//    std::cout << sum_col << std::endl;
-//    std::cout << prop_col << std::endl;
-//    std::cout << proportion_sum << std::endl;
-//    std::cout << "Update Proportion: " << "\t" << proportion[0] << "\t" << proportion[1] << std::endl;
 
 }
 
 
 void EmAlgorithm::InitialiseProportion() {
+//    if (num_category != 2) {
+//        std::cout << "Not yet implemented for more than 2 categories" << std::endl;
+//        exit(222);
+//    }
+
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> lower(0.8,1);
+    std::uniform_real_distribution<> lower(0.9,0.99);
     double lower_proportion = lower(gen);
 
-    double default_proportion = 1.0 / num_category;
-    lower_proportion = default_proportion;
+//    double default_proportion = 1.0 / num_category;
+//    lower_proportion = default_proportion;
 
     proportion = {{1-lower_proportion, lower_proportion}};
 
@@ -255,8 +282,6 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
     }
 
     if ( (ite % LOG_ITE) == 0) {
-//        std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << "\tsum_ratio: " << sum_ratio << std::endl;
-//        PrintSummary();
         LogEmSummary(ite);
     }
 
@@ -270,46 +295,51 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 //    }
     if( sum_ratio < EM_CONVERGE_RATIO_THRESHOLD){
         std::cout <<"============ DONE (ratio < THRESHOLD) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
-        return true;
+//        return true;
         return false;
     }
 
     if( std::isnan(sum_ratio) ){
-//        std::cout <<"============ FAIL (ratio == -nan) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
-        return true;
+        std::cout <<"============ FAIL (ratio == -nan) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
+//        return true;
         return false;
     }
     return true;
 }
 
 void EmAlgorithm::PrintSummary(){
-//    std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << "\tsum_ratio: " << sum_ratio << std::endl;
-    printf("EM Summary: Ln:%.10f\nParameters: ", log_likelihood.load()); //TODO: Add this back
+    std::string out;
+    char temp[1000];
+    sprintf(temp, "EM Summary: Ln:%.6f\nParameters: ", log_likelihood.load());
+    out.append(temp);
      for (auto &item :parameters) {
-        printf("%.15e\t", item);
+         sprintf(temp, "%.6e\t", item);
+         out.append(temp);
     }
 
-    printf("\nProportions: ");
+    sprintf(temp, "\nProportions: ");
+    out.append(temp);
     for (auto &item :proportion) {
-        printf("%.15e\t", item);
+        sprintf(temp, "%.6e\t", item);
+        out.append(temp);
     }
 
-    printf("\n================= END SUMMARY ============\n");
-    fflush(stdout);
+    out.append("\n================= END SUMMARY ============");
+    std::cout << out << std::endl;
 }
 
 std::string EmAlgorithm::GetEMSummary(){
     std::string out;// = "EM Summary\tParameters0 ";
     char temp[1000];
     for (auto &item :parameters) {
-        sprintf(temp, "%.12e\t", item);
+        sprintf(temp, "%.5e\t", item);
         out.append(temp);
     }
     for (auto &item :proportion) {
-        sprintf(temp, "%.12e\t", item);
+        sprintf(temp, "%.5e\t", item);
         out.append(temp);
     }
-//    sprintf(temp, "%.12f\t%.12e\t", log_likelihood, sum_ratio);//TODO: add this back
+    sprintf(temp, "%.5f\t%.5e\t", log_likelihood.load(), sum_ratio);
     out.append(temp);
     return out;
 
@@ -336,7 +366,7 @@ void EmAlgorithm::SetOutfilePrefix(const std::string & infile) {
 
 void EmAlgorithm::Run() {
 
-    std::cout << "Init ";
+    std::cout << "===== Initialise EM =====" << std::endl;
     PrintSummary();
     RunEM();
     em_logger.Stop();
