@@ -30,24 +30,24 @@ class MutationProb {
 public:
     static double CalculateBeta0(Array4D &freq);
     static double CalculateExpBeta(double mu, double beta0);
-    static double ConvertExpBetaToMu(double exp_beta, double beta0);
+    static double ConvertOneMinusExpBetaToMu(double one_minus_exp_beta, double beta0);
 
 
 public:
     MutationProb();
-    MutationProb(double mu);
+    explicit MutationProb(double mu);
 //    MutationProb(const MutationProb& self);
     MutationProb(const ModelParams &model_params);
 	~MutationProb();
 
     void UpdateMu(double mu);
-    double ConvertExpBetaToMu(double exp_beta);
+    double ConvertOneMinusExpBetaToMu(double one_minus_exp_beta);
 
     double GetMutationRate();
     Array4D GetFrequencyPrior();
     Array10D GetAncestorPrior();
     double GetExpBeta();
-    double GetMu0();
+    double GetMu();
     double GetBeta0();
 
 
@@ -56,12 +56,13 @@ private:
     Array10D ancestor_prior;
 
     double mutation_rate;
-    double mu0;
+    double mu;
     double beta0;
     double exp_beta; //exp_beta = exp(-beta0*mu0)
 
     double CalculateExpBeta();
     void CalculateAncestorPrior();
 
+    static double ConvertExpBetaToMu(double exp_beta0, double beta0);
 };
 #endif /* MUTATION_PROB_H_ */

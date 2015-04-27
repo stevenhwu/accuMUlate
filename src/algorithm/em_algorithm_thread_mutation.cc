@@ -47,8 +47,8 @@ void EmAlgorithmThreadMutation::RunEM() {
 
 
 void EmAlgorithmThreadMutation::InitialiseParameters() {
-    double lower_bound = 1e-10;
-    double upper_bound = 0.9;
+    double low_rate = 1e-10;
+    double high_rate = 0.9;
 
 
 
@@ -58,18 +58,27 @@ void EmAlgorithmThreadMutation::InitialiseParameters() {
     std::uniform_int_distribution<> lower(3, 10);
 
     const int lower_power = lower(gen);
-    lower_bound = rand_real(gen)*pow(10, -lower_power);
+    low_rate = rand_real(gen)*pow(10, -lower_power);
 
     do {
         std::uniform_int_distribution<> upper(1, lower_power);
-        upper_bound = rand_real(gen) * pow(10, -upper(gen));
-    } while (upper_bound < lower_bound);
+        high_rate = rand_real(gen) * pow(10, -upper(gen));
+    } while (high_rate < low_rate);
 
-//    lower_bound = 1e-10;
-//    upper_bound = 0.9;
+//    low_rate = 1e-10;
+//    high_rate = 0.9;
+//    low_rate = 1- 1e-10;
+//    high_rate = 1- 0.9;
+//    model_multi.U
+    parameters = {high_rate, low_rate};
+    cache_parameters = {high_rate, low_rate};
+//    parameters = {low_rate, high_rate};
+//    cache_parameters = {low_rate, high_rate};
 
-    parameters = {upper_bound, lower_bound};
-    cache_parameters = {upper_bound, lower_bound};
+//FinalSummary: 2.53325e-06	7.12781e-01	9.99326e-01	6.74226e-04	-1471693.98632	7.80611e-11
+//FinalSummary: 7.12781e-01	2.53325e-06	6.74226e-04	9.99326e-01	-1471693.98632	7.81574e-11
+
+
 
 }
 

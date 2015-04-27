@@ -3,13 +3,13 @@
 
 //EvolutionModel::EvolutionModel(double mu):  mu_prob(MutationProb(mu)) {
 ////    mu_prob = MutationProb(mu);
-//    cout << "C_mu:\t" << mu << "\t" << mu_prob.GetMu0() << endl;
+//    cout << "C_mu:\t" << mu << "\t" << mu_prob.GetMu() << endl;
 //
 //}
 
 EvolutionModel::EvolutionModel(MutationProb mu_prob) : mu_prob(mu_prob) {
 
-    this->mu = mu_prob.GetMu0();
+    this->mu = mu_prob.GetMu();
 }
 
 EvolutionModel::~EvolutionModel() {}

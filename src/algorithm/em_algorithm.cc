@@ -192,8 +192,8 @@ void EmAlgorithm::MaximizationStep() {
     CalculateProportion();
     for (size_t r = 0; r < num_category; ++r) {
         double new_parameter = all_em_stats[r]->MaximiseStats();
-//        double new_mu = mutation_prob.ConvertExpBetaToMu(new_exp_beta);
-//        double new_one_minus_mu = mutation_prob.ConvertExpBetaToMu(-(new_one_minus_exp_beta - 1));
+//        double new_mu = mutation_prob.ConvertOneMinusExpBetaToMu(new_exp_beta);
+//        double new_one_minus_mu = mutation_prob.ConvertOneMinusExpBetaToMu(-(new_one_minus_exp_beta - 1));
         parameters[r] = new_parameter;
 
         if(parameters[r] ==0 && (parameters[r] < DOUBLE_MIN) ){
@@ -245,13 +245,14 @@ void EmAlgorithm::InitialiseProportion() {
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> lower(0.9,0.99);
-    double lower_proportion = lower(gen);
+//    std::uniform_real_distribution<> lower(0.9,0.99);
+    std::uniform_real_distribution<> lower(0.7,0.9);
+    double proportion_for_low_rate = lower(gen);
 
 //    double default_proportion = 1.0 / num_category;
-//    lower_proportion = default_proportion;
+//    proportion_for_low_rate = default_proportion;
 
-    proportion = {{1-lower_proportion, lower_proportion}};
+    proportion = {{1- proportion_for_low_rate, proportion_for_low_rate}};
 
 
 }

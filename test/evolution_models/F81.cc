@@ -67,7 +67,7 @@ TEST_F(F81Test, F81EqualDoubleConstructorTest) {
     F81 model (mu);
     MutationProb prob = model.GetMutationProb();
     double expected_exp_beta = 0.8;
-    ASSERT_DOUBLE_EQ(mu, prob.GetMu0());
+    ASSERT_DOUBLE_EQ(mu, prob.GetMu());
     ASSERT_DOUBLE_EQ(expected_exp_beta, prob.GetExpBeta());
 
     double mu_rate = prob.GetMutationRate();
@@ -157,7 +157,7 @@ TEST_F(F81Test, F81NotEqualUpdateTest) {
 
     MutationProb prob = model.GetMutationProb();
     double expected_exp_beta = 0.4;
-    ASSERT_DOUBLE_EQ(new_mu, prob.GetMu0());
+    ASSERT_DOUBLE_EQ(new_mu, prob.GetMu());
     ASSERT_DOUBLE_EQ(expected_exp_beta, prob.GetExpBeta());
 
 //    MutationRate mu_rate = prob.GetMutationRate();

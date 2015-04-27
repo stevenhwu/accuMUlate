@@ -51,7 +51,7 @@ TEST_F(MutationProbTest, EqualFreqsInit) {
     ASSERT_EQ(0.25*0.25*2, a10D[8]);
     ASSERT_EQ(0.25*0.25, a10D[9]);
 
-    ASSERT_EQ(0.1, muProb.GetMu0());
+    ASSERT_EQ(0.1, muProb.GetMu());
     ASSERT_DOUBLE_EQ(1.333333333333333, muProb.GetBeta0());
     double beta = muProb.GetExpBeta();
 
@@ -94,7 +94,7 @@ TEST_F(MutationProbTest, NotEqualFreqsUpdateMu) {
     ASSERT_EQ(0.3*0.4*2, a10D[8]);
     ASSERT_EQ(0.4*0.4, a10D[9]);
 
-    ASSERT_EQ(0.001, muProb.GetMu0());
+    ASSERT_EQ(0.001, muProb.GetMu());
     ASSERT_DOUBLE_EQ(1.4285714285714286031, muProb.GetBeta0());
 
     double beta = muProb.GetExpBeta();

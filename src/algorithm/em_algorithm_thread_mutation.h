@@ -9,7 +9,7 @@
 #ifndef EM_ALGORITHM_THREAD_MUTATION_H_
 #define EM_ALGORITHM_THREAD_MUTATION_H_
 
-#include "em_algorithm_multithread.h"
+#include "em_algorithm_thread.h"
 
 
 class EmAlgorithmThreadMutation : public EmAlgorithmMultiThreading{

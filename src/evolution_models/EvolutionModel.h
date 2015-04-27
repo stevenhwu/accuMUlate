@@ -33,7 +33,7 @@ public:
     MutationProb GetMutationProb();
     MutationProb GetMutationProb() const;
 
-    virtual void UpdateExpBeta(double d) = 0;
+    virtual void UpdateExpBeta(double d) = 0;//FIXME, clarify expBeta or 1-expBeta, should be 1-expBeta here
 
     virtual std::unique_ptr<EvolutionModel> Clone() const = 0;
     virtual EvolutionModel *Clone2() const = 0;

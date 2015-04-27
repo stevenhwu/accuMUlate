@@ -50,6 +50,8 @@ MutationModelMultiCategories CreateMutationModelMulti(GenomeData genome_data, Mo
 
 void RunEmWithRealDataMultiThread(boost::program_options::variables_map map, size_t thread_count);
 
+void SummariseRealData(boost::program_options::variables_map map);
+
 void RunEmWithRealDataOriginal(boost::program_options::variables_map variables_map) {
     ModelParams params = BoostUtils::CreateModelParams(variables_map);
     MutationProb mutation_prob = MutationProb(params);
@@ -269,6 +271,7 @@ void RunEmWithRealDataMultiThread(boost::program_options::variables_map variable
     SequencingFactory sequencing_factory(params);
     printMemoryUsage("init factory");
     sequencing_factory.CreateSequenceProbsVector(genome_data);
+
     MutationModelMultiCategories modelMulti (2, evo_model0, sequencing_factory);
 
     cout << "Time Create Mutation Model: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
@@ -420,7 +423,8 @@ int main(int argc, char** argv){
     boost::program_options::variables_map variables_map;
     BoostUtils::ParseCommandLinkeInput(argc, argv, variables_map);
 
-
+    SummariseRealData(variables_map);
+//    exit(83);
     {
 //        RunEmWithRealData(genome_data, params);
 //        RunEmWithRealDataOneStep(variables_map);
@@ -447,3 +451,73 @@ int main(int argc, char** argv){
     printMemoryUsage("End");
 
 }
+
+uint16_t max_element_index(ReadData &read_data){
+    uint16_t max = *(  std::max_element(read_data.reads, read_data.reads+4) );
+    for (int i = 0; i < 4; ++i) {
+        if(max==read_data.reads[i])
+            return i;
+    }
+    return -1;
+}
+void SummariseRealData(boost::program_options::variables_map variables_map) {
+
+
+    printMemoryUsage("Start ");
+    ModelParams params = BoostUtils::CreateModelParams(variables_map);
+//    MutationProb mutation_prob (params);
+//    F81 evo_model0(mutation_prob);
+//    MutationModel mutation_model (evo_model0);
+
+    printMemoryUsage("Start Basic");
+
+    clock_t t1;
+    t1 = clock();
+
+    GenomeData genome_data = getGenomeData(variables_map);
+    printMemoryUsage("Read genomeData");
+
+    int index[12];
+    int ref_diff = 0;
+    int des_diff = 0;
+    std::map<int, int> counter;
+    for (auto &site : genome_data) {
+        bool new_line = false;
+        uint16_t ref = site.reference;
+        ReadDataVector &rd = site.all_reads;
+        index[0] = max_element_index(rd[0]);
+
+//        if(ref != index[0]){
+//            cout << "Ref: " << ref << "\t" << index[0] << "===";
+//            ref_diff ++;
+//            new_line = true;
+//        }
+        int local_count = 0;
+        for (int i = 1; i < 12; ++i) {
+            index[i] = max_element_index(rd[i]);
+            if(index[i] != index[0]){
+//                cout << index[i] ;
+//                cout << index[0] << index[1] << endl;
+                des_diff ++;
+                local_count++;
+//                break;
+                new_line = true;
+            }
+        }
+        if(local_count>4){
+            ref_diff++;
+        }
+        counter[local_count]++;
+//        if(new_line) {
+//            cout << "\t" <<  local_count << "\t" << endl;
+//        }
+
+    }
+    cout << "Summary: " << ref_diff << "\t" << des_diff << "\t" << genome_data.size() << endl;
+    for (auto item : counter) {
+        cout << item.first << "\t" << item.second << endl;
+    }
+
+}
+
+
