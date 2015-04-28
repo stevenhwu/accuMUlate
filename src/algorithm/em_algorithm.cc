@@ -245,14 +245,14 @@ void EmAlgorithm::InitialiseProportion() {
 
     std::random_device rd;
     std::mt19937 gen(rd());
-//    std::uniform_real_distribution<> lower(0.9,0.99);
-    std::uniform_real_distribution<> lower(0.7,0.9);
-    double proportion_for_low_rate = lower(gen);
+    std::uniform_real_distribution<> lower(0.9,0.99);
+//    std::uniform_real_distribution<> lower(0.8,0.9);
+    double proportion_of_low_rate = lower(gen);
 
 //    double default_proportion = 1.0 / num_category;
-//    proportion_for_low_rate = default_proportion;
+//    proportion_of_low_rate = default_proportion;
 
-    proportion = {{1- proportion_for_low_rate, proportion_for_low_rate}};
+    proportion = {{1- proportion_of_low_rate, proportion_of_low_rate}};
 
 
 }
@@ -288,6 +288,7 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 
     if (ite == EM_MAX_ITE){
         std::cout <<"============ DONE. IN DEBUG mode, fix at " << EM_MAX_ITE << " ites ======= " << sum_diff << " Total ite:" << ite << "\n";
+
         return false;
     }
 //    if (sum_diff < EM_CONVERGE_THRESHOLD) {
@@ -296,13 +297,17 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 //    }
     if( sum_ratio < EM_CONVERGE_RATIO_THRESHOLD){
         std::cout <<"============ DONE (ratio < THRESHOLD) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
+//        std::cout << ite << "\t" << (ite%VERBOSE_ITE) << "\t" <<  << std::endl;
+        int round_up_ite = ((ite/VERBOSE_ITE)+1)*VERBOSE_ITE;
+        LogEmSummary(round_up_ite);
 //        return true;
         return false;
     }
 
     if( std::isnan(sum_ratio) ){
         std::cout <<"============ FAIL (ratio == -nan) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
-//        return true;
+        LogEmSummary(ite);
+    //        return true;
         return false;
     }
     return true;
@@ -324,6 +329,15 @@ void EmAlgorithm::PrintSummary(){
         sprintf(temp, "%.6e\t", item);
         out.append(temp);
     }
+    for (int r = 0; r < num_category; ++r) {
+        for (int s = 0; s < stat_count; ++s) {
+            double item = all_em_stats[r]->GetStat(s);
+            sprintf(temp, "%.6e\t", item);
+            out.append(temp);
+        }
+    }
+
+
 
     out.append("\n================= END SUMMARY ============");
     std::cout << out << std::endl;
@@ -333,14 +347,21 @@ std::string EmAlgorithm::GetEMSummary(){
     std::string out;// = "EM Summary\tParameters0 ";
     char temp[1000];
     for (auto &item :parameters) {
-        sprintf(temp, "%.5e\t", item);
+        sprintf(temp, "%.6e\t", item);
         out.append(temp);
     }
     for (auto &item :proportion) {
-        sprintf(temp, "%.5e\t", item);
+        sprintf(temp, "%.6e\t", item);
         out.append(temp);
     }
-    sprintf(temp, "%.5f\t%.5e\t", log_likelihood.load(), sum_ratio);
+    for (int r = 0; r < num_category; ++r) {
+        for (int s = 0; s < stat_count; ++s) {
+            double item = all_em_stats[r]->GetStat(s);
+            sprintf(temp, "%.6e\t", item);
+            out.append(temp);
+        }
+    }
+    sprintf(temp, "%.6f\t%.6e\t", log_likelihood.load(), sum_ratio);
     out.append(temp);
     return out;
 
@@ -359,6 +380,12 @@ void EmAlgorithm::SetOutfilePrefix(const std::string & infile) {
     for (int i = 0; i < num_category; ++i) {
         sprintf(temp, "Proportion_%d\t", i);
         header.append(temp);
+    }
+    for (int r = 0; r < num_category; ++r) {
+        for (int s = 0; s < stat_count; ++s) {
+            sprintf(temp, "stat_cat%d_%d\t", r, s);
+            header.append(temp);
+        }
     }
     header.append("Likelihood\tRatio\t");
     em_logger.Header(header);

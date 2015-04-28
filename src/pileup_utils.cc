@@ -86,9 +86,9 @@ namespace PileupUtils{
 */
         }
 
-        printf("Total time V%d: %fs. Ali_Count:%lu reads_count:%d genome_data.size():%lu\n", variant_visitor_index,
+        printf("Total time V%d: %fs. Ali_Count:%lu reads_count:%d %d %d genome_data.size():%lu\n", variant_visitor_index,
                 ((double) (clock()-start)/ CLOCKS_PER_SEC),
-                ali_counter, global_count[0], genome_data.size());
+                ali_counter, global_count[0], global_count[1], global_count[2], genome_data.size());
 
         std::cerr.clear() ;
         experiment.Close();

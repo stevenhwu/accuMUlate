@@ -30,7 +30,28 @@
 
 using namespace std;
 using namespace BamTools;
-
+/*
+ *
+ * Custom filter, remove sample 47 51 44   ->  7 8 10
+M50_CAGATC_L001	9
+M47_ATTGAGGA_L007	8
+M44_GCCAAT_L001	7
+M531_CTTGTA_L005	11
+M50_CAGATC_L005	9
+M40_ACAGTG_L005	6
+M44_GCCAAT_L005	7
+M40_ACAGTG_L001	6
+M531_CTTGTA_L001	11
+M29_CAGATCTG_L007	5
+M28_TGACCA_L005	4
+M25_GTGTTCTA_L007	3
+M28_TGACCA_L001	4
+M19_AACGTGAT_L007	1
+M0_CGATGT_L005	0
+M51_GGAGAACA_L007	10
+M20_AAACATCG_L007	2
+M0_CGATGT_L001	0
+ */
 
 //namespace po = boost::program_options;
 int RunBasicProbCalc(GenomeData base_counts, ModelParams params);
@@ -51,6 +72,8 @@ MutationModelMultiCategories CreateMutationModelMulti(GenomeData genome_data, Mo
 void RunEmWithRealDataMultiThread(boost::program_options::variables_map map, size_t thread_count);
 
 void SummariseRealData(boost::program_options::variables_map map);
+
+void PostFilterGenomeData(GenomeData &genome_data);
 
 void RunEmWithRealDataOriginal(boost::program_options::variables_map variables_map) {
     ModelParams params = BoostUtils::CreateModelParams(variables_map);
@@ -261,6 +284,7 @@ void RunEmWithRealDataMultiThread(boost::program_options::variables_map variable
     t1 = clock();
 
     GenomeData genome_data = getGenomeData(variables_map);
+    PostFilterGenomeData(genome_data);
     printMemoryUsage("Read genomeData");
 
     cout << "Time: read genome data: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
@@ -308,6 +332,29 @@ void RunEmWithRealDataMultiThread(boost::program_options::variables_map variable
     std::cout << "EM started at "<< std::ctime(&start_time) << "EM finished at " << std::ctime(&end_time)  << "EM elapsed time: " << elapsed_seconds.count() << "s\n";
 
     printMemoryUsage("End EM");
+
+}
+
+void PostFilterGenomeData(GenomeData &genome_data) {
+
+//    Custom filter, remove sample 47 51 44   ->  7 8 10
+//
+    for (auto &data : genome_data) {
+        for (int i = 0; i < data.all_reads.size(); ++i) {
+//            std::cout << i << "\t" << data.all_reads[i].key << std::endl;
+        }
+        data.all_reads.erase(data.all_reads.begin()+10);
+        data.all_reads.erase(data.all_reads.begin()+7, data.all_reads.begin()+9);
+
+//     std::cout << data.all_reads.size() << std::endl;
+        for (int i = 0; i < data.all_reads.size(); ++i) {
+//            std::cout << i << "\t" << data.all_reads[i].key << std::endl;
+        }
+//        std::cout << "\n=======\n" << std::endl;
+//        exit(32);
+    }
+//FinalSummary: 5.57299e-01	6.02335e-06	1.32571e-04	9.99867e-01	-238817.82286	7.70999e-11
+//EM Clock time: 32	32148156
 
 }
 

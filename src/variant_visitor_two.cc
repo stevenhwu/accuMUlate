@@ -17,11 +17,11 @@ void VariantVisitorTwo::Visit(const PileupPosition &pileupData) {
 //    string chr = m_bam_ref[pileupData.RefId].RefName;
     uint64_t pos = pileupData.Position;
 
-    m_idx_ref.GetBase(pileupData.RefId, pos, current_base);//Check: Room for improvemnt here?
+    m_idx_ref.GetBase(pileupData.RefId, pos, current_base);//Check: Room for improvement here?
 
     uint16_t ref_base_idx = base_index2[(int) current_base];
     if (ref_base_idx < 4) { //TODO Model for bases at which reference is 'N'
-        global_count[2]++;
+        global_count[1]++;
         ReadDataVector bcalls(total_sample_count, ReadData{0});
         
         for (auto it = begin(pileupData.PileupAlignments); it != end(pileupData.PileupAlignments); ++it) {//auto it2 = *it;
@@ -37,9 +37,12 @@ void VariantVisitorTwo::Visit(const PileupPosition &pileupData) {
                     bcalls[sindex].reads[bindex] += 1;
                 }
             }
+//13309742:m35
+//14713917:m25
+//15621555:m15
         }
         if( filter_data(bcalls) ) {
-            global_count[1]++;
+            global_count[2]++;
             m_all_the_data.push_back(ModelInput{ref_base_idx, bcalls});
             gd_stream.WriteModelInput(m_all_the_data.back());
         }
@@ -96,7 +99,7 @@ VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamH
         m_prob_cut(prob_cut) {
 
 
-
+    std::cout << "Init VariantVisitorTwo: " << m_qual_cut << "\t" << m_mapping_cut << "\t" << m_prob_cut << std::endl;
     qual_cut_char = (char) (m_qual_cut + 33);
 
     rg_tag.push_back(ZERO_CHAR);
@@ -124,6 +127,9 @@ VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamH
         map_tag_sample.emplace(dict->ID, sample_map_temp[dict->Sample]);
 //        map_tag_sample_two_stage.emplace(dict->ID, dict->Sample);
     }
+    for (auto sample : map_tag_sample) {
+        std::cout << sample.first << "\t" << sample.second << std::endl;
+    }
 
 //        cout << "===========================" << endl;
 //        cout << map_tag_sample_two_stage.load_factor() << "\t" << map_tag_sample_two_stage.max_load_factor() << "\t" << map_tag_sample_two_stage.max_size() << endl;
@@ -141,6 +147,12 @@ VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamH
 
 
 bool VariantVisitorTwo::filter_data(ReadDataVector &read_vector) {
+    return true;
+    for (auto item : read_vector) {
+        if (item.key==0){
+            return false;
+        }
+    }
     return true;
     int pass_count = read_vector.size();
     for (auto item : read_vector) {
