@@ -5,7 +5,7 @@ compiler:
 # Change this to your needs
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y libboost-all-dev
+  - sudo apt-get install -y libboost-all-dev libeigen3-dev bamtools
 
 script:
   - mkdir -p build 
