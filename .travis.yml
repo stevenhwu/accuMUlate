@@ -3,7 +3,8 @@ compiler:
   - gcc
   - clang
 # Change this to your needs
-script: 
+script:
+  - mkdir -p build 
   - cd build 
   - cmake ..
   - make
