@@ -62,8 +62,8 @@ class VariantVisitorMain : public PileupVisitor{
 //                ModelInput d = {ref_base_idx, bcalls};
                 m_all_the_data.push_back(ModelInput{ ref_base_idx, bcalls });
 //                ModelInput d = {ref_base_idx, bcalls};
-//                double prob_one = TetMAProbOneMutation(m_params,d);
-//                double prob = TetMAProbability(m_params, d);
+                double prob_one = TetMAProbOneMutation(m_params,d);
+                double prob = TetMAProbability(m_params, d);
 //                if(prob >= m_prob_cut){
 //                     *m_ostream << chr << '\t' 
 //                                << pos << '\t' 

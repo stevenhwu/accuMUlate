@@ -42,7 +42,7 @@ private:
     Eigen::Matrix4d m;
 
 
-
+    void OtherTransitionMatrix();
 };
 
 

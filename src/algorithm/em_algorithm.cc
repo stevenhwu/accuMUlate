@@ -196,12 +196,23 @@ void EmAlgorithm::MaximizationStep() {
 //        double new_one_minus_mu = mutation_prob.ConvertOneMinusExpBetaToMu(-(new_one_minus_exp_beta - 1));
         parameters[r] = new_parameter;
 
-        if(parameters[r] ==0 && (parameters[r] < DOUBLE_MIN) ){
+
+//        if(parameters[r] ==0 && (parameters[r] < DOUBLE_MIN) ){
+        if( parameters[r] < 1e-12 ){
 //        if( (parameters[r] < std::numeric_limits<double>::min()) ){
-//            std::cout << "==WARNING!:: parameters[r]==0" << "\t" << r << "\t" << cache_parameters[r] << std::endl;
+
 //            parameters[r] =  std::numeric_limits<double>::epsilon();
 //            parameters[r] = DOUBLE_MIN;;
-            parameters[r] = 1e-17; //log(1-x) > 0, x=5.56e-17
+//            parameters[r] = 1e-17; //log(1-x) > 0, x=5.56e-17
+//            parameters[r] = 5.56e-17;
+            parameters[r] = 1e-12;
+//            std::cout << "==WARNING!:: parameters[r]==0" << "\t" << r << "\t" << cache_parameters[r] <<
+//                    "\t" << parameters[r] << "\t" << parameters[0]  << std::endl;
+        }
+        if( parameters[r] > (1-1e-3) ){
+            parameters[r] = (1-1e-3);
+//            std::cout << "==WARNING!:: parameters[r]==1" << "\t" << r << "\t" << cache_parameters[r] <<
+//            "\t" << parameters[r] << "\t" << parameters[1]  << std::endl;
         }
     }
 //EM Summary: Ln:-1471696.416905
@@ -245,8 +256,10 @@ void EmAlgorithm::InitialiseProportion() {
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> lower(0.9,0.99);
+    std::uniform_real_distribution<> lower(0.98,0.999);
+//    std::uniform_real_distribution<> lower(0.9,0.99);
 //    std::uniform_real_distribution<> lower(0.8,0.9);
+//    std::uniform_real_distribution<> lower(0.5,0.7);
     double proportion_of_low_rate = lower(gen);
 
 //    double default_proportion = 1.0 / num_category;
@@ -273,9 +286,29 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
     for (size_t r = 0; r < num_category; ++r) {
         double diff = fabs(parameters[r] - cache_parameters[r]);
         sum_diff += diff;
-        sum_ratio += (diff / cache_parameters[r]);
+        double ratio = (diff / cache_parameters[r]);
+        if(!std::isnan(ratio)) {
+            sum_ratio += ratio;
+        }
+
         cache_parameters[r] = parameters[r];
+
     }
+    if( (cache_log_likelihood - log_likelihood.load()) > 1e-8  ) {
+        std::string out = "WARNING: decrease likelihood. Ite: ";
+        char temp[1000];
+        sprintf(temp, "%d.  ", ite);
+        out.append(temp);
+        sprintf(temp, "%.12f\t", cache_log_likelihood.load());
+        out.append(temp);
+        sprintf(temp, "%.12f\t", log_likelihood.load());
+        out.append(temp);
+        sprintf(temp, "%.10e\t", cache_log_likelihood - log_likelihood.load());
+        out.append(temp);
+        std::cout << out << std::endl;
+    }
+    cache_log_likelihood = log_likelihood.load();
+
 
     if ( (ite % VERBOSE_ITE) == 0) {
         std::cout << "Ite: " << ite << " sum_diff: " << sum_diff << "\tsum_ratio: " << sum_ratio << std::endl;
@@ -298,7 +331,7 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
     if( sum_ratio < EM_CONVERGE_RATIO_THRESHOLD){
         std::cout <<"============ DONE (ratio < THRESHOLD) ======= Diff: " << sum_diff << "\tRatio:" << sum_ratio << " Total ite:" << ite << "\n";
 //        std::cout << ite << "\t" << (ite%VERBOSE_ITE) << "\t" <<  << std::endl;
-        int round_up_ite = ((ite/VERBOSE_ITE)+1)*VERBOSE_ITE;
+        int round_up_ite = ((ite/LOG_ITE)+1)*LOG_ITE;
         LogEmSummary(round_up_ite);
 //        return true;
         return false;
@@ -316,23 +349,23 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 void EmAlgorithm::PrintSummary(){
     std::string out;
     char temp[1000];
-    sprintf(temp, "EM Summary: Ln:%.6f\nParameters: ", log_likelihood.load());
+    sprintf(temp, "EM Summary: Ln:%.8f\nParameters: ", log_likelihood.load());
     out.append(temp);
      for (auto &item :parameters) {
-         sprintf(temp, "%.6e\t", item);
+         sprintf(temp, "%.10e\t", item);
          out.append(temp);
     }
 
     sprintf(temp, "\nProportions: ");
     out.append(temp);
     for (auto &item :proportion) {
-        sprintf(temp, "%.6e\t", item);
+        sprintf(temp, "%.10e\t", item);
         out.append(temp);
     }
     for (int r = 0; r < num_category; ++r) {
         for (int s = 0; s < stat_count; ++s) {
             double item = all_em_stats[r]->GetStat(s);
-            sprintf(temp, "%.6e\t", item);
+            sprintf(temp, "%.10e\t", item);
             out.append(temp);
         }
     }
@@ -395,6 +428,7 @@ void EmAlgorithm::SetOutfilePrefix(const std::string & infile) {
 void EmAlgorithm::Run() {
 
     std::cout << "===== Initialise EM =====" << std::endl;
+    cache_log_likelihood = 0;
     PrintSummary();
     RunEM();
     em_logger.Stop();

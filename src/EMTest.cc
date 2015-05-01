@@ -284,7 +284,7 @@ void RunEmWithRealDataMultiThread(boost::program_options::variables_map variable
     t1 = clock();
 
     GenomeData genome_data = getGenomeData(variables_map);
-    PostFilterGenomeData(genome_data);
+    PostFilterGenomeData(genome_data);//TODO: Add this back
     printMemoryUsage("Read genomeData");
 
     cout << "Time: read genome data: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
@@ -345,6 +345,11 @@ void PostFilterGenomeData(GenomeData &genome_data) {
         }
         data.all_reads.erase(data.all_reads.begin()+10);
         data.all_reads.erase(data.all_reads.begin()+7, data.all_reads.begin()+9);
+
+
+//        data.all_reads.erase(data.all_reads.begin()+11);
+//        data.all_reads.erase(data.all_reads.begin()+9);
+//        data.all_reads.erase(data.all_reads.begin()+1, data.all_reads.begin()+7);
 
 //     std::cout << data.all_reads.size() << std::endl;
         for (int i = 0; i < data.all_reads.size(); ++i) {

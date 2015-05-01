@@ -129,6 +129,7 @@ protected:
     void LogEmSummary(int ite);
 
 
+    std::atomic<double> cache_log_likelihood;
 };
 
 
