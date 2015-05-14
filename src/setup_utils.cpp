@@ -126,6 +126,8 @@ uint16_t max_element_index(ReadData &read_data){
     }
     return -1;
 }
+
+
 void SummariseRealData(boost::program_options::variables_map variables_map) {
 
 
@@ -190,4 +192,63 @@ void SummariseRealData(boost::program_options::variables_map variables_map) {
 
 }
 
+
+
+
+
+void SummariseRealData(GenomeData &genome_data ) {
+
+
+
+    clock_t t1;
+    t1 = clock();
+
+
+    int index[12];
+    int ref_diff = 0;
+    int des_diff = 0;
+    std::map<int, int> counter;
+    for (auto &site : genome_data) {
+        bool new_line = false;
+        uint16_t ref = site.reference;
+        ReadDataVector &rd = site.all_reads;
+        index[0] = max_element_index(rd[0]);
+
+//        if(ref != index[0]){
+//            cout << "Ref: " << ref << "\t" << index[0] << "===";
+//            ref_diff ++;
+//            new_line = true;
+//        }
+        int local_count = 0;
+        for (int i = 1; i < 12; ++i) {
+            index[i] = max_element_index(rd[i]);
+            if(index[i] != index[0] && (rd[i].reads[index[i]]>0) ){
+//                cout << index[i] ;
+//                cout << index[0] << index[1] << endl;
+                des_diff ++;
+                local_count++;
+//                break;
+                new_line = true;
+            }
+        }
+        if(local_count>1){
+            ref_diff++;
+            std::cout << local_count << ":   ";
+            for (int i = 0; i < 12; ++i) {
+                std::cout << index[i] << ":" << rd[i].reads[index[i]] << " ";
+            }
+            std::cout << "" << std::endl;
+        }
+        counter[local_count]++;
+//        if(new_line) {
+//            cout << "\t" <<  local_count << "\t" << endl;
+//        }
+
+    }
+    std::cout << "Summary: " << ref_diff << "\t" << des_diff << "\t" << genome_data.size() << std::endl;
+    for (auto item : counter) {
+        std::cout << item.first << "\t" << item.second << std::endl;
+    }
+
+}
 

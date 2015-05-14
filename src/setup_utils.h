@@ -17,6 +17,9 @@
 
 void SummariseReadsData(GenomeData base_counts);
 
+void SummariseRealData(GenomeData &genome_data );
+
+
 GenomeData getGenomeData(boost::program_options::variables_map variables_map);
 
 void SummariseRealData(boost::program_options::variables_map map);

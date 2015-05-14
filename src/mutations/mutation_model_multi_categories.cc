@@ -127,6 +127,7 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
     prob_reads = 0;
     all_stats_diff = 0;
 
+    int site_descendant_count = all_sequence_prob_index[site_index].GetDescendantCount();
     const auto &descendant_genotypes_index = all_sequence_prob_index[site_index].GetDescendantIndex();
     uint32_t anc_genotype_index = all_sequence_prob_index[site_index].GetAncestorIndex();
     auto &ancestor_genotype_10 =  convert_index_key_to_diploid_10[anc_genotype_index];

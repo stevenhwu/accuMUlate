@@ -110,6 +110,18 @@ HaploidProbs SequencingFactory::HaploidSequencing(ReadData const &data) {
 }
 
 
+void SequencingFactory::CalculateAncestorPrior() {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = i; j < 4; ++j) {
+            int index10 = LookupTable::index_converter_4_4_to_10[i][j];
+            ancestor_prior[index10] = frequency_prior[i] * frequency_prior[j];
+            if(i != j){
+                ancestor_prior[index10] *= 2; //Count both AC and CA
+            }
+        }
+    }
+}
+
 //
 //void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp, GenomeData &genome_data) {
 //
@@ -222,7 +234,7 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 //    std::unordered_map<uint64_t, uint> map_rd_to_index;
 //    std::array<std::unordered_map<uint64_t, uint>, 4> map_ancestor_to_index;
 
-
+//    sgi.clear();
     sgi.reserve(genome_data.size());
 //    for (size_t i = 0; i < genome_data.size(); ++i){
 //        sgi.emplace_back(genome_data[i]);
@@ -241,7 +253,7 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
         ModelInput data = std::move(genome_data[i]);
 //        ModelInput data = genome_data[i];
         int descendant_conut = data.all_reads.size() - 1;
-
+        std::cout << "FactoryDesCount: "<< descendant_conut << std::endl;
 //        sgi.emplace_back(descendant_conut);
 //        SiteGenotypesIndex &item = sgi[i];
 
@@ -315,18 +327,6 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 //    return SiteGenotypes();
 }
 
-void SequencingFactory::CalculateAncestorPrior() {
-    for (int i = 0; i < 4; ++i) {
-        for (int j = i; j < 4; ++j) {
-            int index10 = LookupTable::index_converter_4_4_to_10[i][j];
-            ancestor_prior[index10] = frequency_prior[i] * frequency_prior[j];
-            if(i != j){
-                ancestor_prior[index10] *= 2; //Count both AC and CA
-            }
-        }
-    }
-}
-
 
 //
 //void SequencingFactory::CalculateAncestorGenotypeIndex(SiteGenotypesIndex &seq_prob) {
@@ -360,23 +360,13 @@ void SequencingFactory::CalculateAncestorPrior() {
 //}
 
 
-DiploidProbsIndex10 SequencingFactory::ConvertDiploid16ToDiploid10(DiploidProbs diploid_16, int reference) {
-    diploid_16 *= ref_diploid_probs[reference];
-    DiploidProbsIndex10 temp_diploid_10;
-    for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
-        int index16 = LookupTable::index_converter_10_to_16[index10];
-        temp_diploid_10[index10] = diploid_16[index16] * ancestor_prior[index10];
-    }
-
-    return temp_diploid_10;
-}
-
 void SequencingFactory::CreateSequenceProbsVector(GenomeData &data) {
 
     CreateSequenceProbsVector(sgi, data);
 //    return std::move(sgi);
 }
 
+[[deprecated]]
 void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sgi, ModelInput &data) {
 
 
@@ -455,4 +445,16 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 
 std::vector<SiteGenotypesIndex> &&SequencingFactory::RemoveSiteGenotypeIndexVector() {
     return std::move(sgi);
+}
+
+
+DiploidProbsIndex10 SequencingFactory::ConvertDiploid16ToDiploid10(DiploidProbs diploid_16, int reference) {
+    diploid_16 *= ref_diploid_probs[reference];
+    DiploidProbsIndex10 temp_diploid_10;
+    for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+        int index16 = LookupTable::index_converter_10_to_16[index10];
+        temp_diploid_10[index10] = diploid_16[index16] * ancestor_prior[index10];
+    }
+
+    return temp_diploid_10;
 }

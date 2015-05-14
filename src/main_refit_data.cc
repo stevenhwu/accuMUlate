@@ -71,9 +71,112 @@ MutationModelMultiCategories CreateMutationModelMulti(GenomeData genome_data, Mo
 
 void RunEmWithRealDataMultiThread(boost::program_options::variables_map map, size_t thread_count);
 
-void SummariseRealData(boost::program_options::variables_map map);
 
 //void PostFilterGenomeData(GenomeData &genome_data);
+
+void CustomFilterGenomeData(GenomeData &genome_data) {
+
+//    Custom filter, remove sample 47 51 44   ->  7 8 10
+//
+    for (int g = genome_data.size()-1 ; g >= 0; --g) {
+
+        ModelInput &data = genome_data[g];
+//        for (int i = 0; i < data.all_reads.size(); ++i) {
+//            std::cout << i << ":" << data.all_reads[i].key << " ";
+//        }
+//        std::cout << "" << std::endl;
+        data.all_reads.erase(data.all_reads.begin()+10);
+        data.all_reads.erase(data.all_reads.begin()+7, data.all_reads.begin()+9);
+
+//        for (int i = 0; i < data.all_reads.size(); ++i) {
+//            std::cout << i << ":" << data.all_reads[i].key << " ";
+//        }
+//        std::cout << "" << std::endl;
+//        data.all_reads.erase(data.all_reads.begin()+11);
+//        data.all_reads.erase(data.all_reads.begin()+9);
+//        data.all_reads.erase(data.all_reads.begin()+1, data.all_reads.begin()+7);
+
+        int sum = 0;
+
+        for (int j = 0; j < 4; ++j) {
+            sum += data.all_reads[0].reads[j];
+        }
+        if(sum < 6){
+//            for (int j = 0; j < 4; ++j) {
+//                std::cout << data.all_reads[0].reads[j] << " ";
+//            } std::cout << "" << std::endl;
+
+//            data.all_reads.clear();
+//            std::cout << g << ":" << genome_data.size() << " ";
+//
+//            std::cout << genome_data.size() << "\t" << data.all_reads[0].key << "\t" << sum << std::endl;
+//            for (int j = 0; j < 4; ++j) {
+//                std::cout << data.all_reads[0].reads[j]  << std::endl;
+//            }
+
+            genome_data.erase(genome_data.begin()+g);
+//            break;
+
+        }
+        else {
+            int zero_count = 0;
+            for (int i = data.all_reads.size() - 1; i > 0; --i) {
+                int sum = 0;
+
+                for (int j = 0; j < 4; ++j) {
+                    sum += data.all_reads[i].reads[j];
+                }
+//            std::cout << i << "\t" << data.all_reads[i].key << "\t" << sum <<std::endl;
+//            std::cout << i << ":" << sum << " ";
+                if (sum < 6) {
+                data.all_reads.erase(data.all_reads.begin()+i);//FIXME: current model assume equal des, fail if do this
+                    data.all_reads[i] = 0;
+                    zero_count ++;
+                }
+
+            }
+//        std::cout << "" << std::endl;
+//        for (int i = 0; i < data.all_reads.size(); ++i) {
+//            std::cout << i << ":" << data.all_reads[i].key << " ";
+//        }
+//        std::cout << "" << std::endl;
+//        std::cout << "FINAL SIZE: " << data.all_reads.size() << std::endl;
+//        std::exit(13);
+            if (zero_count == data.all_reads.size() -1) {
+//                data.all_reads.clear();
+//                std::cout << "FINAL SIZE: " << data.all_reads.size() << "\t" << zero_count << std::endl;
+//                for (int i = 0; i < data.all_reads.size(); ++i) {
+//                    std::cout << i << ":" << data.all_reads[i].key << " ";
+//                }
+//                 std::cout << "" << std::endl;
+
+                genome_data.erase(genome_data.begin() + g);
+
+            }
+        }
+//        for (int i = 0; i < data.all_reads.size(); ++i) {
+//            int sum = 0;
+//            for (int j = 0; j < 4; ++j) {
+//                sum += data.all_reads[i].reads[j];
+//            }
+////            if(sum<6){
+////                std::cout << i << "\t" ;
+////                for (int j = 0; j < 4; ++j) {
+////                    std::cout << data.all_reads[i].reads[j] << " "  ;
+////                }
+////                std::cout << "" << std::endl;
+////            }
+////            std::cout << i << "\t" << data.all_reads[i].key << std::endl;
+//        }
+//        std::cout << "" << std::endl;
+//        std::cout << "\n=======\n" << std::endl;
+//        exit(32);
+    }
+//FinalSummary: 5.57299e-01	6.02335e-06	1.32571e-04	9.99867e-01	-238817.82286	7.70999e-11
+//EM Clock time: 32	32148156
+
+}
+
 
 
 void RefitData(boost::program_options::variables_map variables_map) {
@@ -90,19 +193,34 @@ void RefitData(boost::program_options::variables_map variables_map) {
     t1 = clock();
 
     GenomeData genome_data = getGenomeData(variables_map);
-    printMemoryUsage("Read genomeData");
+    SummariseRealData(genome_data);
+    CustomFilterGenomeData(genome_data);//TODO: Add this back
+    SummariseRealData(genome_data);
 
+
+
+
+//    std::vector<SiteGenotypesIndex> sgi;
+    SequencingFactory sequencing_factory(params);
+    sequencing_factory.CreateSequenceProbsVector(genome_data);
+
+
+    std::exit(-3);
     cout << "Time: read genome data: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
     cout << "===== Setup EmData. Init site_count: " << genome_data.size() << endl;
+    printMemoryUsage("Read genomeData");
+
+
 
     t1 = clock();
-    CreateMutationModel(mutation_model, genome_data, params);
-    cout << "Time Create Mutation Model: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
+//    CreateMutationModel(mutation_model, genome_data, params);
 
+    cout << "Time Create Mutation Model: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
     cout << "===== Done preprocess. Final site count: " << mutation_model.GetSiteCount() << endl;
     printMemoryUsage("Created Mutation Model");
-    cout << "===== Setup EM" << endl;
 
+
+    cout << "===== Setup EM" << endl;
 //    std::vector<std::unique_ptr<EmModel>> em_model2;
 //    em_model2.emplace_back(new EmModelMutation(mutation_model));
 //    em_model2.emplace_back(new EmModelMutation(mutation_model));
@@ -380,7 +498,7 @@ int main(int argc, char** argv){
     boost::program_options::variables_map variables_map;
     BoostUtils::ParseCommandLinkeInput(argc, argv, variables_map);
 
-    SummariseRealData(variables_map);
+//    SummariseRealData(variables_map);
 //    exit(83);
     {
 //        RefitData(genome_data, params);
