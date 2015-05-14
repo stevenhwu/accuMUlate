@@ -35,15 +35,15 @@ MutationModelMultiCategories::MutationModelMultiCategories(int num_categories, E
     all_sequence_prob_index = factory.RemoveSiteGenotypeIndexVector();
 
     site_count = all_sequence_prob_index.size();
-    descendant_count = all_sequence_prob_index[0].GetDescendantCount();
+//    descendant_count = all_sequence_prob_index[0].GetDescendantCount();
 
     for (int i = 0; i < categories_count; ++i) {
         InitCache(i);
         UpdateCache(i);
     }
 
-    std::cout << "Site_count: " << "\t" << site_count << "\tDescendant_count: " << descendant_count  << std::endl;
-    std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
+    std::cout << "Site_count: " << "\t" << site_count << "\tDescendant_count varies! "<< std::endl;
+//    std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
 
 }
 
@@ -128,6 +128,7 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
     all_stats_diff = 0;
 
     int site_descendant_count = all_sequence_prob_index[site_index].GetDescendantCount();
+//    std::cout << site_descendant_count << std::endl;
     const auto &descendant_genotypes_index = all_sequence_prob_index[site_index].GetDescendantIndex();
     uint32_t anc_genotype_index = all_sequence_prob_index[site_index].GetAncestorIndex();
     auto &ancestor_genotype_10 =  convert_index_key_to_diploid_10[anc_genotype_index];
@@ -148,8 +149,8 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
         all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
     }
     all_stats_diff /= prob_reads;
-    all_stats_diff /= descendant_count;//NOTE: need this to auto calculate stat_same. sum to 1
-
+//    all_stats_diff /= descendant_count;//NOTE: need this to auto calculate stat_same. sum to 1
+    all_stats_diff /= site_descendant_count;
 }
 
 
@@ -178,7 +179,7 @@ void MutationModelMultiCategories::NoCacheCalculateDes(int site_index, int a, do
     summary_stat_diff_ancestor = 0;
     stat_same = 0;
     std::vector<uint32_t> const &descendant_index = all_sequence_prob_index[site_index].GetDescendantIndex();
-    for (int d = 0; d < descendant_count; ++d) {//TODO: Check descendant info, merge some of them together
+    for (int d = 0; d < descendant_index.size(); ++d) {//TODO: Check descendant info, merge some of them together
         double summary_stat_same = 0;
         double summary_stat_diff = 0;
         double sum_over_probs = 1;
@@ -223,7 +224,7 @@ void MutationModelMultiCategories::CalculateLikelihoodUnnormalised(int site_inde
     summary_stat_diff_ancestor = 0;
     double stat_same = 0;
     std::vector<uint32_t> const &descendant_index = all_sequence_prob_index[site_index].GetDescendantIndex();
-    for (int d = 0; d < descendant_count; ++d) {//TODO: Check descendant info, merge some of them together
+    for (int d = 0; d < descendant_index.size(); ++d) {//TODO: Check descendant info, merge some of them together
         double summary_stat_same = 0;
         double summary_stat_diff = 0;
         double sum_over_probs = 1;

@@ -244,15 +244,7 @@ int SequenceProb::GetDescendantCount() {
 	return descendant_count;
 }
 
-void SequenceProb::printReadData(ReadData read_data) {
-	printf("%d %d %d %d\n", read_data.reads[0], read_data.reads[1], read_data.reads[2], read_data.reads[3]);
 
-}
-
-void SequenceProb::PrintReads(ReadData data) {
-	printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);
-
-}
 
 ReadData SequenceProb::GetDescendantReadData(int descent_index) {
 	return all_descendant_data[descent_index];

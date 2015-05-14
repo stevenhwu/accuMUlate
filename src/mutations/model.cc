@@ -393,3 +393,21 @@ int parseLine(char* line) {
 	i = atoi(line);
 	return i;
 }
+
+
+void PrintReads(ReadData read_data) {
+//	printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);
+	for (int j = 0; j < 4; ++j) {
+		std::cout << read_data.reads[j] << " ";
+	} std::cout << "" << std::endl;
+
+}
+
+
+
+void PrintModelInput(ModelInput model_input) {
+    for (int i = 0; i < model_input.all_reads.size(); ++i) {
+        PrintReads(model_input.all_reads[i]);
+    }
+    std::cout << std::endl;
+}

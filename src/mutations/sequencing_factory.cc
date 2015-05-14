@@ -236,14 +236,9 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 
 //    sgi.clear();
     sgi.reserve(genome_data.size());
-//    for (size_t i = 0; i < genome_data.size(); ++i){
-//        sgi.emplace_back(genome_data[i]);
-//    }
 
-    uint32_t index = 0;
+    uint32_t index_descendant = 0;
     uint32_t index_ancestor = 0;
-
-//    sgi.reserve(genome_data.size());
 
     for (size_t i = 0; i < genome_data.size(); ++i) {
 
@@ -253,15 +248,13 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
         ModelInput data = std::move(genome_data[i]);
 //        ModelInput data = genome_data[i];
         int descendant_conut = data.all_reads.size() - 1;
-        std::cout << "FactoryDesCount: "<< descendant_conut << std::endl;
-//        sgi.emplace_back(descendant_conut);
-//        SiteGenotypesIndex &item = sgi[i];
+//        std::cout << "FactoryDesCount: "<< descendant_conut << std::endl;
 
-        SiteGenotypesIndex item (descendant_conut);
+        SiteGenotypesIndex site_genotype(descendant_conut);
 
-        for (int j = 0; j < item.GetDescendantCount(); ++j) {
+        for (int j = 0; j < site_genotype.GetDescendantCount(); ++j) {
 //            std::cout << i <<  "\t" << j << std::endl;
-//            ReadData rd = item.GetDescendantReadData(j);
+//            ReadData rd = site_genotype.GetDescendantReadData(j);
 //            ReadData &rd = genome_data[i].all_reads[j+1];
             ReadData &rd = data.all_reads[j+1];
             auto rd_key = rd.key;
@@ -271,25 +264,25 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
             if (find_key == map_rd_to_index.end()) {
 
                 HaploidProbs prob = HaploidSequencing(rd);
-                {
-                    HaploidProbs prob_exp = prob.exp();
-                    convert_index_key_to_haploid_unnormalised.push_back(prob_exp);
-                }
+//                {
+//                    HaploidProbs prob_exp = prob.exp();
+//                    convert_index_key_to_haploid_unnormalised.push_back(prob_exp);
+//                }
 
                 double scale = prob.maxCoeff();
                 convert_index_key_to_haploid_scaler.push_back(scale);
                 prob = (prob - scale).exp();
                 convert_index_key_to_haploid.push_back(prob);
 
-                map_rd_to_index[rd_key] = index;
-                index++;
+                map_rd_to_index[rd_key] = index_descendant;
+                index_descendant++;
 
             }
-            item.SetDescendantIndex(j, map_rd_to_index[rd_key]);
+            site_genotype.SetDescendantIndex(j, map_rd_to_index[rd_key]);
         }
 
 
-//        ReadData rd = item.GetAncestorReadData();
+//        ReadData rd = site_genotype.GetAncestorReadData();
 //        ReadData &rd = genome_data[i].all_reads[0];
         ReadData &rd = data.all_reads[0];
 
@@ -297,10 +290,10 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
         auto find_key = map_ancestor_to_index[data.reference].find(rd_key);
         if (find_key == map_ancestor_to_index[data.reference].end()) {
             DiploidProbs temp_prob = DiploidSequencing(rd);
-            {
-                DiploidProbsIndex10 temp_dip_10 = ConvertDiploid16ToDiploid10(temp_prob.exp(), data.reference);
-                convert_index_key_to_diploid_10_unnormalised.push_back(temp_dip_10);
-            }
+//            {
+//                DiploidProbsIndex10 temp_dip_10 = ConvertDiploid16ToDiploid10(temp_prob.exp(), data.reference);
+//                convert_index_key_to_diploid_10_unnormalised.push_back(temp_dip_10);
+//            }
 
             double scale = temp_prob.maxCoeff();
             convert_index_key_to_diploid_10_scaler.push_back(scale);
@@ -313,15 +306,15 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
             map_ancestor_to_index[data.reference][rd_key] = index_ancestor;
             index_ancestor++;
         }
-        item.SetAncestorIndex(map_ancestor_to_index[data.reference][rd_key]);
+        site_genotype.SetAncestorIndex(map_ancestor_to_index[data.reference][rd_key]);
 
-        sgi.push_back(std::move(item));
+        sgi.push_back(std::move(site_genotype));
 
 //        if(i==5){
 //            break;
 //        }
     }
-    std::cout << "Cache descendant size: " << index << "\t" << convert_index_key_to_haploid.size() << "\t" << map_rd_to_index.size() <<std::endl;
+    std::cout << "Cache descendant size: " << index_descendant << "\t" << convert_index_key_to_haploid.size() << "\t" << map_rd_to_index.size() <<std::endl;
     std::cout << "Cache ancestor size: " << index_ancestor << "\t" << convert_index_key_to_diploid_10.size() << "\t" << map_ancestor_to_index.size() <<std::endl;
 
 //    return SiteGenotypes();
@@ -365,6 +358,7 @@ void SequencingFactory::CreateSequenceProbsVector(GenomeData &data) {
     CreateSequenceProbsVector(sgi, data);
 //    return std::move(sgi);
 }
+
 
 [[deprecated]]
 void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex> &sgi, ModelInput &data) {

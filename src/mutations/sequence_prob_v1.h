@@ -43,7 +43,7 @@ public:
 
     static std::array<DiploidProbs, 4> DiploidPopulationFactory(ModelParams const model_params);
     static HaploidProbs HaploidProbsFactory(ReadData const &data);
-    static void printReadData(ReadData read_data);
+
 
     static void CreateSequenceProbV1(std::vector<SequenceProb> &sp, GenomeData &genome_data, ModelParams model_params) {
         sp.reserve(genome_data.size());
@@ -129,7 +129,7 @@ public:
     ReadData GetDescendantReadData(int descent_index);
     uint64_t GetDescendantReadDataKey(int descent_index);
 
-    void PrintReads(ReadData data);
+
 //    double GetLikelihood();
 
     ReadDataVector GetDescendantReadData();

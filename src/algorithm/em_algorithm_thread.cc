@@ -41,6 +41,7 @@ void EmAlgorithmMultiThreading::ExpectationStepModelPtrMTMulti() {
 
     }
 
+
 //7.204842241669e-01	9.095599810937e-07	1.305992121779e-04	9.998694007878e-01	9.998694007878e-01	Time new: 61	61484826
 }
 

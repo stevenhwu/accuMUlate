@@ -105,7 +105,7 @@ private:
     std::vector<std::array<std::vector<std::pair<double, double>>, 10>> cache_read_data_to_all_index_rev;//TODO: turn this into a class
 
     int site_count;
-    int descendant_count;
+//    int descendant_count;
 
 
 

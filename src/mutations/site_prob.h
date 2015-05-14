@@ -58,7 +58,7 @@ public:
 
     void UpdateModel(EvolutionModel &evo_model);
 
-    static void PrintReads(ReadData data);
+
 protected:
 
 

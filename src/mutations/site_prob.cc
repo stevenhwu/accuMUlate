@@ -265,8 +265,4 @@ void SiteProb::CalculateOneDescendantGivenAncestor(int index16, int des_index, d
 }
 
 
-void SiteProb::PrintReads(ReadData data) {
-    printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);
-
-}
 

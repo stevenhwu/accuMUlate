@@ -77,103 +77,79 @@ void RunEmWithRealDataMultiThread(boost::program_options::variables_map map, siz
 void CustomFilterGenomeData(GenomeData &genome_data) {
 
 //    Custom filter, remove sample 47 51 44   ->  7 8 10
-//
+
     for (int g = genome_data.size()-1 ; g >= 0; --g) {
 
         ModelInput &data = genome_data[g];
-//        for (int i = 0; i < data.all_reads.size(); ++i) {
-//            std::cout << i << ":" << data.all_reads[i].key << " ";
-//        }
-//        std::cout << "" << std::endl;
-        data.all_reads.erase(data.all_reads.begin()+10);
-        data.all_reads.erase(data.all_reads.begin()+7, data.all_reads.begin()+9);
+//        PrintModelInput(data);
+//        std::cout << "\t" << data.all_reads.size() << "\t" << data.all_reads.capacity() << "\t";
+//        data.all_reads.erase(data.all_reads.begin()+10);
+//        data.all_reads.erase(data.all_reads.begin()+7, data.all_reads.begin()+9);
+//        data.all_reads.shrink_to_fit();
 
-//        for (int i = 0; i < data.all_reads.size(); ++i) {
-//            std::cout << i << ":" << data.all_reads[i].key << " ";
-//        }
-//        std::cout << "" << std::endl;
-//        data.all_reads.erase(data.all_reads.begin()+11);
-//        data.all_reads.erase(data.all_reads.begin()+9);
-//        data.all_reads.erase(data.all_reads.begin()+1, data.all_reads.begin()+7);
+
+        std::swap(data.all_reads[10], data.all_reads.back());
+        data.all_reads.pop_back();
+        std::swap(data.all_reads[8], data.all_reads.back());
+        data.all_reads.pop_back();
+        std::swap(data.all_reads[7], data.all_reads.back());
+        data.all_reads.pop_back();
+//        std::cout << "\t" << data.all_reads.size() << "\t" << data.all_reads.capacity() << "\t" << std::endl;
+
 
         int sum = 0;
-
         for (int j = 0; j < 4; ++j) {
             sum += data.all_reads[0].reads[j];
         }
-        if(sum < 6){
-//            for (int j = 0; j < 4; ++j) {
-//                std::cout << data.all_reads[0].reads[j] << " ";
-//            } std::cout << "" << std::endl;
 
-//            data.all_reads.clear();
-//            std::cout << g << ":" << genome_data.size() << " ";
-//
-//            std::cout << genome_data.size() << "\t" << data.all_reads[0].key << "\t" << sum << std::endl;
-//            for (int j = 0; j < 4; ++j) {
-//                std::cout << data.all_reads[0].reads[j]  << std::endl;
-//            }
-
-            genome_data.erase(genome_data.begin()+g);
-//            break;
-
+        if(sum < 6){//Bad ref, remove site
+//            PrintModelInput(data);
+//            genome_data.erase(genome_data.begin()+g);
+            std::swap(genome_data[g], genome_data.back());
+            genome_data.pop_back();
         }
-        else {
-            int zero_count = 0;
-            for (int i = data.all_reads.size() - 1; i > 0; --i) {
+//        else if(sum>150){
+//            PrintReads(data.all_reads[0]);
+//        }
+        else {//Check each descendant
+//            std::cout <<g << "\t" << data.all_reads.capacity() << "\t" << data.all_reads.size() << std::endl;
+            for (int i = data.all_reads.size()-1 ; i > 0; --i) {
                 int sum = 0;
-
                 for (int j = 0; j < 4; ++j) {
                     sum += data.all_reads[i].reads[j];
                 }
-//            std::cout << i << "\t" << data.all_reads[i].key << "\t" << sum <<std::endl;
-//            std::cout << i << ":" << sum << " ";
                 if (sum < 6) {
-                data.all_reads.erase(data.all_reads.begin()+i);//FIXME: current model assume equal des, fail if do this
-                    data.all_reads[i] = 0;
-                    zero_count ++;
+//                    std::cout << g << "\t" << sum << "\t" << i << "\t" << data.all_reads.size() << "\t" << data.all_reads[i].key <<"\t" << data.all_reads[i-1].key <<"\t" << data.all_reads[i+1].key <<"\t";
+//                    data.all_reads.erase(data.all_reads.begin()+i);//FIXME: current model assume equal des, fail if do this
+                    std::swap(data.all_reads[i], data.all_reads.back());
+                    data.all_reads.pop_back();
+
+//                    if (i != pList.size() - 1)
+//                    {
+//                        // Beware of move assignment to self
+//                        // see http://stackoverflow.com/questions/13127455/
+//                        pList[i] = std::move(pList.back());
+//                    }
+//                    pList.pop_back();
                 }
-
-            }
-//        std::cout << "" << std::endl;
-//        for (int i = 0; i < data.all_reads.size(); ++i) {
-//            std::cout << i << ":" << data.all_reads[i].key << " ";
-//        }
-//        std::cout << "" << std::endl;
-//        std::cout << "FINAL SIZE: " << data.all_reads.size() << std::endl;
-//        std::exit(13);
-            if (zero_count == data.all_reads.size() -1) {
-//                data.all_reads.clear();
-//                std::cout << "FINAL SIZE: " << data.all_reads.size() << "\t" << zero_count << std::endl;
-//                for (int i = 0; i < data.all_reads.size(); ++i) {
-//                    std::cout << i << ":" << data.all_reads[i].key << " ";
+//                else if(sum>200){
+//                    PrintReads(data.all_reads[i]);
 //                }
-//                 std::cout << "" << std::endl;
+            }
 
-                genome_data.erase(genome_data.begin() + g);
+            if (data.all_reads.size() ==1) {
+//                std::cout << g << "\t" << data.all_reads.size() << std::endl;
+//                for (int i = 0; i < 9; ++i) {
+//                    PrintReads(data.all_reads[i]);
+//                }
+
+                std::swap(genome_data[g], genome_data.back());
+                genome_data.pop_back();
 
             }
         }
-//        for (int i = 0; i < data.all_reads.size(); ++i) {
-//            int sum = 0;
-//            for (int j = 0; j < 4; ++j) {
-//                sum += data.all_reads[i].reads[j];
-//            }
-////            if(sum<6){
-////                std::cout << i << "\t" ;
-////                for (int j = 0; j < 4; ++j) {
-////                    std::cout << data.all_reads[i].reads[j] << " "  ;
-////                }
-////                std::cout << "" << std::endl;
-////            }
-////            std::cout << i << "\t" << data.all_reads[i].key << std::endl;
-//        }
-//        std::cout << "" << std::endl;
-//        std::cout << "\n=======\n" << std::endl;
-//        exit(32);
+
     }
-//FinalSummary: 5.57299e-01	6.02335e-06	1.32571e-04	9.99867e-01	-238817.82286	7.70999e-11
-//EM Clock time: 32	32148156
 
 }
 
@@ -197,20 +173,17 @@ void RefitData(boost::program_options::variables_map variables_map) {
     CustomFilterGenomeData(genome_data);//TODO: Add this back
     SummariseRealData(genome_data);
 
-
-
-
 //    std::vector<SiteGenotypesIndex> sgi;
-    SequencingFactory sequencing_factory(params);
-    sequencing_factory.CreateSequenceProbsVector(genome_data);
+//    SequencingFactory sequencing_factory(params);
+//    sequencing_factory.CreateSequenceProbsVector(genome_data);
 
 
-    std::exit(-3);
+
     cout << "Time: read genome data: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
     cout << "===== Setup EmData. Init site_count: " << genome_data.size() << endl;
     printMemoryUsage("Read genomeData");
 
-
+    std::exit(200);
 
     t1 = clock();
 //    CreateMutationModel(mutation_model, genome_data, params);

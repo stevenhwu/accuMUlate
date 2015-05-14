@@ -162,8 +162,7 @@ public:
     ReadData GetDescendantReadData(int descent_index);
     uint64_t GetDescendantReadDataKey(int descent_index);
 
-    void PrintReads(ReadData data);
-//    double GetLikelihood();
+
 
     ReadDataVector GetDescendantReadData();
     ReadDataVector const & GetDescendantReadData2();

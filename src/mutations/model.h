@@ -33,16 +33,15 @@ union ReadData {
 //        std::cout << "ReadData move constructor" << std::endl;
     }
 
-    ReadData& operator=(ReadData &&other) {
+    ReadData &operator=(ReadData &&other) {
 //        std::cout << "ReadData move assignment" << std::endl;
         key = other.key;
         return *this;
     }
 
-    ReadData(const ReadData& other) = default;
-    ReadData& operator=(const ReadData& other) = default;
+    ReadData(const ReadData &other) = default;
 
-
+    ReadData &operator=(const ReadData &other) = default;
 };
 
 typedef std::vector<ReadData> ReadDataVector;
@@ -89,6 +88,10 @@ struct ModelInput{// Can probably stand to lose this, started out more complex..
     ~ModelInput(){};
 };
 //#pragma pack(pop)   /* restore original alignment from stack */
+
+
+void PrintReads(ReadData data);
+void PrintModelInput(ModelInput model_input);
 
 
 typedef std::vector<ModelInput> GenomeData;
