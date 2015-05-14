@@ -17,7 +17,7 @@
 //#define DEPRECATED(func) func
 //#endif
 
-#include "model.h"
+#include <mutations/model.h>
 #include "lookup.h"
 
 

@@ -6,8 +6,6 @@
  */
 
 #include "mutation_prob.h"
-#include <cmath>
-#include <iostream>
 
 MutationProb::MutationProb(const ModelParams &model_params) {
 

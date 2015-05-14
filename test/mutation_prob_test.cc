@@ -1,5 +1,7 @@
+#include <mutations/model.h>
+#include <mutations/mutation_prob.h>
 #include "gtest/gtest.h"
-#include "mutation_prob.h"
+
 
 class MutationProbTest : public ::testing::Test {
 protected:

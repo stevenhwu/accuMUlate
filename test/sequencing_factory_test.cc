@@ -2,9 +2,11 @@
 // Created by steven on 4/2/15.
 //
 
+
+#include <mutations/sequencing_factory.h>
 #include "gtest/gtest.h"
-#include "sequencing_factory.h"
 #include "unittest_utils.h"
+
 class SequenceFactorTest : public ::testing::Test {
 
 public:

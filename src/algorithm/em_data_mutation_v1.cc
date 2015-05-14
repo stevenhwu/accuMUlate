@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include "em_data_mutation_v1.h"
-#include "em_model_mutation_v1.h"
 
 
 EmDataMutationV1::EmDataMutationV1(SequenceProb &sequence_prob, EvolutionModel &evo_model){

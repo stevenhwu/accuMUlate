@@ -5,8 +5,6 @@
  *      Author: Steven Wu
  */
 #include <iostream>
-#include <stdint.h>
-#include <strings.h>
 #include "site_genotypes.h"
 
 const bool DEBUG = false;

@@ -10,9 +10,9 @@
 #define EM_DATA_MUTATION_V1_H_
 
 
+#include <mutations/site_genotypes.h>
+#include <mutations/site_prob.h>
 #include "em_data.h"
-#include "site_genotypes.h"
-#include "site_prob.h"
 #include "em_model.h"
 #include "em_model_mutation_v1.h"
 

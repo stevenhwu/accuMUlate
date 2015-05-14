@@ -1,17 +1,4 @@
-#include <iostream>
-#include <cstdint>
-#include <cmath>
-#include <vector>
-#include <initializer_list>
-#include <iostream>
-#include <map>
-#include <fstream>
-#include <memory>
-#include <random>
 #include "distributions/DirichletMultinomialDistribution.h"
-#include "Eigen/Dense"
-
-#include "model.h"
 
 
 void SimulateGenomeData(GenomeData &genome_data, int descendant_count, size_t fake_sample_count, double fake_prop) {

@@ -5,15 +5,6 @@
  *      Author: Steven Wu
  */
 
-#include <memory>
-#include <vector>
-#include "gtest/gtest.h"
-
-#include "algorithm/em_model_binomial.h"
-
-#include <algorithm/em_data_binomial.h>
-#include <algorithm/em_algorithm_binomial.h>
-
 
 
 class EmAlgorithmBinomialTest : public ::testing::Test {

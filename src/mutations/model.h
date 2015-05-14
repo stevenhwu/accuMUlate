@@ -8,9 +8,14 @@
 
 //#pragma GCC diagnostic pop
 
-#include <stdint.h>
+//#include <stdint.h>
 #include <vector>
 #include <iostream>
+#include <cmath>
+#include <map>
+#include <fstream>
+#include <memory>
+#include <random>
 #include "Eigen/Dense"
 
 union ReadData {

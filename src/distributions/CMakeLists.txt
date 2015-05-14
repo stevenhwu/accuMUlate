@@ -1,7 +1,7 @@
 #add_executable(accuMUlate DirichletMultinomialDistribution.cpp)
-#add_library(distributions DirichletMultinomialDistribution.cpp)
 
 
+add_library(LibDistributions DirichletMultinomialDistribution.cpp)
 
 
 SET(SOURCE_FILES ${SOURCE_FILES}

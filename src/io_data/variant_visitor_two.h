@@ -15,7 +15,7 @@
 #include "utils/bamtools_pileup_engine.h"
 #include "utils/bamtools_fasta.h"
 
-#include "model.h"
+#include <mutations/model.h>
 #include "parsers.h"
 #include "genome_data_stream.h"
 

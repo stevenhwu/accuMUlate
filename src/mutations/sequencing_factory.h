@@ -5,7 +5,7 @@
 #ifndef _SEQUENCING_FACTORY_H_
 #define _SEQUENCING_FACTORY_H_
 
-#include "model.h"
+#include <mutations/model.h>
 #include "site_genotypes.h"
 #include "sequence_prob_v1.h"
 #include "site_genotype_index.h"

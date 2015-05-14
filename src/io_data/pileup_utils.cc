@@ -6,10 +6,6 @@
  */
 
 
-#include <sys/socket.h>
-#include <stdint.h>
-#include <fcntl.h>
-#include <time.h>
 #include <stdio.h>
 #include "pileup_utils.h"
 
@@ -32,7 +28,7 @@ namespace PileupUtils{
 
         BoostUtils::ExtractInputVariables(vm, genome_data, experiment, references, header, reference_genome);
 
-        PileupEngine pileup;
+        BamTools::PileupEngine pileup;
 
         if(variant_visitor_index == 1){
             CreatePileupV1(vm, genome_data, references, header, reference_genome, pileup);

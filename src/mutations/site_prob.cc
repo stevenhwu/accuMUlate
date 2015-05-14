@@ -6,7 +6,6 @@
  */
 
 #include <iostream>
-#include <strings.h>
 
 #include "site_prob.h"
 

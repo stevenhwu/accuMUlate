@@ -6,7 +6,7 @@
 #include "api/BamReader.h"
 #include "utils/bamtools_pileup_engine.h"
 
-#include "model.h"
+#include <mutations/model.h>
 #include "parsers.h"
 
 using namespace BamTools;

@@ -1,9 +1,11 @@
-#include "site_prob.h"
+
 #include <evolution_models/F81.h>
-#include <sequence_prob_v1.h>
+
+#include <mutations/sequence_prob_v1.h>
+#include <mutations/site_prob.h>
 
 #include "gtest/gtest.h"
-#include "site_genotypes.h"
+
 
 class SiteProbTest : public ::testing::Test {
 public:

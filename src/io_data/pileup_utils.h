@@ -10,26 +10,25 @@
 #ifndef PILEUP_UTILS_H_
 #define PILEUP_UTILS_H_
 
-
 #include <iostream>
 #include <vector>
-
 #include <boost/program_options.hpp>
 #include <time.h>
 
-#include "api/BamReader.h"
-#include "utils/bamtools_pileup_engine.h"
-#include "utils/bamtools_fasta.h"
 
-#include "model.h"
-//#include "parsers.h"
-//#include "sequence_prob.h"
+//#include "api/BamReader.h"
+#include "utils/bamtools_pileup_engine.h"
+//#include utils/bamtools_fasta.h"
+
+#include <mutations/model.h>
 #include "VariantVisitor.h"
 #include "variant_visitor_two.h"
 
 #include "genome_data_stream.h"
 #include "boost_input_utils.h"
 
+//#include "parsers.h"
+//#include "sequence_prob.h"
 
 namespace PileupUtils {
 

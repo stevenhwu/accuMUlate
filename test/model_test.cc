@@ -1,11 +1,11 @@
 //
 // Created by steven on 4/8/15.
 //
+#include <mutations/model.h>
 #include "gtest/gtest.h"
 #include "unittest_utils.h"
-#include "model.h"
 
-#include "sequencing_factory.h"
+
 
 class ModelTest : public ::testing::Test {
 

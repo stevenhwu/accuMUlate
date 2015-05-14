@@ -7,14 +7,6 @@
 
 
 #include "em_algorithm_mutation.h"
-#include <iostream>
-#include "em_algorithm_mutation_v1.h"
-#include "em_algorithm_binomial.h"
-#include "em_algorithm.h"
-#include "em_summary_stat_mutation.h"
-
-#include <stddef.h>
-#include <glob.h>
 
 const double EM_CONVERGE_THRESHOLD = 1e-10;
 const double EM_CONVERGE_RATIO_THRESHOLD = 1e-10;
@@ -196,21 +188,21 @@ void EmAlgorithm::MaximizationStep() {
 //        double new_one_minus_mu = mutation_prob.ConvertOneMinusExpBetaToMu(-(new_one_minus_exp_beta - 1));
         parameters[r] = new_parameter;
 
-
-//        if(parameters[r] ==0 && (parameters[r] < DOUBLE_MIN) ){
-        if( parameters[r] < 1e-12 ){
+        //FIXME: Proper way to deal with boundary? maybe MAP?
+        if(parameters[r] ==0 && (parameters[r] < DOUBLE_MIN) ){
+//        if( parameters[r] < 1e-12 ){
 //        if( (parameters[r] < std::numeric_limits<double>::min()) ){
 
 //            parameters[r] =  std::numeric_limits<double>::epsilon();
 //            parameters[r] = DOUBLE_MIN;;
-//            parameters[r] = 1e-17; //log(1-x) > 0, x=5.56e-17
+            parameters[r] = 1e-17; //log(1-x) > 0, x=5.56e-17
 //            parameters[r] = 5.56e-17;
-            parameters[r] = 1e-12;
+//            parameters[r] = 1e-12;
 //            std::cout << "==WARNING!:: parameters[r]==0" << "\t" << r << "\t" << cache_parameters[r] <<
 //                    "\t" << parameters[r] << "\t" << parameters[0]  << std::endl;
         }
         if( parameters[r] > (1-1e-3) ){
-            parameters[r] = (1-1e-3);
+//            parameters[r] = (1-1e-3);
 //            std::cout << "==WARNING!:: parameters[r]==1" << "\t" << r << "\t" << cache_parameters[r] <<
 //            "\t" << parameters[r] << "\t" << parameters[1]  << std::endl;
         }

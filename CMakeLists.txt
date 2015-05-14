@@ -125,16 +125,19 @@ ENDIF(ZLIB_FOUND)
 
 set(LIBS ${LIBS} ${Boost_LIBRARIES} ${Bamtools_LIBRARIES}) #  ${GSL_LIBRARIES}
 set(INCLUDE_DIR ${INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${Bamtools_INCLUDE_DIR}  ${EIGEN3_INCLUDE_DIR})
+message(${Bamtools_INCLUDE_DIR})
+message(${Bamtools_LIBRARIES})
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
-
 include_directories(SYSTEM ${INCLUDE_DIR})
 
 include_directories(SYSTEM "/usr/include/")
 include_directories(SYSTEM "/usr/include/google")
-#include_directories("/usr/include/sparsehash")
+##include_directories("/usr/include/sparsehash")
 include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
-
+#include_directories("${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
+#include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src/api")
+#include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src/utils")
 
 message("==================== BUILD TYPE ${CMAKE_BUILD_TYPE} ====================")
 ADD_SUBDIRECTORY(src)

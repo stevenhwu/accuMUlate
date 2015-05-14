@@ -6,11 +6,6 @@
  */
 
 
-
-#include <stdint.h>
-#include <strings.h>
-#include <tgmath.h>
-
 #include "mutation_model.h"
 
 

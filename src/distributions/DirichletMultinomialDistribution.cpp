@@ -11,7 +11,7 @@
 //#include <gsl/gsl_rng.h>
 #include <cmath>
 #include <iostream>
-#include "../model.h"
+
 
 //#include <cmath>
 //#include <iostream>

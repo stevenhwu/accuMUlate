@@ -5,15 +5,10 @@
  *      Author: Steven Wu
  */
 
-#include <memory>
-#include <vector>
-#include "gtest/gtest.h"
-
 #include "em_model_mutation_v1.h"
 
 #include "em_data_mutation_v1.h"
 #include "em_algorithm_mutation_old.h"
-#include <evolution_models/F81.h>
 
 
 class EmAlgorithmMutationTest : public ::testing::Test {

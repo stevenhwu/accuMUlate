@@ -7,5 +7,6 @@ SET(SOURCE_FILES ${SOURCE_FILES}
     #PARENT_SCOPE
     CACHE INTERNAL "Global"
     )
+add_library(LibEvolutionModels EvolutionModel.cc F81.cc JC69.cc)
 #list (APPEND SOURCE_LIST ${SOURCE_FILES})
 #message("MODEL: ${SOURCE_FILES} ")

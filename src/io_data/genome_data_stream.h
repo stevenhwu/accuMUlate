@@ -17,8 +17,8 @@
 
 #include <cstring>
 #include <cmath> // for log2f
-#include "model.h"
 
+#include <mutations/model.h>
 #include <errno.h>
 #include <stddef.h>
 #include <stdint.h>

@@ -1,6 +1,4 @@
-#include <math.h>
-#include <iostream>
-#include "mutation_prob.h"
+
 #include "JC69.h"
 
 JC69::~JC69() {

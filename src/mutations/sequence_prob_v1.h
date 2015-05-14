@@ -20,7 +20,7 @@
 
 #include <vector>
 #include <iostream>
-#include "model.h"
+#include <mutations/model.h>
 #include "mutation_prob.h"
 #include "distributions/DirichletMultinomialDistribution.h"
 #include "evolution_models/EvolutionModel.h"

@@ -5,8 +5,8 @@
 #ifndef _UNITTEST_UTILS_H_
 #define _UNITTEST_UTILS_H_
 
+#include <mutations/model.h>
 #include "gtest/gtest.h"
-#include "model.h"
 #include "constant.h"
 
 

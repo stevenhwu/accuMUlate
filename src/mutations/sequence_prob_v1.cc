@@ -5,10 +5,7 @@
  *      Author: Steven Wu
  */
 #include <iostream>
-#include <stdint.h>
-#include <strings.h>
 #include "sequence_prob_v1.h"
-
 
 
 const int ANCESTOR_COUNT = 10;

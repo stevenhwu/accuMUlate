@@ -14,9 +14,9 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 # Add test cpp file
 #SET(TEST_SOURCE_FILES ${TEST_SOURCE_FILES} testA.cc testB.cc)
 SET(TEST_SOURCE_FILES ${TEST_SOURCE_FILES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/MutationProbTest.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/SequenceProbTest.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/SiteProbTest.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/mutation_prob_test.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/sequence_prob_test.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/site_prob_test.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory_test.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/mutation_model_test.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index_test.cc
@@ -24,14 +24,16 @@ SET(TEST_SOURCE_FILES ${TEST_SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/model_test.cc
     )
 
-ADD_SUBDIRECTORY("evolution_models")
-ADD_SUBDIRECTORY("algorithm")
+
+
+SET(LOCAL_LIBS LibEvolutionModels LibDistributions LibIoData LibMutations)
+
 
 add_executable( UnitTests ${TEST_SOURCE_FILES} ${SOURCE_FILES} )
 
 
 # Link test executable against gtest & gtest_main
-target_link_libraries(UnitTests gtest gtest_main ${LIBS} )
+target_link_libraries(UnitTests gtest gtest_main ${LIBS} ${LOCAL_LIBS})
 add_test( UnitTests UnitTests )
 
 

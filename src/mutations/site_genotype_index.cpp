@@ -17,7 +17,6 @@
  *  Created on: Nov 7, 2014
  *      Author: Steven Wu
  */
-#include "site_genotypes.h"
 
 //SiteGenotypesIndex::~SiteGenotypesIndex() {
 //}

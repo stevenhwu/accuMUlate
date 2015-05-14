@@ -9,7 +9,6 @@
 #include <stddef.h>
 #include "em_algorithm_binomial.h"
 #include "em_summary_stat_binomial.h"
-#include "em_algorithm.h"
 
 EmAlgorithmBinomial::EmAlgorithmBinomial(int num_category0, std::vector<std::unique_ptr<EmData>> &data_ptr0, EmModelBinomial &em_model0)
         : EmAlgorithm(num_category0, data_ptr0, em_model0) {

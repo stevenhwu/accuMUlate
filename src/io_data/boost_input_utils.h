@@ -17,16 +17,29 @@
 #include <time.h>
 
 
-#include "parsers.h"
-#include "api/BamReader.h"
-#include "utils/bamtools_pileup_engine.h"
-#include "utils/bamtools_fasta.h"
+#include "io_data/parsers.h"
+//#include "api/BamReader.h"
+//#include "utils/bamtools_pileup_engine.h"
+//#include "utils/bamtools_fasta.h"
 
-#include "model.h"
+//#include "third-party/bamtools/src/api/BamReader.h"
+//#include "third-party/bamtools/src/utils/bamtools_pileup_engine.h"
+//#include "third-party/bamtools/src/utils/bamtools_fasta.h"
+
+#include "api/BamReader.h"
+#include "utils/bamtools_fasta.h"
+//#include <api/BamReader.h>
+//#include <utils/bamtools_fasta.h>
+
+
+#include <mutations/model.h>
 #include <sys/stat.h>
 
+
+
 namespace BoostUtils {
-    using namespace std;
+
+
 
 //    namespace po = boost::program_options;
 

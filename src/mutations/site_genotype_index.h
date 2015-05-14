@@ -14,7 +14,7 @@
 
 #include <vector>
 #include <iostream>
-#include "model.h"
+#include <mutations/model.h>
 #include "mutation_prob.h"
 #include "site_prob.h"
 #include "site_genotypes.h"

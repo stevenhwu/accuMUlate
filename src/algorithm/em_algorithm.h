@@ -22,7 +22,7 @@
 #include "em_data.h"
 #include "em_model_mutation.h"
 #include "em_logger.h"
-#include "mutation_model_multi_categories.h"
+#include <mutations/mutation_model_multi_categories.h>
 
 extern const double EM_CONVERGE_THRESHOLD;
 

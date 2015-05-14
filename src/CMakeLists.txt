@@ -1,37 +1,45 @@
 
 
-
 SET(SOURCE_FILES CACHE INTERNAL "Global")
 #message("A: ${SOURCE_FILES}")
+
+#file(GLOB helloworld_SRC
+#    "*.h"
+#    "*.cpp"
+#)
+#add_executable(helloworld ${helloworld_SRC})
+
 SET(SOURCE_FILES ${SOURCE_FILES}
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/boost_input_utils.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/genome_data_stream.cc
+#    io_data/boost_input_utils.cc
+#    io_data/genome_data_stream.cc
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/constant.h
     ${CMAKE_CURRENT_SOURCE_DIR}/lookup.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/setup_utils.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/model.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/mutation_model.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/mutation_model_multi_categories.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/mutation_prob.cc
+#    mutations/model.cc
+#    mutations/mutation_model.cc
+#    mutations/mutation_model_multi_categories.cc
+#    mutations/mutation_prob.cc
+#
+##    io_data/parsers.cc
+##    io_data/pileup_utils.cc
+#
+#    mutations/site_genotypes.cc
+#
+#    mutations/sequence_prob_v1.cc
+#    mutations/sequencing_factory.cc
+#    mutations/site_prob.cc
+#    mutations/sequencing_factory.h
+#    mutations/sequencing_factory.cc
+#    mutations/sequencing_factory.h
+#    mutations/sequencing_factory.h
+#    mutations/site_genotype_index.cpp
+#    mutations/site_genotype_index.h
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/parsers.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/pileup_utils.cc
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/site_genotypes.cc
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/sequence_prob_v1.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/site_prob.cc
-${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.h
-${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.cc
-${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.h
-${CMAKE_CURRENT_SOURCE_DIR}/sequencing_factory.h
-${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index.cpp
-${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index.h
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/VariantVisitor.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/variant_visitor_two.cc
+#    io_data/VariantVisitor.cc
+#    io_data/variant_visitor_two.cc
 
     CACHE INTERNAL "Global"
     )
@@ -44,35 +52,40 @@ ${CMAKE_CURRENT_SOURCE_DIR}/site_genotype_index.h
 
 #message("BB: ${SOURCE_FILES} ${PROJECT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ")
 
-ADD_SUBDIRECTORY(distributions)
-ADD_SUBDIRECTORY(evolution_models)
-ADD_SUBDIRECTORY(algorithm)
-
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
   message("Using /usr/local/lib/ on ${CMAKE_SYSTEM_NAME}")
   link_directories(/usr/local/lib)
 endif()
 
 
+ADD_SUBDIRECTORY(algorithm)
+ADD_SUBDIRECTORY(distributions)
+ADD_SUBDIRECTORY(evolution_models)
+ADD_SUBDIRECTORY(io_data)
+ADD_SUBDIRECTORY(mutations)
+
+
+SET(LOCAL_LIBS LibEvolutionModels LibDistributions LibIoData LibMutations)
+
 #message("C: ${SOURCE_FILES} ")
+#message(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(accuMUlate main.cc ${SOURCE_FILES})
-target_link_libraries(accuMUlate ${LIBS} )
+target_link_libraries(accuMUlate ${LIBS} ${LOCAL_LIBS})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-link_directories(${CMAKE_CURRENT_SOURCE_DIR})
-message(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_executable(EMTest EMTest.cc ${SOURCE_FILES} )
-target_link_libraries(EMTest ${LIBS} )
+
+target_link_libraries(EMTest ${LIBS} ${LOCAL_LIBS})
 target_link_libraries(EMTest profiler)
 
 add_executable(AlignmentPreprocessor main_alignment_preprocessor.cc ${SOURCE_FILES})
-target_link_libraries(AlignmentPreprocessor ${LIBS} )
+target_link_libraries(AlignmentPreprocessor ${LIBS} ${LOCAL_LIBS})
 #target_link_libraries(AlignmentPreprocessor profiler)
 
+add_executable(MainRefitData main_refit_data.cc ${SOURCE_FILES} )
+target_link_libraries(MainRefitData ${LIBS} ${LOCAL_LIBS})
 
-#target_link_libraries(accuMUlate distributions)
-#target_link_libraries(accuMUlate bamtools bamtools-utils ${LIBS} distributions)
 
 
 #add_executable(pp utils/post_processor.cc parsers.cc model.cc)

@@ -3,6 +3,9 @@
 #define __JC69_H_
 
 #include <array>
+#include <math.h>
+#include <iostream>
+
 #include "EvolutionModel.h"
 
 class JC69 : public EvolutionModel {

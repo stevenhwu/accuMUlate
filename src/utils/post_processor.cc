@@ -9,7 +9,7 @@
 #include "utils/bamtools_pileup_engine.h"
 #include "boost/program_options.hpp"
 
-#include "model.h"
+#include <mutations/model.h>
 #include "parsers.h"
 
 using namespace std;

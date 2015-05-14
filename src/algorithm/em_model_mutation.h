@@ -11,7 +11,8 @@
 #define EM_MODEL_MUTATION_H_
 
 
-#include "mutation_model.h"
+#include <mutations/model.h>
+#include <mutations/mutation_model.h>
 #include "em_model.h"
 
 class EmModelMutation : public EmModel {

@@ -6,7 +6,9 @@
  */
 
 
+
 #include "boost_input_utils.h"
+
 namespace BoostUtils {
     using namespace std;
 
@@ -34,8 +36,8 @@ namespace BoostUtils {
     void ParseCommandLinkeInput(int argc, char **argv, boost::program_options::variables_map &vm) {
 //    boost::program_options::variables_map vm;
         namespace po = boost::program_options;
-        string ref_file;
-        string config_path;
+        std::string ref_file;
+        std::string config_path;
         po::options_description cmd("Command line options");
         cmd.add_options()
                 ("help,h", "Print a help message")
@@ -91,9 +93,9 @@ namespace BoostUtils {
             BamTools::SamHeader &header, BamTools::Fasta &reference_genome) {
 
 
-        string ref_file = vm["reference"].as<string>();
-        string bam_path = vm["bam"].as<string>();
-        string index_path = vm["bam-index"].as<string>();
+        std::string ref_file = vm["reference"].as<std::string>();
+        std::string bam_path = vm["bam"].as<std::string>();
+        std::string index_path = vm["bam-index"].as<std::string>();
         if (index_path == "") {
             index_path = bam_path + ".bai";
         }
@@ -102,7 +104,7 @@ namespace BoostUtils {
         references = experiment.GetReferenceData();
         header = experiment.GetHeader();
 
-//    ofstream result_stream (vm["out"].as<string>());
+//    ofstream result_stream (vm["out"].as<std::string>());
         //TODO: check sucsess of all these opens/reads:experiment.Open(bam_path);
 //        experiment.OpenIndex(index_path);// BamTools::Fasef_file);
 
@@ -118,7 +120,7 @@ namespace BoostUtils {
 //  Assign some memory for the big list
         uint32_t total_len = 0;
         if (vm.count("intervals")) {
-            BedFile bed(vm["intervals"].as<string>());
+            BedFile bed(vm["intervals"].as<std::string>());
             BedInterval region;
             while (bed.get_interval(region) == 0) {
                 total_len += (region.end - region.start);

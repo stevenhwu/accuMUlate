@@ -8,7 +8,8 @@
 #ifndef DIRICHLETMULTINOMIALDISTRIBUTION_H_
 #define DIRICHLETMULTINOMIALDISTRIBUTION_H_
 
-#include "../model.h"
+#include <mutations/model.h>
+
 
 class DirichletMultinomialDistribution {
 public:

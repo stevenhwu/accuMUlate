@@ -10,8 +10,6 @@
 #ifndef MUTATION_MODEL_H_
 #define MUTATION_MODEL_H_
 
-//#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-//#pragma GCC diagnostic ignored "-Wdeprecated"
 
 #include <vector>
 #include <iostream>
@@ -19,12 +17,12 @@
 #include <map>
 #include <mutex>
 
-#include "model.h"
+#include <mutations/model.h>
 #include "mutation_prob.h"
 #include "site_prob.h"
 #include "site_genotypes.h"
 #include "distributions/DirichletMultinomialDistribution.h"
-#include "evolution_models/EvolutionModel.h"
+//#include "evolution_models/EvolutionModel.h"
 #include "lookup.h"
 #include "site_prob.h"
 #include "sequencing_factory.h"
@@ -36,15 +34,17 @@
 typedef std::array<std::array<double, 4>, 10> Std2DArray;
 
 
-
 class MutationModel {
 
 public:
 
     MutationModel(EvolutionModel &evo_model0, std::vector<SiteGenotypesIndex> &all_index);
+
     MutationModel(EvolutionModel &evo_model0);
+
     MutationModel() {
     }
+
     virtual ~MutationModel() {
     }
 
@@ -59,10 +59,15 @@ public:
 
     void UpdateExpBeta(double expBeta);
 
-    void CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff, double &log_likelihood_scaler);
+    void CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff,
+                                       double &log_likelihood_scaler);
 
-    void NoCacheCalculateDes(int site_index, int a, double &product_prob_given_ancestor, double &stat_same, double &summary_stat_diff_ancestor);
-    void CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs &prob_reads_given_descent, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff);
+    void NoCacheCalculateDes(int site_index, int a, double &product_prob_given_ancestor, double &stat_same,
+                             double &summary_stat_diff_ancestor);
+
+    void CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs &prob_reads_given_descent,
+                                             double &prob_reads_d_given_a, double &summary_stat_same,
+                                             double &summary_stat_diff);
 
     int GetSiteCount() const;
 //
@@ -125,7 +130,7 @@ private:
 //    std::vector<std::array<std::array<double, 2>, 10> > cache_read_data_to_all_index;
 //    std::vector<std::array<std::pair<double, double>, 10> > cache_read_data_to_all_index;
 
-    std::array<std::vector<std::pair<double, double>>, 10>  cache_read_data_to_all_index_rev;
+    std::array<std::vector<std::pair<double, double>>, 10> cache_read_data_to_all_index_rev;
 //    std::array<std::vector<std::array<double, 2>>, 10>  cache_read_data_to_all_index_rev;
 
 //    std::vector<double> summary_stat_diff_vec ;
@@ -133,12 +138,15 @@ private:
     int descendant_count;
 
 
-
 public:
-    void CacheLoopDesAll2(int anc_index, std::vector<uint32_t> const &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
+    void CacheLoopDesAll2(int anc_index, std::vector<uint32_t> const &aa, double &product_prob_given_ancestor,
+                          double &summary_stat_diff_ancestor);
 
-    void CacheLoopDesAll3(int anc_index, std::vector<int> const &aa, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
-    void CacheLoopDesAll4(int anc_index, std::vector<std::array<std::array<double, 2>, 10>*> &cd, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) ;
+    void CacheLoopDesAll3(int anc_index, std::vector<int> const &aa, double &product_prob_given_ancestor,
+                          double &summary_stat_diff_ancestor);
+
+    void CacheLoopDesAll4(int anc_index, std::vector<std::array<std::array<double, 2>, 10> *> &cd,
+                          double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
 
 //    void InitCacheOld1();
 //    void SummaryIndexToHaploid();
@@ -146,7 +154,8 @@ public:
     static void AddGenotypeFactory(SequencingFactory &factory);
 
 //    void AddSequenceProbOld1(std::vector<SiteGenotypes> &all);
-    void CalculateLikelihoodUnnormalised(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
+    void CalculateLikelihoodUnnormalised(int site_index, int anc_index, double &product_prob_given_ancestor,
+                                         double &summary_stat_diff_ancestor);
 };
 
 
