@@ -1,14 +1,21 @@
 language: cpp
 compiler:
-  - gcc
+#  - gcc
   - clang
 # Change this to your needs
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y libboost-all-dev libeigen3-dev bamtools
-
+#  - sudo apt-get update -qq
+install:
+  - sudo apt-get install -y libboost-all-dev
+  - sudo apt-get install -y libeigen3-dev 
+before_script:
+  - git clone git://github.com/pezmaster31/bamtools.git
+  - cd bamtools && mkdir build && cd build && cmake .. && make
+  - pwd
+  - cd ../.. && mkdir -p lib/bamtools
+  - ls
+  - cd lib/bamtools
+  - pwd
+  - ln -s bamtools/lib/* .
 script:
-  - mkdir -p build 
-  - cd build 
-  - cmake ..
-  - make
+  - cd ../.. && pwd &&  mkdir -p build && cd build && cmake -DBamtools_PREFIX=../bamtools/ .. && make
