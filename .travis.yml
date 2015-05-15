@@ -1,13 +1,17 @@
 language: cpp
 compiler:
-#  - gcc
+  - gcc
   - clang
 # Change this to your needs
 before_install:
 #  - sudo apt-get update -qq
 install:
   - sudo apt-get install -y libboost-all-dev
-  - sudo apt-get install -y libeigen3-dev 
+  - sudo apt-get install -y libeigen3-dev
+  - echo $LANG
+  - echo $LC_ALL
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update && sudo apt-get install -y llvm-3.4 llvm-3.4-dev; fi
+ 
 before_script:
   - git clone git://github.com/pezmaster31/bamtools.git
   - cd bamtools && mkdir build && cd build && cmake .. && make
