@@ -10,6 +10,7 @@
 
 //#include <stdint.h>
 #include <vector>
+#include <array>
 #include <iostream>
 #include <cmath>
 #include <map>
