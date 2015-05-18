@@ -1,6 +1,8 @@
 #Calling mutations from MA lines
 
 
+[![Build Status](https://travis-ci.org/stevenhwu/accuMUlate.svg?branch=EM_develop)](https://travis-ci.org/stevenhwu/accuMUlate)
+
 ##Required libs
 
 Needs to be compiled/on path:

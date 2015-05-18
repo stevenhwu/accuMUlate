@@ -77,7 +77,7 @@ target_link_libraries(accuMUlate ${LIBS} ${LOCAL_LIBS})
 add_executable(EMTest EMTest.cc ${SOURCE_FILES} )
 
 target_link_libraries(EMTest ${LIBS} ${LOCAL_LIBS})
-target_link_libraries(EMTest profiler)
+#target_link_libraries(EMTest profiler)
 
 add_executable(AlignmentPreprocessor main_alignment_preprocessor.cc ${SOURCE_FILES})
 target_link_libraries(AlignmentPreprocessor ${LIBS} ${LOCAL_LIBS})
