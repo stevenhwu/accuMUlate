@@ -259,8 +259,9 @@ void EmAlgorithm::InitialiseProportion() {
 
     proportion = {{1- proportion_of_low_rate, proportion_of_low_rate}};
 
+    proportion = {{1.4027775284e-02,	9.8597222472e-01}};
 
-}
+};
 
 std::vector<double> EmAlgorithm::GetParameters() {
     return parameters;
@@ -286,8 +287,9 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
         cache_parameters[r] = parameters[r];
 
     }
+
     if( (cache_log_likelihood - log_likelihood.load()) > 1e-8  ) {
-        std::string out = "WARNING: decrease likelihood. Ite: ";
+        std::string out = "\n!!!!!!!!!!!!!!!!!!!!!!!!\n!!!!!!!!!!!!!!WARNING: decrease likelihood. Ite: ";
         char temp[1000];
         sprintf(temp, "%d.  ", ite);
         out.append(temp);
@@ -420,7 +422,6 @@ void EmAlgorithm::SetOutfilePrefix(const std::string & infile) {
 void EmAlgorithm::Run() {
 
     std::cout << "===== Initialise EM =====" << std::endl;
-    cache_log_likelihood = 0;
     PrintSummary();
     RunEM();
     em_logger.Stop();

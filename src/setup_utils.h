@@ -14,14 +14,20 @@
 //#include <algorithm/em_algorithm_mutation.h>
 #include <io_data/boost_input_utils.h>
 #include <io_data/pileup_utils.h>
+#include <algorithm/em_algorithm_thread_mutation.h>
 
-GenomeData getGenomeData(boost::program_options::variables_map variables_map);
+GenomeData GetGenomeData(boost::program_options::variables_map variables_map);
 
 void SummariseRealData(GenomeData &genome_data );
 
 void SummariseRealData(boost::program_options::variables_map map);
 
 void PostFilterGenomeData(GenomeData &genome_data);
+
+
+void RemoveDescendantRDV(ReadDataVector &read_vector, int d);
+
+void RemoveSiteGenomeData(GenomeData &genome_data, int g);
 
 
 class setup_utils {

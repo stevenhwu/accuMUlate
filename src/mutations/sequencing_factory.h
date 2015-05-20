@@ -69,6 +69,7 @@ private:
     std::unordered_map<uint64_t, uint32_t> map_rd_to_index;
     std::array<std::unordered_map<uint64_t, uint32_t>, 4> map_ancestor_to_index;
 
+    std::unordered_map<int, int> map_des_count;
     //
 //    void CalculateDescendantGenotypes(SiteGenotypes &seq_prob);
 //    void CalculateAncestorGenotype(SiteGenotypes &seq_prob);

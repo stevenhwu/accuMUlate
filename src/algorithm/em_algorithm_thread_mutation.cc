@@ -10,19 +10,23 @@ EmAlgorithmThreadMutation::EmAlgorithmThreadMutation(MutationModelMultiCategorie
     all_probs = Eigen::ArrayXXd::Zero(num_category, site_count);
     parameters = std::vector<double>(num_category, 0);
     cache_parameters = std::vector<double>(num_category, 0);
+    cache_log_likelihood = std::numeric_limits<double>::lowest();
+
+
+
 
     InitialiseProportion();
-
     InitialiseParameters();
-
     InitialiseSummaryStat();
 
-    num_blocks = 1000;
+    num_blocks = 1;
+    blocks_info.reserve(num_blocks);
     size_t block_size = site_count / num_blocks;
     for (int i = 0; i < num_blocks - 1; ++i) {
         blocks_info.emplace_back(i * block_size, (i + 1) * block_size);
     }
     blocks_info.emplace_back( (num_blocks - 1) * block_size, site_count);
+
 
 }
 
@@ -41,6 +45,7 @@ void EmAlgorithmThreadMutation::RunEM() {
         MaximizationStep();
         notConverged = EmStoppingCriteria(i);
         i++;
+
     }
 
 }
@@ -70,6 +75,15 @@ void EmAlgorithmThreadMutation::InitialiseParameters() {
 //    low_rate = 1- 1e-10;
 //    high_rate = 1- 0.9;
 //    model_multi.U
+
+//EM Summary: Ln:-1405.19959316
+//Parameters: 3.7007533031e-01	6.5633711554e-09
+//Proportions: 1.4027775284e-02	9.8597222472e-01	8.8364417124e-01	5.1913335718e-01	9.8597221824e+01	6.4713016597e-07
+//================= END SUMMARY ============
+
+
+    high_rate =  3.7007533031e-01;
+    low_rate = 6.5633711554e-09;
     parameters = {high_rate, low_rate};
     cache_parameters = {high_rate, low_rate};
 //    parameters = {low_rate, high_rate};

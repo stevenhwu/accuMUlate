@@ -4,7 +4,15 @@
 ################################
 
 enable_testing()
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+include( CTest )
+#include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+
+include_directories(${GTEST_INCLUDE_DIRS})
+#
+#    add_executable(foo foo.cc)
+#    target_link_libraries(foo ${GTEST_BOTH_LIBRARIES})
+#
+#    add_test(AllTestsInFoo foo)
 
 #/home/steven/Postdoc2/Project_accuMUlate/accuMUlate/include/gtest-1.7.0
 
@@ -30,10 +38,9 @@ SET(LOCAL_LIBS LibEvolutionModels LibDistributions LibIoData LibMutations)
 
 
 add_executable( UnitTests ${TEST_SOURCE_FILES} ${SOURCE_FILES} )
-
-
 # Link test executable against gtest & gtest_main
-target_link_libraries(UnitTests gtest gtest_main ${LIBS} ${LOCAL_LIBS})
-add_test( UnitTests UnitTests )
+# target_link_libraries(UnitTests gtest gtest_main ${LIBS} ${LOCAL_LIBS})
+target_link_libraries(UnitTests ${GTEST_BOTH_LIBRARIES} ${LIBS} ${LOCAL_LIBS})
+add_test( UnitTestsALL UnitTests )
 
 

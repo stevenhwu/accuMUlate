@@ -240,7 +240,8 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
     uint32_t index_descendant = 0;
     uint32_t index_ancestor = 0;
 
-    for (size_t i = 0; i < genome_data.size(); ++i) {
+//    for (size_t i = 0; i < genome_data.size(); ++i) {//FIXME: change this back
+    for (size_t i = 2335; i < 2350; ++i) {
 
 //        uint16_t ref = genome_data[i].reference;
 //        int descendant_conut = genome_data[i].all_reads.size()-1;
@@ -250,10 +251,11 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
         int descendant_conut = data.all_reads.size() - 1;
 //        std::cout << "FactoryDesCount: "<< descendant_conut << std::endl;
 
+        map_des_count[descendant_conut]++;
         SiteGenotypesIndex site_genotype(descendant_conut);
-
+//        std::cout << "\n" << i << "=" << descendant_conut << " " << site_genotype.GetDescendantCount() << ": ";
         for (int j = 0; j < site_genotype.GetDescendantCount(); ++j) {
-//            std::cout << i <<  "\t" << j << std::endl;
+//            std::cout << j << " ";
 //            ReadData rd = site_genotype.GetDescendantReadData(j);
 //            ReadData &rd = genome_data[i].all_reads[j+1];
             ReadData &rd = data.all_reads[j+1];
@@ -269,7 +271,7 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 //                    convert_index_key_to_haploid_unnormalised.push_back(prob_exp);
 //                }
 
-                double scale = prob.maxCoeff();
+                double scale = 0;//prob.maxCoeff();
                 convert_index_key_to_haploid_scaler.push_back(scale);
                 prob = (prob - scale).exp();
                 convert_index_key_to_haploid.push_back(prob);
@@ -295,9 +297,10 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 //                convert_index_key_to_diploid_10_unnormalised.push_back(temp_dip_10);
 //            }
 
-            double scale = temp_prob.maxCoeff();
+            double scale = 0;//temp_prob.maxCoeff();
             convert_index_key_to_diploid_10_scaler.push_back(scale);
             temp_prob = (temp_prob - scale).exp();
+            std::cout << temp_prob << std::endl;
             DiploidProbsIndex10 temp_dip_10 = ConvertDiploid16ToDiploid10(temp_prob, data.reference);
             convert_index_key_to_diploid_10.push_back(temp_dip_10);
 
@@ -317,6 +320,9 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
     std::cout << "Cache descendant size: " << index_descendant << "\t" << convert_index_key_to_haploid.size() << "\t" << map_rd_to_index.size() <<std::endl;
     std::cout << "Cache ancestor size: " << index_ancestor << "\t" << convert_index_key_to_diploid_10.size() << "\t" << map_ancestor_to_index.size() <<std::endl;
 
+    for (auto count : map_des_count) {
+        std::cout << count.first << "\t" << count.second << std::endl;
+    }
 //    return SiteGenotypes();
 }
 

@@ -145,7 +145,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(SYSTEM ${INCLUDE_DIR})
 
 include_directories(SYSTEM "/usr/include/")
-include_directories(SYSTEM "/usr/include/google")
+#include_directories(SYSTEM "/usr/include/google")
 ##include_directories("/usr/include/sparsehash")
 include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
 #include_directories("${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
@@ -156,11 +156,14 @@ message("==================== BUILD TYPE ${CMAKE_BUILD_TYPE} ===================
 ADD_SUBDIRECTORY(src)
 
 ########### Find/add GTest #################
-## find_package (GTEST) not setup properly yet
+find_package (GTest) #not setup properly yet
+IF(GTEST_FOUND)
+
 #1
-ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/include/googletest-trunk/")
+#ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/include/googletest-trunk/")
 #SET(GTEST_ROOT "${CMAKE_SOURCE_DIR}/include/googletest-trunk")
-ADD_SUBDIRECTORY(test)
+
+  ADD_SUBDIRECTORY(test)
 
 
 #2 Some link error??
@@ -175,9 +178,17 @@ ADD_SUBDIRECTORY(test)
 #3 SVN checkout version
 #ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/gtest")
 
-
-
-
-
-
-
+# Defines the following variables:
+#
+#   GTEST_FOUND - Found the Google Testing framework
+#   GTEST_INCLUDE_DIRS - Include directories
+#
+# Also defines the library variables below as normal
+# variables.  These contain debug/optimized keywords when
+# a debugging library is found.
+#
+#   GTEST_BOTH_LIBRARIES - Both libgtest & libgtest-main
+#   GTEST_LIBRARIES - libgtest
+#   GTEST_MAIN_LIBRARIES - libgtest-main
+#
+ENDIF(GTEST_FOUND)

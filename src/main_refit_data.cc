@@ -65,7 +65,7 @@ M51_GGAGAACA_L007	10
 
 void CreateMutationModel(MutationModel &model, GenomeData &genome_data, ModelParams &params);
 
-//GenomeData getGenomeData(boost::program_options::variables_map variables_map);
+//GenomeData GetGenomeData(boost::program_options::variables_map variables_map);
 
 MutationModelMultiCategories CreateMutationModelMulti(GenomeData genome_data, ModelParams params);
 
@@ -78,73 +78,48 @@ void CustomFilterGenomeData(GenomeData &genome_data) {
 
 //    Custom filter, remove sample 47 51 44   ->  7 8 10
 
+    int read_lower_bound = 6;
+    int read_upper_bound = 150;
     for (int g = genome_data.size()-1 ; g >= 0; --g) {
 
-        ModelInput &data = genome_data[g];
-//        PrintModelInput(data);
-//        std::cout << "\t" << data.all_reads.size() << "\t" << data.all_reads.capacity() << "\t";
-//        data.all_reads.erase(data.all_reads.begin()+10);
-//        data.all_reads.erase(data.all_reads.begin()+7, data.all_reads.begin()+9);
-//        data.all_reads.shrink_to_fit();
-
-
-        std::swap(data.all_reads[10], data.all_reads.back());
-        data.all_reads.pop_back();
-        std::swap(data.all_reads[8], data.all_reads.back());
-        data.all_reads.pop_back();
-        std::swap(data.all_reads[7], data.all_reads.back());
-        data.all_reads.pop_back();
+        ReadDataVector &read_vector = genome_data[g].all_reads;
+        RemoveDescendantRDV(read_vector, 10);
+        RemoveDescendantRDV(read_vector, 8);
+        RemoveDescendantRDV(read_vector, 7);
+        read_vector.shrink_to_fit();
 //        std::cout << "\t" << data.all_reads.size() << "\t" << data.all_reads.capacity() << "\t" << std::endl;
-
 
         int sum = 0;
         for (int j = 0; j < 4; ++j) {
-            sum += data.all_reads[0].reads[j];
+            sum += read_vector[0].reads[j];
         }
 
-        if(sum < 6){//Bad ref, remove site
+        if(sum < read_lower_bound || sum > read_upper_bound){//Bad ref, remove site
 //            PrintModelInput(data);
-//            genome_data.erase(genome_data.begin()+g);
-            std::swap(genome_data[g], genome_data.back());
-            genome_data.pop_back();
+            RemoveSiteGenomeData(genome_data, g);
         }
-//        else if(sum>150){
-//            PrintReads(data.all_reads[0]);
-//        }
+
         else {//Check each descendant
-//            std::cout <<g << "\t" << data.all_reads.capacity() << "\t" << data.all_reads.size() << std::endl;
-            for (int i = data.all_reads.size()-1 ; i > 0; --i) {
+            for (int i = read_vector.size()-1 ; i > 0; --i) {
                 int sum = 0;
                 for (int j = 0; j < 4; ++j) {
-                    sum += data.all_reads[i].reads[j];
+                    sum += read_vector[i].reads[j];
                 }
-                if (sum < 6) {
+                if (sum < read_lower_bound || sum > read_upper_bound) {
+                    RemoveDescendantRDV(read_vector, i);
 //                    std::cout << g << "\t" << sum << "\t" << i << "\t" << data.all_reads.size() << "\t" << data.all_reads[i].key <<"\t" << data.all_reads[i-1].key <<"\t" << data.all_reads[i+1].key <<"\t";
-//                    data.all_reads.erase(data.all_reads.begin()+i);//FIXME: current model assume equal des, fail if do this
-                    std::swap(data.all_reads[i], data.all_reads.back());
-                    data.all_reads.pop_back();
-
-//                    if (i != pList.size() - 1)
-//                    {
-//                        // Beware of move assignment to self
-//                        // see http://stackoverflow.com/questions/13127455/
-//                        pList[i] = std::move(pList.back());
-//                    }
-//                    pList.pop_back();
                 }
-//                else if(sum>200){
-//                    PrintReads(data.all_reads[i]);
-//                }
             }
 
-            if (data.all_reads.size() ==1) {
+            if (read_vector.size() ==1) {
 //                std::cout << g << "\t" << data.all_reads.size() << std::endl;
 //                for (int i = 0; i < 9; ++i) {
 //                    PrintReads(data.all_reads[i]);
 //                }
 
-                std::swap(genome_data[g], genome_data.back());
-                genome_data.pop_back();
+//                std::swap(genome_data[g], genome_data.back());
+//                genome_data.pop_back();
+                RemoveSiteGenomeData(genome_data, g);
 
             }
         }
@@ -152,7 +127,6 @@ void CustomFilterGenomeData(GenomeData &genome_data) {
     }
 
 }
-
 
 
 void RefitData(boost::program_options::variables_map variables_map) {
@@ -168,7 +142,7 @@ void RefitData(boost::program_options::variables_map variables_map) {
     clock_t t1;
     t1 = clock();
 
-    GenomeData genome_data = getGenomeData(variables_map);
+    GenomeData genome_data = GetGenomeData(variables_map);
     SummariseRealData(genome_data);
     CustomFilterGenomeData(genome_data);//TODO: Add this back
     SummariseRealData(genome_data);
@@ -241,7 +215,7 @@ void RefitData(boost::program_options::variables_map variables_map) {
 //    clock_t t1;
 //    t1 = clock();
 //
-//    GenomeData genome_data = getGenomeData(variables_map);
+//    GenomeData genome_data = GetGenomeData(variables_map);
 //    PostFilterGenomeData(genome_data);//TODO: Add this back
 //    printMemoryUsage("Read genomeData");
 //
@@ -451,7 +425,7 @@ void CreateMutationModel(MutationModel &mutation_model, GenomeData &genome_data,
 
 
 
-//GenomeData getGenomeData(boost::program_options::variables_map variables_map) {
+//GenomeData GetGenomeData(boost::program_options::variables_map variables_map) {
 //
 //
 //    std::string file_name = variables_map["bam"].as<string>();// "zz_test_GenomeData_binary_subset";

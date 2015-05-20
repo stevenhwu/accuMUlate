@@ -128,7 +128,7 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
     all_stats_diff = 0;
 
     int site_descendant_count = all_sequence_prob_index[site_index].GetDescendantCount();
-//    std::cout << site_descendant_count << std::endl;
+
     const auto &descendant_genotypes_index = all_sequence_prob_index[site_index].GetDescendantIndex();
     uint32_t anc_genotype_index = all_sequence_prob_index[site_index].GetAncestorIndex();
     auto &ancestor_genotype_10 =  convert_index_key_to_diploid_10[anc_genotype_index];
@@ -141,6 +141,8 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
 //    log_likelihood_scaler=0;
     double summary_stat_diff_ancestor = 0;
     double prod_prob_ancestor = 1;
+
+//    std::cout << site_descendant_count << ":";
     for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
         CacheLoopDesAll2(category_index, index10, descendant_genotypes_index, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
 
@@ -150,6 +152,7 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
     }
     all_stats_diff /= prob_reads;
 //    all_stats_diff /= descendant_count;//NOTE: need this to auto calculate stat_same. sum to 1
+//    std::cout << "\t" << all_stats_diff << std::endl;
     all_stats_diff /= site_descendant_count;
 }
 
@@ -165,6 +168,7 @@ void MutationModelMultiCategories::CacheLoopDesAll2(int category_index, int anc_
 
     auto &vv = cache_read_data_to_all_index_rev[category_index][anc_index];
 //    for (int d = 0; d < descendant_count; ++d) {
+//    std::cout << aa.size() ;
     for (auto &item : aa) {
 
         std::pair<double, double> &cp = vv[item];
