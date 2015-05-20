@@ -17,7 +17,7 @@
 #include <fstream>
 #include <memory>
 #include <random>
-#include "Eigen/Dense"
+#include <Eigen/Dense>
 
 union ReadData {
     uint64_t key;
