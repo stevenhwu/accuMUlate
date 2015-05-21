@@ -17,9 +17,9 @@
 
 
 //#include "api/BamReader.h"
-#include "utils/bamtools_pileup_engine.h"
+#include "third-party/bamtools/src/utils/bamtools_pileup_engine.h"
 //#include utils/bamtools_fasta.h"
-
+#include "bamtools_fasta.h"
 #include <mutations/model.h>
 #include "VariantVisitor.h"
 #include "variant_visitor_two.h"

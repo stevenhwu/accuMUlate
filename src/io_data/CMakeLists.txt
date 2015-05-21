@@ -1,4 +1,5 @@
 add_library(LibIoData
+    bamtools_fasta.cpp
     boost_input_utils.cc
     genome_data_stream.cc
     parsers.cc

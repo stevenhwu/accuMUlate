@@ -13,7 +13,7 @@
 #include "api/BamReader.h"
 #include "api/BamAlignment.h"
 #include "utils/bamtools_pileup_engine.h"
-#include "utils/bamtools_fasta.h"
+#include "bamtools_fasta.h"
 
 #include <mutations/model.h>
 #include "parsers.h"
