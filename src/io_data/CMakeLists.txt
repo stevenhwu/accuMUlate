@@ -1,5 +1,6 @@
 add_library(LibIoData
-    bamtools_fasta.cpp
+    local_bamtools/bamtools_fasta.cpp
+    local_bamtools/bamtools_pileup_engine.cpp
     boost_input_utils.cc
     genome_data_stream.cc
     parsers.cc

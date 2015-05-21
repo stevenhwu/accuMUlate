@@ -31,7 +31,7 @@
 //#include <api/BamReader.h>
 //#include <utils/bamtools_fasta.h>
 
-#include "bamtools_fasta.h"
+#include "local_bamtools/bamtools_fasta.h"
 #include <mutations/model.h>
 #include <sys/stat.h>
 
@@ -47,7 +47,7 @@ namespace BoostUtils {
 
     void ExtractInputVariables(boost::program_options::variables_map &vm, GenomeData &genome_data,
             BamTools::BamReader &experiment, BamTools::RefVector &references,
-            BamTools::SamHeader &header, Fasta &reference_genome);
+            BamTools::SamHeader &header, LocalBamToolsUtils::Fasta &reference_genome);
 
     ModelParams CreateModelParams(boost::program_options::variables_map variables_map);
 

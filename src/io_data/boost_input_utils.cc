@@ -90,7 +90,7 @@ namespace BoostUtils {
 
     void ExtractInputVariables(boost::program_options::variables_map &vm, GenomeData &genome_data,
             BamTools::BamReader &experiment, BamTools::RefVector &references,
-            BamTools::SamHeader &header, Fasta &reference_genome) {
+            BamTools::SamHeader &header, LocalBamToolsUtils::Fasta &reference_genome) {
 
 
         std::string ref_file = vm["reference"].as<std::string>();

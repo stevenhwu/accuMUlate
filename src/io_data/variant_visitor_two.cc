@@ -12,7 +12,7 @@
 
 int global_count[10];
 
-void VariantVisitorTwo::Visit(const PileupPosition &pileupData) {
+void VariantVisitorTwo::Visit(const LocalBamToolsUtils::PileupPosition &pileupData) {
 
 //    string chr = m_bam_ref[pileupData.RefId].RefName;
     uint64_t pos = pileupData.Position;
@@ -89,7 +89,7 @@ int VariantVisitorTwo::GetSampleIndex(std::string const &tag_data) {
 }
 
 VariantVisitorTwo::VariantVisitorTwo(const RefVector &bam_references, const SamHeader &header,
-        const Fasta &idx_ref, GenomeData &all_the_data, std::string binary_outfile, int qual_cut, int mapping_cut, double prob_cut)
+        const LocalBamToolsUtils::Fasta &idx_ref, GenomeData &all_the_data, std::string binary_outfile, int qual_cut, int mapping_cut, double prob_cut)
         :
         PileupVisitor(),  m_bam_ref(bam_references),
         m_header(header), m_idx_ref(idx_ref),

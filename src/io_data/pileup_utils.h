@@ -17,9 +17,9 @@
 
 
 //#include "api/BamReader.h"
-#include "third-party/bamtools/src/utils/bamtools_pileup_engine.h"
-//#include utils/bamtools_fasta.h"
-#include "bamtools_fasta.h"
+#include "local_bamtools/bamtools_pileup_engine.h"
+
+#include "local_bamtools/bamtools_fasta.h"
 #include <mutations/model.h>
 #include "VariantVisitor.h"
 #include "variant_visitor_two.h"
@@ -40,9 +40,13 @@ namespace PileupUtils {
 
     void CreatePileupAlignment(boost::program_options::variables_map &vm, GenomeData &genome_data, int index);
 
-    void CreatePileupV2(boost::program_options::variables_map &vm, GenomeData &genome_data, RefVector &references, SamHeader &header, Fasta &reference_genome, PileupEngine &pileup);
+    void CreatePileupV2(boost::program_options::variables_map &vm, GenomeData &genome_data, RefVector &references,
+                        SamHeader &header, LocalBamToolsUtils::Fasta &reference_genome,
+                        LocalBamToolsUtils::PileupEngine &pileup);
 
-    void CreatePileupV1(boost::program_options::variables_map &vm, GenomeData &genome_data, RefVector &references, SamHeader &header, Fasta &reference_genome, PileupEngine &pileup);
+    void CreatePileupV1(boost::program_options::variables_map &vm, GenomeData &genome_data, RefVector &references,
+                        SamHeader &header, LocalBamToolsUtils::Fasta &reference_genome,
+                        LocalBamToolsUtils::PileupEngine &pileup);
 
     void WriteGenomeDataToBinary(std::string file_name, GenomeData &base_counts) ;
 

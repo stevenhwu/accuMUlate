@@ -24,11 +24,11 @@ namespace PileupUtils{
         BamReader experiment;
         RefVector references;
         SamHeader header;
-        Fasta reference_genome;
+        LocalBamToolsUtils::Fasta reference_genome;
 
         BoostUtils::ExtractInputVariables(vm, genome_data, experiment, references, header, reference_genome);
 
-        BamTools::PileupEngine pileup;
+        LocalBamToolsUtils::PileupEngine pileup;
 
         if(variant_visitor_index == 1){
             CreatePileupV1(vm, genome_data, references, header, reference_genome, pileup);
@@ -113,7 +113,10 @@ namespace PileupUtils{
     }
 
 
-    void CreatePileupV1(boost::program_options::variables_map &vm, GenomeData &genome_data, RefVector &references, SamHeader &header, Fasta &reference_genome, PileupEngine &pileup) {
+    void CreatePileupV1(boost::program_options::variables_map &vm, GenomeData &genome_data,
+                        RefVector &references, SamHeader &header,
+                        LocalBamToolsUtils::Fasta &reference_genome,
+                        LocalBamToolsUtils::PileupEngine &pileup) {
         BamAlignment ali;
         SampleMap samples;
 
@@ -147,7 +150,10 @@ namespace PileupUtils{
     }
 
 
-    void CreatePileupV2(boost::program_options::variables_map &vm, GenomeData &genome_data, RefVector &references, SamHeader &header, Fasta &reference_genome, PileupEngine &pileup) {
+    void CreatePileupV2(boost::program_options::variables_map &vm, GenomeData &genome_data,
+                        RefVector &references, SamHeader &header,
+                        LocalBamToolsUtils::Fasta &reference_genome,
+                        LocalBamToolsUtils::PileupEngine &pileup) {
 
         std::string binary_outfile = vm["output_binary_file"].as<std::string>();
 

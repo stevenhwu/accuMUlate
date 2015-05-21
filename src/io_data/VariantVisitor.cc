@@ -2,7 +2,7 @@
 #include "variant_visitor_two.h"
 
 
-void VariantVisitor::Visit(const PileupPosition &pileupData) {
+void VariantVisitor::Visit(const LocalBamToolsUtils::PileupPosition &pileupData) {
     std::string chr = m_bam_ref[pileupData.RefId].RefName;
     uint64_t pos = pileupData.Position;
     m_idx_ref.GetBase(pileupData.RefId, pos, current_base);

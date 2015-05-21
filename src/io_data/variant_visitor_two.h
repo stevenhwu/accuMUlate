@@ -12,11 +12,11 @@
 #include <stdint.h>
 #include "api/BamReader.h"
 #include "api/BamAlignment.h"
-#include "utils/bamtools_pileup_engine.h"
-#include "bamtools_fasta.h"
+#include "parsers.h"
+
 
 #include <mutations/model.h>
-#include "parsers.h"
+
 #include "genome_data_stream.h"
 
 using namespace BamTools;
@@ -24,12 +24,12 @@ using namespace BamTools;
 extern int global_count[10];
 
 
-class VariantVisitorTwo : public PileupVisitor{
+class VariantVisitorTwo : public LocalBamToolsUtils::PileupVisitor{
 
     static const char ZERO_CHAR = ((char) 0);
 
 public:
-    VariantVisitorTwo(const RefVector &bam_references, const SamHeader &header, const Fasta &idx_ref,
+    VariantVisitorTwo(const RefVector &bam_references, const SamHeader &header, const LocalBamToolsUtils::Fasta &idx_ref,
             GenomeData &all_the_data, std::string binary_outfile, int qual_cut, int mapping_cut, double prob_cut);
 
 
@@ -39,7 +39,7 @@ public:
     }
 
 public:
-    virtual void Visit(const PileupPosition& pileupData);
+    virtual void Visit(const LocalBamToolsUtils::PileupPosition& pileupData);
     static bool filter_data(ReadDataVector &read_vector);
 
 private:
@@ -47,7 +47,7 @@ private:
 
     RefVector m_bam_ref;
     SamHeader m_header;
-    Fasta m_idx_ref;
+    LocalBamToolsUtils::Fasta m_idx_ref;
     GenomeData &m_all_the_data;
     int m_qual_cut;
     int m_mapping_cut;

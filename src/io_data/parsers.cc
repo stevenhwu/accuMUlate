@@ -102,7 +102,7 @@ uint16_t base_index(char b){
 //    return(-1); //TODO refactor this to  update sample in place
 //}
 
-bool include_site(PileupAlignment pileup, uint16_t map_cut, uint16_t qual_cut){
+bool include_site(LocalBamToolsUtils::PileupAlignment pileup, uint16_t map_cut, uint16_t qual_cut){
     const BamAlignment *ali = &pileup.Alignment;
     if(ali->MapQuality > map_cut){
         uint16_t bqual = static_cast<short>(ali->Qualities[pileup.PositionInAlignment]) - 33;
@@ -114,7 +114,7 @@ bool include_site(PileupAlignment pileup, uint16_t map_cut, uint16_t qual_cut){
 }
 
 
-bool include_site_2(const PileupAlignment & pileup, uint16_t map_cut, uint16_t qual_cut){
+bool include_site_2(const LocalBamToolsUtils::PileupAlignment & pileup, uint16_t map_cut, uint16_t qual_cut){
     const BamAlignment *ali = &(pileup.Alignment);
     if(ali->MapQuality > map_cut){
         uint16_t bqual = static_cast<short>(ali->Qualities[pileup.PositionInAlignment]) - 33;
@@ -128,7 +128,7 @@ bool include_site_2(const PileupAlignment & pileup, uint16_t map_cut, uint16_t q
 
 
 
-bool include_site_3(const PileupAlignment & pileup, uint16_t map_cut, char qual_cut){
+bool include_site_3(const LocalBamToolsUtils::PileupAlignment & pileup, uint16_t map_cut, char qual_cut){
 //    const BamAlignment *ali = &(pileup.Alignment);
     if(pileup.Alignment.MapQuality > map_cut){
         char reference = pileup.Alignment.Qualities[pileup.PositionInAlignment];

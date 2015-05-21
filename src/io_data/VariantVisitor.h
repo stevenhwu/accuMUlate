@@ -3,18 +3,18 @@
 #define __VariantVisitor_H_
 
 #include "api/BamReader.h"
-#include "utils/bamtools_pileup_engine.h"
-#include "bamtools_fasta.h"
+//#include "bamtools_pileup_engine.h"
+//#include "bamtools_fasta.h"
 
 #include <mutations/model.h>
 #include "parsers.h"
 
 using namespace BamTools;
-class VariantVisitor : public PileupVisitor{
+class VariantVisitor : public LocalBamToolsUtils::PileupVisitor{
 public:
     VariantVisitor(const RefVector& bam_references,
             const SamHeader& header,
-            const Fasta& idx_ref,
+            const LocalBamToolsUtils::Fasta& idx_ref,
             GenomeData& all_the_data,
 //                      const ModelParams& p,
             const SampleMap& samples,
@@ -31,9 +31,9 @@ public:
     { }
     virtual ~VariantVisitor(void) { }
 public:
-    virtual void Visit(const PileupPosition& pileupData);
+    virtual void Visit(const LocalBamToolsUtils::PileupPosition& pileupData);
 private:
-    Fasta m_idx_ref;
+    LocalBamToolsUtils::Fasta m_idx_ref;
     RefVector m_bam_ref;
     SamHeader m_header;
     SampleMap m_samples;

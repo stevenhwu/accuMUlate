@@ -2,7 +2,10 @@
 #ifndef parsers_H
 #define parsers_H
 
-#include "utils/bamtools_pileup_engine.h"
+//#include "utils/bamtools_pileup_engine.h"
+#include "local_bamtools/bamtools_pileup_engine.h"
+#include "local_bamtools/bamtools_fasta.h"
+
 #include <unordered_map>
 #include <iostream>
 #include <string>
@@ -45,7 +48,7 @@ class BedFile{
 };
 //Helper functions
 
-bool include_site(BamTools::PileupAlignment pileup, uint16_t map_cut, uint16_t qual_cut);
+bool include_site(LocalBamToolsUtils::PileupAlignment pileup, uint16_t map_cut, uint16_t qual_cut);
 /* include_site vs include_site_3(4) and with lots of cache (V2)
 Total time V1: 8.884579 Count:100000 G_count:6927746 Base_count:16143
 Total time V2: 6.720386 Count:100000 G_count:6927746 Base_count:16143
@@ -64,8 +67,8 @@ Total time V1: 9.067891 Count:100000 G_count:6927746 Base_count:16143
 
  */
 
-bool include_site_2(const BamTools::PileupAlignment & pileup, uint16_t map_cut, uint16_t qual_cut);
-bool include_site_3(const BamTools::PileupAlignment & pileup, uint16_t map_cut, char qual_cut);
+bool include_site_2(const LocalBamToolsUtils::PileupAlignment & pileup, uint16_t map_cut, uint16_t qual_cut);
+bool include_site_3(const LocalBamToolsUtils::PileupAlignment & pileup, uint16_t map_cut, char qual_cut);
 //using namespace BamTools;
 bool include_site_4(const BamTools::BamAlignment & alignment, const int &pos, const uint16_t &map_cut, const char &qual_cut);
 uint16_t base_index(char b);
