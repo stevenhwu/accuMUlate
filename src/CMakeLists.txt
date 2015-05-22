@@ -10,36 +10,9 @@ SET(SOURCE_FILES CACHE INTERNAL "Global")
 #add_executable(helloworld ${helloworld_SRC})
 
 SET(SOURCE_FILES ${SOURCE_FILES}
-
-#    io_data/boost_input_utils.cc
-#    io_data/genome_data_stream.cc
-
     ${CMAKE_CURRENT_SOURCE_DIR}/constant.h
     ${CMAKE_CURRENT_SOURCE_DIR}/lookup.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/setup_utils.cpp
-
-#    mutations/model.cc
-#    mutations/mutation_model.cc
-#    mutations/mutation_model_multi_categories.cc
-#    mutations/mutation_prob.cc
-#
-##    io_data/parsers.cc
-##    io_data/pileup_utils.cc
-#
-#    mutations/site_genotypes.cc
-#
-#    mutations/sequence_prob_v1.cc
-#    mutations/sequencing_factory.cc
-#    mutations/site_prob.cc
-#    mutations/sequencing_factory.h
-#    mutations/sequencing_factory.cc
-#    mutations/sequencing_factory.h
-#    mutations/sequencing_factory.h
-#    mutations/site_genotype_index.cpp
-#    mutations/site_genotype_index.h
-
-#    io_data/VariantVisitor.cc
-#    io_data/variant_visitor_two.cc
 
     CACHE INTERNAL "Global"
     )

@@ -41,7 +41,8 @@ void PostFilterGenomeData(GenomeData &genome_data) {
                     sum += read_vector[i].reads[j];
                 }
                 if (sum < read_lower_bound || sum > read_upper_bound) {
-                    RemoveDescendantRDV(read_vector, i);
+//                    RemoveDescendantRDV(read_vector, i);
+                    read_vector[i].key=0;
 //                    std::cout << g << "\t" << sum << "\t" << i << "\t" << data.all_reads.size() << "\t" << data.all_reads[i].key <<"\t" << data.all_reads[i-1].key <<"\t" << data.all_reads[i+1].key <<"\t";
                 }
             }

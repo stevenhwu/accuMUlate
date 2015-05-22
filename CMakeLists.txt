@@ -105,11 +105,10 @@ MARK_AS_ADVANCED(
 SET( CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
     "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Maintainer."
     FORCE )
+
 message("CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_PATH}")
-
-message("CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_INCLUDE_PATH}")
-message("CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_LIBRARY_PATH}")
-
+message("CMAKE_SYSTEM_INCLUDE_PATH ${CMAKE_SYSTEM_INCLUDE_PATH}")
+message("CMAKE_SYSTEM_LIBRARY_PATH ${CMAKE_SYSTEM_LIBRARY_PATH}")
 message("CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}")
 message("CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH}")
 
@@ -119,9 +118,7 @@ SET(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ~/lib ~/include ${CMAKE_INSTALL_PREFI
 message(${CMAKE_INSTALL_PREFIX})
 message("CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}")
 
-#SET(CMAKE_PREFIX_PATH "home/steven/Desktop/toDelete/build/boost_install/boost_1_58_0/zz/")
-message("CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH}")
-#SET(CMAKE_PREFIX_PATH CMAKE_PREFIX_PATH ${HOME}/lib ${HOME}/include)
+
 ########## FIND_PACKAGE ##########
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakeModule/")
@@ -144,10 +141,10 @@ message(${Bamtools_LIBRARIES})
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(SYSTEM ${INCLUDE_DIR})
 
-include_directories(SYSTEM "/usr/include/")
+#include_directories(SYSTEM "/usr/include/")
 #include_directories(SYSTEM "/usr/include/google")
 ##include_directories("/usr/include/sparsehash")
-include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
+#include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
 #include_directories("${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src")
 #include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src/api")
 #include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/src/third-party/bamtools/src/utils")

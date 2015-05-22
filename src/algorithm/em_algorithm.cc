@@ -300,6 +300,7 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
         sprintf(temp, "%.10e\t", cache_log_likelihood - log_likelihood.load());
         out.append(temp);
         std::cout << out << std::endl;
+        std::exit(99);
     }
     cache_log_likelihood = log_likelihood.load();
 

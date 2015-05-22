@@ -143,17 +143,54 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
     double prod_prob_ancestor = 1;
 
 //    std::cout << site_descendant_count << ":";
+//#define NO_CACHE
+#ifdef NO_CACHE
+    double no_cache_prob = 1;
+    double no_cache_stat_diff = 0;
+    double no_cache_stat_same = 0;
+
+    double no_cache_prob_reads = 0;
+    double no_cache_all_stats_diff = 0;
+    double no_cache_all_stats_same = 0;
+#endif
+
+
     for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
-        CacheLoopDesAll2(category_index, index10, descendant_genotypes_index, prod_prob_ancestor, summary_stat_diff_ancestor);//Uses this one
+        CacheLoopDesAll2(category_index, index10, descendant_genotypes_index, prod_prob_ancestor,
+                         summary_stat_diff_ancestor);//Uses this one
 
         double prob_reads_given_a = ancestor_genotype_10[index10] * prod_prob_ancestor;
         prob_reads += prob_reads_given_a;
-        all_stats_diff += summary_stat_diff_ancestor*prob_reads_given_a;
+        all_stats_diff += summary_stat_diff_ancestor * prob_reads_given_a;
     }
+#ifdef NO_CACHE
+    for (int index10 = 0; index10 < ANCESTOR_COUNT; ++index10) {
+        NoCacheCalculateDes(category_index, site_index, index10, no_cache_prob, no_cache_stat_same, no_cache_stat_diff);
+        double no_cache_prob_reads_given_a = ancestor_genotype_10[index10] * no_cache_prob;
+        no_cache_prob_reads += no_cache_prob_reads_given_a;
+        no_cache_all_stats_diff += no_cache_stat_diff * no_cache_prob_reads_given_a;
+        no_cache_all_stats_same += no_cache_stat_same * no_cache_prob_reads_given_a;
+    }
+    std::cout << (no_cache_all_stats_diff +no_cache_all_stats_same )/no_cache_prob_reads << "\t" <<
+            site_descendant_count << "\t" << no_cache_all_stats_diff << "\t" << no_cache_all_stats_same  << std::endl;
+//    std::cout << prob_reads << "==" << no_cache_prob_reads  << "\t" << all_stats_diff <<"=="<< no_cache_all_stats_diff<< std::endl;
+    if((prob_reads - no_cache_prob_reads)>1e-18){
+        std::cout <<"P:" << site_index <<":"<<category_index << ":" << prob_reads << "==" << no_cache_prob_reads << std::endl;
+    }
+    if((all_stats_diff - no_cache_all_stats_diff)>1e-18){
+        std::cout <<"S:" << site_index <<":"<<category_index << ":" << all_stats_diff <<"=="<< no_cache_all_stats_diff<< std::endl;
+    }
+#endif
+
+
     all_stats_diff /= prob_reads;
 //    all_stats_diff /= descendant_count;//NOTE: need this to auto calculate stat_same. sum to 1
 //    std::cout << "\t" << all_stats_diff << std::endl;
     all_stats_diff /= site_descendant_count;
+
+
+
+
 }
 
 
@@ -178,11 +215,15 @@ void MutationModelMultiCategories::CacheLoopDesAll2(int category_index, int anc_
 }
 
 
-void MutationModelMultiCategories::NoCacheCalculateDes(int site_index, int a, double &product_prob_given_ancestor, double &stat_same, double &summary_stat_diff_ancestor) {
+void MutationModelMultiCategories::NoCacheCalculateDes(int categories_index, int site_index, int anc_index10,
+                                                       double &product_prob_given_ancestor, double &summary_stat_same_ancestor,
+                                                       double &summary_stat_diff_ancestor) {
+
     product_prob_given_ancestor = 1;
     summary_stat_diff_ancestor = 0;
-    stat_same = 0;
+    summary_stat_same_ancestor = 0;
     std::vector<uint32_t> const &descendant_index = all_sequence_prob_index[site_index].GetDescendantIndex();
+//    std::cout << " "<< descendant_index.size() ;
     for (int d = 0; d < descendant_index.size(); ++d) {//TODO: Check descendant info, merge some of them together
         double summary_stat_same = 0;
         double summary_stat_diff = 0;
@@ -190,38 +231,42 @@ void MutationModelMultiCategories::NoCacheCalculateDes(int site_index, int a, do
 
 //        HaploidProbs prob_reads_given_descent = all_sequence_prob[site_index].GetDescendantGenotypes(d);
         HaploidProbs prob_reads_given_descent = convert_index_key_to_haploid[descendant_index [d]];//UNTESTED:
-//        CalculateOneDescendantGivenAncestor(a, prob_reads_given_descent, sum_over_probs, summary_stat_same, summary_stat_diff);
+        CalculateOneDescendantGivenAncestor(categories_index, anc_index10, prob_reads_given_descent, sum_over_probs, summary_stat_same,
+                                            summary_stat_diff);
 
         summary_stat_diff_ancestor += summary_stat_diff;
+        summary_stat_same_ancestor += summary_stat_same;
         product_prob_given_ancestor *= sum_over_probs;
 
     }
 }
 
-//void MutationModelMultiCategories::CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs &prob_reads_given_descent,
-//        double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff) {
-//
-//    int index16 = LookupTable::index_converter_10_to_16[anc_index10];
-//    prob_reads_d_given_a = 0;
-//    summary_stat_same = 0;
-//    summary_stat_diff = 0;
-//
-//
-//    for (int b = 0; b < BASE_COUNT; ++b) {
-//
-//        double prob = transition_matrix_a_to_d_single(index16, b) * prob_reads_given_descent[b];
-////        double prob = cache_data_transition[t][anc_index10][b];
-//        prob_reads_d_given_a += prob;
-//
-//        summary_stat_same += prob_reads_given_descent[b] * (1.0- mutation_rate_single) * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
-//        summary_stat_diff += prob_reads_given_descent[b] * mutation_rate_single * frequency_prior[b];
-//
-//
-//    }
-//    summary_stat_same /= prob_reads_d_given_a;
-//    summary_stat_diff /= prob_reads_d_given_a;
-//
-//}
+void MutationModelMultiCategories::CalculateOneDescendantGivenAncestor(int category_index, int anc_index10,
+                                                                       HaploidProbs &prob_reads_given_descent,
+                                                                       double &prob_reads_d_given_a,
+                                                                       double &summary_stat_same,
+                                                                       double &summary_stat_diff) {
+
+    int index16 = LookupTable::index_converter_10_to_16[anc_index10];
+    prob_reads_d_given_a = 0;
+    summary_stat_same = 0;
+    summary_stat_diff = 0;
+
+
+    for (int b = 0; b < BASE_COUNT; ++b) {
+//        transition_matrix_a_to_d_single[category_index]()
+        double prob = transition_matrix_a_to_d_single[category_index](index16, b) * prob_reads_given_descent[b];
+//        double prob = cache_data_transition[t][anc_index10][b];
+        prob_reads_d_given_a += prob;
+
+        summary_stat_same += prob_reads_given_descent[b] * (1.0- mutation_rate_single[category_index]) * LookupTable::summary_stat_same_lookup_table[anc_index10][b];
+        summary_stat_diff += prob_reads_given_descent[b] * mutation_rate_single[category_index] * frequency_prior[b];
+
+    }
+    summary_stat_same /= prob_reads_d_given_a;
+    summary_stat_diff /= prob_reads_d_given_a;
+
+}
 
 void MutationModelMultiCategories::CalculateLikelihoodUnnormalised(int site_index, int anc_index, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor) {
     product_prob_given_ancestor = 1;

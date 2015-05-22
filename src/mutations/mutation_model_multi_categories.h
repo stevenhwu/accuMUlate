@@ -65,9 +65,15 @@ public:
     void CalculateAncestorToDescendant(int category_index, int site_index, double &prob_reads,
                                                                      double &all_stats_diff, double &log_likelihood_scaler);
 
-    void NoCacheCalculateDes(int site_index, int a, double &product_prob_given_ancestor, double &stat_same, double &summary_stat_diff_ancestor);
+    void NoCacheCalculateDes(int categories_index, int site_index, int anc_index10,
+                                                           double &product_prob_given_ancestor, double &stat_same,
+                                                           double &summary_stat_diff_ancestor);
 
-    void CalculateOneDescendantGivenAncestor(int anc_index10, HaploidProbs &prob_reads_given_descent, double &prob_reads_d_given_a, double &summary_stat_same, double &summary_stat_diff);
+    void CalculateOneDescendantGivenAncestor(int category_index, int anc_index10,
+                                                                           HaploidProbs &prob_reads_given_descent,
+                                                                           double &prob_reads_d_given_a,
+                                                                           double &summary_stat_same,
+                                                                           double &summary_stat_diff);
 
     int GetCategoriesCount() const;
     int GetSiteCount() const;

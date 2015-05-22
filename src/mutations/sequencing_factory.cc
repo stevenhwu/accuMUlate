@@ -242,6 +242,7 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
 
 //    for (size_t i = 0; i < genome_data.size(); ++i) {//FIXME: change this back
     for (size_t i = 2335; i < 2350; ++i) {
+//      for (size_t i = 200; i < 300; ++i) {
 
 //        uint16_t ref = genome_data[i].reference;
 //        int descendant_conut = genome_data[i].all_reads.size()-1;
@@ -264,14 +265,17 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
             auto find_key = map_rd_to_index.find(rd_key);
 
             if (find_key == map_rd_to_index.end()) {
-
+//                rd.key=0;
+//                const HaploidProbs &array = HaploidSequencing(rd);
+//                std::cout << "0:" << array.format(nice_row)  << std::endl;
                 HaploidProbs prob = HaploidSequencing(rd);
 //                {
 //                    HaploidProbs prob_exp = prob.exp();
 //                    convert_index_key_to_haploid_unnormalised.push_back(prob_exp);
 //                }
 
-                double scale = 0;//prob.maxCoeff();
+                double scale = prob.maxCoeff();
+//                scale = 0;//TODO REMOVE
                 convert_index_key_to_haploid_scaler.push_back(scale);
                 prob = (prob - scale).exp();
                 convert_index_key_to_haploid.push_back(prob);
@@ -291,16 +295,22 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
         auto rd_key = rd.key;
         auto find_key = map_ancestor_to_index[data.reference].find(rd_key);
         if (find_key == map_ancestor_to_index[data.reference].end()) {
+
+//            rd.key = 0;
+//            DiploidProbs array = DiploidSequencing(rd);
+//            std::cout << "0:" << array.format(nice_row)  << std::endl;
+
             DiploidProbs temp_prob = DiploidSequencing(rd);
 //            {
 //                DiploidProbsIndex10 temp_dip_10 = ConvertDiploid16ToDiploid10(temp_prob.exp(), data.reference);
 //                convert_index_key_to_diploid_10_unnormalised.push_back(temp_dip_10);
 //            }
 
-            double scale = 0;//temp_prob.maxCoeff();
+            double scale = temp_prob.maxCoeff();
+//            scale = 0;//TODO: REMOVE
             convert_index_key_to_diploid_10_scaler.push_back(scale);
             temp_prob = (temp_prob - scale).exp();
-            std::cout << temp_prob << std::endl;
+//            std::cout << temp_prob << std::endl;
             DiploidProbsIndex10 temp_dip_10 = ConvertDiploid16ToDiploid10(temp_prob, data.reference);
             convert_index_key_to_diploid_10.push_back(temp_dip_10);
 
