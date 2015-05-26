@@ -42,7 +42,6 @@ void EmAlgorithmMultiThreading::ExpectationStepModelPtrMTMulti() {
     }
 
 
-//7.204842241669e-01	9.095599810937e-07	1.305992121779e-04	9.998694007878e-01	9.998694007878e-01	Time new: 61	61484826
 }
 
 
@@ -76,12 +75,16 @@ void EmAlgorithmMultiThreading::MultiCategories(size_t site_start, size_t site_e
         for (size_t r = 0; r < num_category; ++r) {
             double prob = local_probs[r] / sum;
 //            thread_stats[r][0] += prob * temp_stats[r][0];
+
             thread_stats[r][1] += prob * temp_stats[r];
             thread_stats[r][0] += prob * (1-temp_stats[r]);
+            std::cout << temp_stats[r] << "\t" << prob << "\t" << (prob*temp_stats[r])<< std::endl;
             all_probs(r,s) = local_probs[r];//threads
         }
 
     }
+    std::cout << "" << std::endl;
+//    std::cout <<  << std::endl;
     auto current = log_likelihood.load();
     while (!log_likelihood.compare_exchange_weak(current, current + thread_likelihood));//threads
     for (size_t r = 0; r < num_category; ++r) {

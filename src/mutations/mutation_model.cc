@@ -416,7 +416,8 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
     }
 
     all_stats_diff /= prob_reads;
-    all_stats_diff /= descendant_count;//TODO: need this to auto calculate stat_same. sum to 1
+    all_stats_diff /= descendant_genotypes_index.size();
+//    all_stats_diff /= descendant_count;//TODO: need this to auto calculate stat_same. sum to 1
 
 //lock.unlock();
 #ifdef DEBUG7

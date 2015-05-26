@@ -5,6 +5,8 @@
 EmAlgorithmMutation::EmAlgorithmMutation(std::vector<std::unique_ptr<EmModel>> &model_ptr) : EmAlgorithm(model_ptr) {
 
     InitWithModel();
+    stat_count = 2;
+    cache_log_likelihood = std::numeric_limits<double>::lowest();
 
 }
 

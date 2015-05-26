@@ -87,6 +87,7 @@ void EmAlgorithm::InitWithModel() {
 }
 
 
+
 void EmAlgorithm::InitWithData() {
 
     if (num_category != 2) {
@@ -187,7 +188,7 @@ void EmAlgorithm::MaximizationStep() {
 //        double new_mu = mutation_prob.ConvertOneMinusExpBetaToMu(new_exp_beta);
 //        double new_one_minus_mu = mutation_prob.ConvertOneMinusExpBetaToMu(-(new_one_minus_exp_beta - 1));
         parameters[r] = new_parameter;
-
+        std::cout << "NEW Parameters_"+r << ": " << parameters[r] << std::endl;
         //FIXME: Proper way to deal with boundary? maybe MAP?
         if(parameters[r] ==0 && (parameters[r] < DOUBLE_MIN) ){
 //        if( parameters[r] < 1e-12 ){
@@ -397,26 +398,31 @@ std::string EmAlgorithm::GetEMSummary(){
 
 void EmAlgorithm::SetOutfilePrefix(const std::string & infile) {
     em_logger.SetOutifle(infile);
-
+    std::cout << "Site_count: " << num_category << std::endl;
     std::string header;
     char temp[1000];
     header.append("Ite\t");
+    std::cout << "Site_count: 2" << site_count << std::endl;
     for (int i = 0; i < num_category; ++i) {
         sprintf(temp, "Parameter_%d\t", i);
         header.append(temp);
     }
+    std::cout << "Site_count: 3" << site_count << std::endl;
     for (int i = 0; i < num_category; ++i) {
         sprintf(temp, "Proportion_%d\t", i);
         header.append(temp);
     }
+    std::cout << "Site_count: 4" << stat_count << std::endl;
     for (int r = 0; r < num_category; ++r) {
         for (int s = 0; s < stat_count; ++s) {
             sprintf(temp, "stat_cat%d_%d\t", r, s);
             header.append(temp);
         }
     }
+    std::cout << "Site_count: 5" << site_count << std::endl;
     header.append("Likelihood\tRatio\t");
     em_logger.Header(header);
+    std::cout << "Site_count: " << site_count << std::endl;
 
 }
 

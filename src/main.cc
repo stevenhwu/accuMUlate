@@ -79,7 +79,7 @@ class VariantVisitorMain : public LocalBamToolsUtils::PileupVisitor{
     private:
         RefVector m_bam_ref;
         SamHeader m_header;
-    LocalBamToolsUtils::Fasta m_idx_ref;
+        LocalBamToolsUtils::Fasta m_idx_ref;
         GenomeData& m_all_the_data;
         SampleMap m_samples;
         BamAlignment& m_ali;

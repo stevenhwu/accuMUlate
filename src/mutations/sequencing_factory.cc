@@ -241,8 +241,25 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
     uint32_t index_ancestor = 0;
 
 //    for (size_t i = 0; i < genome_data.size(); ++i) {//FIXME: change this back
-    for (size_t i = 2335; i < 2350; ++i) {
+//    for (size_t i = 2335; i < 2350; ++i) {
 //      for (size_t i = 200; i < 300; ++i) {
+    for(size_t i : {
+            2335,
+// 2336,
+ 2337,
+ 2338,
+ 2339,
+ 2340,
+ 2341,
+ 2342,
+ 2343,
+ 2344,
+ 2345,
+ 2346,
+ 2347,
+// 2348,
+ 2349
+    }) {
 
 //        uint16_t ref = genome_data[i].reference;
 //        int descendant_conut = genome_data[i].all_reads.size()-1;
@@ -250,7 +267,7 @@ void SequencingFactory::CreateSequenceProbsVector(std::vector<SiteGenotypesIndex
         ModelInput data = std::move(genome_data[i]);
 //        ModelInput data = genome_data[i];
         int descendant_conut = data.all_reads.size() - 1;
-//        std::cout << "FactoryDesCount: "<< descendant_conut << std::endl;
+        std::cout << "FactoryDesCount: "<< descendant_conut << std::endl;
 
         map_des_count[descendant_conut]++;
         SiteGenotypesIndex site_genotype(descendant_conut);

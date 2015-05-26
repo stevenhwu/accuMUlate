@@ -76,6 +76,7 @@ void RunEmWithRealData(boost::program_options::variables_map variables_map) {
 
     GenomeData genome_data = GetGenomeData(variables_map);
     PostFilterGenomeData(genome_data);//TODO: Add this back
+
     printMemoryUsage("Read genomeData");
 
     cout << "Time: read genome data: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
@@ -259,9 +260,9 @@ int main(int argc, char** argv){
     {
 //        RunEmWithRealData(genome_data, params);
 
-//        RunEmWithRealData(variables_map);
-        int thread_count = variables_map["thread"].as<int>();
-        RunEmWithRealDataMultiThread(variables_map, thread_count);
+        RunEmWithRealData(variables_map);
+//        int thread_count = variables_map["thread"].as<int>();
+//        RunEmWithRealDataMultiThread(variables_map, thread_count);
 
 
     }

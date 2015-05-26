@@ -88,7 +88,7 @@ void MutationModelMultiCategories::InitCache(int category_index) {
 
 void MutationModelMultiCategories::UpdateCache(int category_index) {
 
-
+    std::cout << "Update Cache: " << category_index << std::endl;
     std::array<double, 4> temp_base_prob;
     for (int b = 0; b < BASE_COUNT; ++b) {
         temp_base_prob[b] = mutation_rate_single[category_index] * frequency_prior[b];
@@ -143,7 +143,7 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
     double prod_prob_ancestor = 1;
 
 //    std::cout << site_descendant_count << ":";
-//#define NO_CACHE
+#define NO_CACHE
 #ifdef NO_CACHE
     double no_cache_prob = 1;
     double no_cache_stat_diff = 0;
@@ -174,11 +174,18 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
     std::cout << (no_cache_all_stats_diff +no_cache_all_stats_same )/no_cache_prob_reads << "\t" <<
             site_descendant_count << "\t" << no_cache_all_stats_diff << "\t" << no_cache_all_stats_same  << std::endl;
 //    std::cout << prob_reads << "==" << no_cache_prob_reads  << "\t" << all_stats_diff <<"=="<< no_cache_all_stats_diff<< std::endl;
-    if((prob_reads - no_cache_prob_reads)>1e-18){
-        std::cout <<"P:" << site_index <<":"<<category_index << ":" << prob_reads << "==" << no_cache_prob_reads << std::endl;
+
+    if ((summary_stat_diff_ancestor == no_cache_stat_diff) ){//> 1e-2000) {
+        std::cout << "STAT:" << site_index << ":" << category_index << ":" << summary_stat_diff_ancestor << "!=" <<
+        no_cache_stat_diff << std::endl;
     }
-    if((all_stats_diff - no_cache_all_stats_diff)>1e-18){
-        std::cout <<"S:" << site_index <<":"<<category_index << ":" << all_stats_diff <<"=="<< no_cache_all_stats_diff<< std::endl;
+    if ((prob_reads - no_cache_prob_reads) > 1e-18) {
+        std::cout << "P:" << site_index << ":" << category_index << ":" << prob_reads << "==" << no_cache_prob_reads <<
+        std::endl;
+    }
+    if ((all_stats_diff - no_cache_all_stats_diff) > 1e-18) {
+        std::cout << "S:" << site_index << ":" << category_index << ":" << all_stats_diff << "==" <<
+        no_cache_all_stats_diff << std::endl;
     }
 #endif
 
@@ -188,7 +195,7 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
 //    std::cout << "\t" << all_stats_diff << std::endl;
     all_stats_diff /= site_descendant_count;
 
-
+    all_stats_diff *= 100;
 
 
 }
