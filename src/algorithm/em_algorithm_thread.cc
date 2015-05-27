@@ -13,7 +13,7 @@
 #include "em_algorithm_thread.h"
 
 EmAlgorithmMultiThreading::EmAlgorithmMultiThreading(MutationModelMultiCategories &model_multi0, uint32_t thread_count0)
-        : model_multi(model_multi0), thread_count(thread_count0), EmAlgorithm(model_multi0.GetCategoriesCount()) {
+        : EmAlgorithm(model_multi0.GetCategoriesCount()), model_multi(model_multi0), thread_count(thread_count0) {
     std::cout << "ModelMultiCategories MultiThread Construct: " << num_category << "\t" << "Thread_count: " << "\t" <<
     thread_count << "\t One data, one model" << std::endl;
 }

@@ -56,13 +56,13 @@ struct ModelInput{// Can probably stand to lose this, started out more complex..
     uint16_t reference;
 
 
-    ModelInput() : reference(-1), site_index(-1){
+    ModelInput() :  site_index(-1), reference(-1){
     }
 
     ModelInput(const ModelInput& other) = default;
     ModelInput& operator=(const ModelInput& other) = default;
 
-    ModelInput(ModelInput&& other) :reference(other.reference), site_index(other.site_index){
+    ModelInput(ModelInput&& other) :site_index(other.site_index), reference(other.reference) {
 //        std::cout << "ModelInput move constructor" << std::endl;
         other.reference = 0;
         other.site_index = 0;
@@ -80,7 +80,7 @@ struct ModelInput{// Can probably stand to lose this, started out more complex..
         return *this;
     }
 
-    ModelInput(int read_data_count, uint32_t site_index) : reference(-1), site_index(site_index) {
+    ModelInput(uint32_t site_index, int read_data_count) : site_index(site_index), reference(-1)  {
         all_reads.reserve(read_data_count);
         for (int i = 0; i < read_data_count; ++i) {
             all_reads.emplace_back(ReadData{0});
@@ -88,12 +88,12 @@ struct ModelInput{// Can probably stand to lose this, started out more complex..
 //        all_reads = ReadDataVector(read_data_count, ReadData{0}     );
     }
 
-    ModelInput(uint16_t reference0, ReadDataVector &all_reads0) : ModelInput(reference0, -1, all_reads0){
-    }
+//    ModelInput(uint16_t reference0, ReadDataVector &all_reads0) : ModelInput(-1, reference0, all_reads0) {
+//    }
 
-    ModelInput(uint16_t reference0, uint32_t site_index, ReadDataVector &all_reads0) : reference(reference0),
+    ModelInput(uint32_t site_index, uint16_t reference0, ReadDataVector &all_reads0) : all_reads(all_reads0),
                                                                                        site_index(site_index),
-                                                                                       all_reads(all_reads0) {
+                                                                                       reference(reference0) {
     }
 
     ~ModelInput() { };

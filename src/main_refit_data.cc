@@ -121,7 +121,7 @@ void RefitData(boost::program_options::variables_map variables_map) {
     printMemoryUsage("Created Mutation Model");
 
     cout << "===== Setup REFIT model" << endl;
-    double parameters[2] = {1e-4, 1e-10};
+    double parameters[2] = {6.172340e-01,	7.007283e-06};
     for (size_t r = 0; r < 2; ++r) {
 //        all_em_stats[r]->Reset();
         model_multi.UpdateOneMinusExpBeta(r, parameters[r]); //1-exp_beta

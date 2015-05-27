@@ -74,14 +74,15 @@ public:
 
 
 protected:
-    uint32_t thread_count;
-    size_t num_blocks = 120;
-    std::vector<std::pair<size_t, size_t>> blocks_info;
 
     MutationModelMultiCategories model_multi;
+    std::vector<std::pair<size_t, size_t>> blocks_info;
+
+
+    uint32_t thread_count;
+    size_t num_blocks;
 
     std::mutex lock_stat;
-
 };
 
 

@@ -270,7 +270,7 @@ void GenomeDataStream::ReadGenomeData(GenomeData &data) {
     data.reserve(site_count);
 
     for (size_t s = 0; s < site_count; ++s) {
-        ModelInput m(read_data_count, s);
+        ModelInput m(s, read_data_count);
         ReadModelInput(m);
         data.push_back(std::move(m));
     }
@@ -317,7 +317,7 @@ ModelInput GenomeDataStream::ReadOne() {
     uint16_t ref;
     uint64_t key;
     ReadReference(ref);
-    ModelInput model_input(read_data_count, -1);
+    ModelInput model_input(-1, read_data_count);
     model_input.reference = ref;
 
     for (size_t i = 0; i < read_data_count; ++i) {

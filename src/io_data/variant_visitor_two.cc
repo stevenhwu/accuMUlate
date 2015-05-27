@@ -43,7 +43,7 @@ void VariantVisitorTwo::Visit(const LocalBamToolsUtils::PileupPosition &pileupDa
         }
         if( filter_data(bcalls) ) {
             global_count[2]++;
-            m_all_the_data.push_back(ModelInput{ref_base_idx, bcalls});
+            m_all_the_data.push_back(ModelInput{0, ref_base_idx, bcalls});
             gd_stream.WriteModelInput(m_all_the_data.back());
         }
 

@@ -36,7 +36,7 @@ void SimulateGenomeData(GenomeData &genome_data, int descendant_count, size_t fa
 			bcalls[0].reads[ref_index] = delta_reads + uniform_dist(e2);
 		}
 
-		genome_data.emplace_back( ModelInput{ref_index, (uint32_t)s, bcalls} ) ;
+		genome_data.emplace_back( ModelInput{(uint32_t)s, ref_index, bcalls} ) ;
 	}
 
 }
@@ -279,7 +279,7 @@ double TetMAProbOneMutation(const ModelParams &params, const ModelInput site_dat
 //        0.001,
 //        0.001,
 //    };
-//    ModelInput two_vars = {"scf0", 87, 1, 
+//    ModelInput two_vars = {"scf0", 87, 1,
 //        {
 //        { 0, 30,  0,  0},
 //        { 0, 30,  0,  0},

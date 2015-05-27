@@ -30,7 +30,7 @@ void VariantVisitor::Visit(const LocalBamToolsUtils::PileupPosition &pileupData)
     uint16_t ref_base_idx = base_index(current_base);
     if (ref_base_idx < 4) { //TODO Model for bases at which reference is 'N'
         global_count[2]++;
-            m_all_the_data.push_back(ModelInput{ref_base_idx, bcalls});
+            m_all_the_data.push_back(ModelInput{0, ref_base_idx, bcalls});
     }
     else{
         std::cout << "ELSE" << std::endl;

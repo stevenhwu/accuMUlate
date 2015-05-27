@@ -20,7 +20,7 @@ EmAlgorithmThreadMutation::EmAlgorithmThreadMutation(MutationModelMultiCategorie
     InitialiseParameters();
     InitialiseSummaryStat();
 
-    num_blocks = 1;
+    num_blocks = 120;
     blocks_info.reserve(num_blocks);
     size_t block_size = site_count / num_blocks;
     for (int i = 0; i < num_blocks - 1; ++i) {

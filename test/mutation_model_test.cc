@@ -11,6 +11,8 @@ public:
 
 
 protected:
+    MutationModelTest() : base_custom3(0, 0) {}
+
     const std::vector<double> freq_equal {0.25,0.25,0.25,0.25};     //beta0= 1.333333
     const std::vector<double> freq_not_equal {0.1, 0.2, 0.3, 0.4};
 
