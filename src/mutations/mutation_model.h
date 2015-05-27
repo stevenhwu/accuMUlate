@@ -57,7 +57,7 @@ public:
 
     void UpdateCache();
 
-    void UpdateExpBeta(double expBeta);
+    void UpdateOneMinusExpBeta(double oneMinusExpBeta);
 
     void CalculateAncestorToDescendant(int site_index, double &prob_reads, double &all_stats_diff,
                                        double &log_likelihood_scaler);

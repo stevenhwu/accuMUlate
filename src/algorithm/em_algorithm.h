@@ -116,7 +116,7 @@ protected:
 
     virtual void InitialiseProportion();
 
-    virtual void InitialiseParameters() = 0;
+    virtual void InitialiseParameters();
 
     virtual void InitialiseSummaryStat() = 0;
 
@@ -130,6 +130,8 @@ protected:
 
 
     std::atomic<double> cache_log_likelihood;
+
+    std::string header;
 };
 
 

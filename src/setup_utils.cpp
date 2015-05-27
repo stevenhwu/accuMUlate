@@ -6,22 +6,18 @@
 #include <vector>
 #include "setup_utils.h"
 
+void CustomFilterGenomeData(GenomeData &genome_data) {
 
-void PostFilterGenomeData(GenomeData &genome_data) {
-
-//    Custom filter, remove sample 47 51 44   ->  7 8 10
-//  Alter the size of each descendant
 //    Custom filter, remove sample 47 51 44   ->  7 8 10
 
     int read_lower_bound = 6;
     int read_upper_bound = 150;
     for (int g = genome_data.size()-1 ; g >= 0; --g) {
-
         ReadDataVector &read_vector = genome_data[g].all_reads;
         RemoveDescendantRDV(read_vector, 10);
         RemoveDescendantRDV(read_vector, 8);
         RemoveDescendantRDV(read_vector, 7);
-        read_vector.shrink_to_fit();
+
 //        std::cout << "\t" << data.all_reads.size() << "\t" << data.all_reads.capacity() << "\t" << std::endl;
 
         int sum = 0;
@@ -32,6 +28,7 @@ void PostFilterGenomeData(GenomeData &genome_data) {
         if(sum < read_lower_bound || sum > read_upper_bound){//Bad ref, remove site
 //            PrintModelInput(data);
             RemoveSiteGenomeData(genome_data, g);
+
         }
 
         else {//Check each descendant
@@ -42,12 +39,12 @@ void PostFilterGenomeData(GenomeData &genome_data) {
                 }
                 if (sum < read_lower_bound || sum > read_upper_bound) {
                     RemoveDescendantRDV(read_vector, i);
-//                    read_vector[i].key=0;
+
 //                    std::cout << g << "\t" << sum << "\t" << i << "\t" << data.all_reads.size() << "\t" << data.all_reads[i].key <<"\t" << data.all_reads[i-1].key <<"\t" << data.all_reads[i+1].key <<"\t";
                 }
             }
 
-            if (read_vector.size() ==1 ) {
+            if (read_vector.size() ==1) {
 //                std::cout << g << "\t" << data.all_reads.size() << std::endl;
 //                for (int i = 0; i < 9; ++i) {
 //                    PrintReads(data.all_reads[i]);
@@ -60,10 +57,12 @@ void PostFilterGenomeData(GenomeData &genome_data) {
             }
         }
 
+        read_vector.shrink_to_fit();
+
     }
 
-
 }
+
 
 
 
@@ -219,8 +218,11 @@ void RemoveDescendantRDV(ReadDataVector &read_vector, int d) {
 }
 
 void RemoveSiteGenomeData(GenomeData &genome_data, int g) {
+//    std::cout << "\tRemove g:"<<g << "\t" << genome_data[g].site_index << "\t" ;
     std::swap(genome_data[g], genome_data.back());
+//    std::cout << genome_data[g].site_index  << "\t" ;
     genome_data.pop_back();
+//    std::cout << genome_data[g].site_index  << std::endl;
 }
 
 

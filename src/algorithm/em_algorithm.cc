@@ -123,7 +123,7 @@ void EmAlgorithm::ExpectationStepModel() {
 
             ExpectationStepCustom(s, r, sum_prob, temp_stats[r]);
 
-            //FIXME: Should make model take the data, lot's of refactor required to do this for mutation model.
+            //TODO: Should make model take the data, lot's of refactor required to do this for mutation model.
             //CHECK: Should be possible to avoid static_cast
             all_probs(r, s) = proportion[r] * sum_prob;
         }
@@ -188,8 +188,7 @@ void EmAlgorithm::MaximizationStep() {
 //        double new_mu = mutation_prob.ConvertOneMinusExpBetaToMu(new_exp_beta);
 //        double new_one_minus_mu = mutation_prob.ConvertOneMinusExpBetaToMu(-(new_one_minus_exp_beta - 1));
         parameters[r] = new_parameter;
-        std::cout << "NEW Parameters_"+r << ": " << parameters[r] << std::endl;
-        //FIXME: Proper way to deal with boundary? maybe MAP?
+        //TODO: Proper way to deal with boundary? maybe MAP?
         if(parameters[r] ==0 && (parameters[r] < DOUBLE_MIN) ){
 //        if( parameters[r] < 1e-12 ){
 //        if( (parameters[r] < std::numeric_limits<double>::min()) ){
@@ -264,6 +263,54 @@ void EmAlgorithm::InitialiseProportion() {
 
 };
 
+
+void EmAlgorithm::InitialiseParameters() {
+    double low_rate = 1e-10;
+    double high_rate = 0.9;
+
+
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> rand_real(1,9);
+    std::uniform_int_distribution<> lower(3, 10);
+
+    const int lower_power = lower(gen);
+    low_rate = rand_real(gen)*pow(10, -lower_power);
+
+    do {
+        std::uniform_int_distribution<> upper(1, lower_power);
+        high_rate = rand_real(gen) * pow(10, -upper(gen));
+    } while (high_rate < low_rate);
+
+//    low_rate = 1e-10;
+//    high_rate = 0.9;
+//    low_rate = 1- 1e-10;
+//    high_rate = 1- 0.9;
+//    model_multi.U
+
+//EM Summary: Ln:-1405.19959316
+//Parameters: 3.7007533031e-01	6.5633711554e-09
+//Proportions: 1.4027775284e-02	9.8597222472e-01	8.8364417124e-01	5.1913335718e-01	9.8597221824e+01	6.4713016597e-07
+//================= END SUMMARY ============
+
+
+//    high_rate =  3.7007533031e-01;
+//    low_rate = 6.5633711554e-09;
+//    low_rate =  1e-10;
+//    high_rate = 1e-1;
+    parameters = {high_rate, low_rate};
+    cache_parameters = {high_rate, low_rate};
+//    parameters = {low_rate, high_rate};
+//    cache_parameters = {low_rate, high_rate};
+
+//FinalSummary: 2.53325e-06	7.12781e-01	9.99326e-01	6.74226e-04	-1471693.98632	7.80611e-11
+//FinalSummary: 7.12781e-01	2.53325e-06	6.74226e-04	9.99326e-01	-1471693.98632	7.81574e-11
+
+
+
+}
+
 std::vector<double> EmAlgorithm::GetParameters() {
     return parameters;
 }
@@ -301,7 +348,7 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
         sprintf(temp, "%.10e\t", cache_log_likelihood - log_likelihood.load());
         out.append(temp);
         std::cout << out << std::endl;
-        std::exit(99);
+//        std::exit(99);
     }
     cache_log_likelihood = log_likelihood.load();
 
@@ -345,29 +392,30 @@ bool EmAlgorithm::EmStoppingCriteria(int ite) {
 void EmAlgorithm::PrintSummary(){
     std::string out;
     char temp[1000];
-    sprintf(temp, "EM Summary: Ln:%.8f\nParameters: ", log_likelihood.load());
+    sprintf(temp, "EM Summary: Ln:%.8f\n", log_likelihood.load());
     out.append(temp);
-     for (auto &item :parameters) {
-         sprintf(temp, "%.10e\t", item);
-         out.append(temp);
-    }
+//     for (auto &item :parameters) {
+//         sprintf(temp, "%.10e\t", item);
+//         out.append(temp);
+//    }
+//
+//    sprintf(temp, "\nProportions: ");
+//    out.append(temp);
+//    for (auto &item :proportion) {
+//        sprintf(temp, "%.10e\t", item);
+//        out.append(temp);
+//    }
+//    for (int r = 0; r < num_category; ++r) {
+//        for (int s = 0; s < stat_count; ++s) {
+//            double item = all_em_stats[r]->GetStat(s);
+//            sprintf(temp, "%.10e\t", item);
+//            out.append(temp);
+//        }
+//    }
 
-    sprintf(temp, "\nProportions: ");
-    out.append(temp);
-    for (auto &item :proportion) {
-        sprintf(temp, "%.10e\t", item);
-        out.append(temp);
-    }
-    for (int r = 0; r < num_category; ++r) {
-        for (int s = 0; s < stat_count; ++s) {
-            double item = all_em_stats[r]->GetStat(s);
-            sprintf(temp, "%.10e\t", item);
-            out.append(temp);
-        }
-    }
-
-
-
+//    out.append("\n");
+    out.append(header).append("\n");
+    out.append("Ite\t").append(GetEMSummary());
     out.append("\n================= END SUMMARY ============");
     std::cout << out << std::endl;
 }
@@ -375,6 +423,8 @@ void EmAlgorithm::PrintSummary(){
 std::string EmAlgorithm::GetEMSummary(){
     std::string out;// = "EM Summary\tParameters0 ";
     char temp[1000];
+    sprintf(temp, "%.6f\t", log_likelihood.load());
+    out.append(temp);
     for (auto &item :parameters) {
         sprintf(temp, "%.6e\t", item);
         out.append(temp);
@@ -390,7 +440,7 @@ std::string EmAlgorithm::GetEMSummary(){
             out.append(temp);
         }
     }
-    sprintf(temp, "%.6f\t%.6e\t", log_likelihood.load(), sum_ratio);
+    sprintf(temp, "%.6e\t", sum_ratio);
     out.append(temp);
     return out;
 
@@ -398,31 +448,25 @@ std::string EmAlgorithm::GetEMSummary(){
 
 void EmAlgorithm::SetOutfilePrefix(const std::string & infile) {
     em_logger.SetOutifle(infile);
-    std::cout << "Site_count: " << num_category << std::endl;
-    std::string header;
+    header.clear();
     char temp[1000];
-    header.append("Ite\t");
-    std::cout << "Site_count: 2" << site_count << std::endl;
+    header.append("Ite\tLikelihood\t");
     for (int i = 0; i < num_category; ++i) {
         sprintf(temp, "Parameter_%d\t", i);
         header.append(temp);
     }
-    std::cout << "Site_count: 3" << site_count << std::endl;
     for (int i = 0; i < num_category; ++i) {
         sprintf(temp, "Proportion_%d\t", i);
         header.append(temp);
     }
-    std::cout << "Site_count: 4" << stat_count << std::endl;
     for (int r = 0; r < num_category; ++r) {
         for (int s = 0; s < stat_count; ++s) {
             sprintf(temp, "stat_cat%d_%d\t", r, s);
             header.append(temp);
         }
     }
-    std::cout << "Site_count: 5" << site_count << std::endl;
-    header.append("Likelihood\tRatio\t");
+    header.append("Diff_Ratio\t");
     em_logger.Header(header);
-    std::cout << "Site_count: " << site_count << std::endl;
 
 }
 

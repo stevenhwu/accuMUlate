@@ -66,6 +66,9 @@ public:
 
 
     void ExpectationStepModelPtrMT();
+
+//    [[deprecated]]
+    __attribute_deprecated__
     void WorkingThread(size_t site_start, size_t site_end);
 
 

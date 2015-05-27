@@ -56,9 +56,9 @@ int MutationModelMultiCategories::GetSiteCount() const {
 }
 
 
-void MutationModelMultiCategories::UpdateExpBeta(int category_index, double expBeta) {
+void MutationModelMultiCategories::UpdateOneMinusExpBeta(int category_index, double oneMinusExpBeta) {
 
-    evo_model->UpdateExpBeta(expBeta);
+    evo_model->UpdateOneMinusExpBeta(oneMinusExpBeta);
 
     transition_matrix_a_to_d_single[category_index] = evo_model->GetTranstionMatirxAToD();
     mutation_rate_single[category_index] = evo_model->GetMutationRate();
@@ -88,7 +88,7 @@ void MutationModelMultiCategories::InitCache(int category_index) {
 
 void MutationModelMultiCategories::UpdateCache(int category_index) {
 
-    std::cout << "Update Cache: " << category_index << std::endl;
+
     std::array<double, 4> temp_base_prob;
     for (int b = 0; b < BASE_COUNT; ++b) {
         temp_base_prob[b] = mutation_rate_single[category_index] * frequency_prior[b];
@@ -143,7 +143,7 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
     double prod_prob_ancestor = 1;
 
 //    std::cout << site_descendant_count << ":";
-#define NO_CACHE
+//#define NO_CACHE
 #ifdef NO_CACHE
     double no_cache_prob = 1;
     double no_cache_stat_diff = 0;
@@ -171,13 +171,13 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
         no_cache_all_stats_diff += no_cache_stat_diff * no_cache_prob_reads_given_a;
         no_cache_all_stats_same += no_cache_stat_same * no_cache_prob_reads_given_a;
     }
-    std::cout << (no_cache_all_stats_diff +no_cache_all_stats_same )/no_cache_prob_reads << "\t" <<
-            site_descendant_count << "\t" << no_cache_all_stats_diff << "\t" << no_cache_all_stats_same  << std::endl;
+//    std::cout << (no_cache_all_stats_diff +no_cache_all_stats_same )/no_cache_prob_reads << "\t"
+//    std::cout << site_descendant_count << "\t" << no_cache_all_stats_diff << "\t" << no_cache_all_stats_same  << std::endl;
 //    std::cout << prob_reads << "==" << no_cache_prob_reads  << "\t" << all_stats_diff <<"=="<< no_cache_all_stats_diff<< std::endl;
 
-    if ((summary_stat_diff_ancestor == no_cache_stat_diff) ){//> 1e-2000) {
+    if ((summary_stat_diff_ancestor - no_cache_stat_diff) > 1e-20) {
         std::cout << "STAT:" << site_index << ":" << category_index << ":" << summary_stat_diff_ancestor << "!=" <<
-        no_cache_stat_diff << std::endl;
+        no_cache_stat_diff << "\t" << (summary_stat_diff_ancestor - no_cache_stat_diff) << std::endl;
     }
     if ((prob_reads - no_cache_prob_reads) > 1e-18) {
         std::cout << "P:" << site_index << ":" << category_index << ":" << prob_reads << "==" << no_cache_prob_reads <<
@@ -193,9 +193,8 @@ void MutationModelMultiCategories::CalculateAncestorToDescendant(int category_in
     all_stats_diff /= prob_reads;
 //    all_stats_diff /= descendant_count;//NOTE: need this to auto calculate stat_same. sum to 1
 //    std::cout << "\t" << all_stats_diff << std::endl;
-    all_stats_diff /= site_descendant_count;
+//    all_stats_diff /= site_descendant_count;
 
-    all_stats_diff *= 100;
 
 
 }
@@ -231,7 +230,7 @@ void MutationModelMultiCategories::NoCacheCalculateDes(int categories_index, int
     summary_stat_same_ancestor = 0;
     std::vector<uint32_t> const &descendant_index = all_sequence_prob_index[site_index].GetDescendantIndex();
 //    std::cout << " "<< descendant_index.size() ;
-    for (int d = 0; d < descendant_index.size(); ++d) {//TODO: Check descendant info, merge some of them together
+    for (int d = 0; d < descendant_index.size(); ++d) {
         double summary_stat_same = 0;
         double summary_stat_diff = 0;
         double sum_over_probs = 1;
@@ -280,7 +279,7 @@ void MutationModelMultiCategories::CalculateLikelihoodUnnormalised(int site_inde
     summary_stat_diff_ancestor = 0;
     double stat_same = 0;
     std::vector<uint32_t> const &descendant_index = all_sequence_prob_index[site_index].GetDescendantIndex();
-    for (int d = 0; d < descendant_index.size(); ++d) {//TODO: Check descendant info, merge some of them together
+    for (int d = 0; d < descendant_index.size(); ++d) {
         double summary_stat_same = 0;
         double summary_stat_diff = 0;
         double sum_over_probs = 1;
@@ -295,3 +294,6 @@ void MutationModelMultiCategories::CalculateLikelihoodUnnormalised(int site_inde
     }
 }
 
+int MutationModelMultiCategories::GetDescendantCount(int site_index) {
+    return all_sequence_prob_index[site_index].GetDescendantCount();
+}

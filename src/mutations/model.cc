@@ -36,7 +36,7 @@ void SimulateGenomeData(GenomeData &genome_data, int descendant_count, size_t fa
 			bcalls[0].reads[ref_index] = delta_reads + uniform_dist(e2);
 		}
 
-		genome_data.emplace_back( ModelInput{ref_index, bcalls} ) ;
+		genome_data.emplace_back( ModelInput{ref_index, (uint32_t)s, bcalls} ) ;
 	}
 
 }
@@ -406,7 +406,10 @@ void PrintReads(ReadData read_data) {
 
 
 void PrintModelInput(ModelInput model_input) {
-    for (int i = 0; i < model_input.all_reads.size(); ++i) {
+	std::cout << "Ref:\t";
+    PrintReads(model_input.all_reads[0]);
+    for (int i = 1; i < model_input.all_reads.size(); ++i) {
+        std::cout << " -D"<< i << "\t";
         PrintReads(model_input.all_reads[i]);
     }
     std::cout << std::endl;

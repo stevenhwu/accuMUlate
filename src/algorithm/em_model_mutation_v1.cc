@@ -16,7 +16,7 @@ EmModelMutationV1::EmModelMutationV1(const EmModelMutationV1 &em_model) {
 
     //MutationRate rate = evo_model->GetMutationRate();
     //std::cout << "Copy Constructor EmModelEvolutionV1: "<< rate.prob << "\t" << rate.one_minus_p << std::endl;
-//FIXME: Implemente rule of three,   Copy assignment operator!!
+//TODO: Implemente rule of three,   Copy assignment operator!!
 
 }
 
@@ -32,7 +32,7 @@ EmModelMutationV1::EmModelMutationV1(EvolutionModel &evo_model0) : evo_model(&ev
 void EmModelMutationV1::UpdateParameter(double param) {
 
 //    cout << "IN EmModelMutationV1: updateing: " << param << "\t" << mutation_rate.prob << "\t" << mutation_rate.one_minus_p << endl;
-    evo_model->UpdateExpBeta(param);
+    evo_model->UpdateOneMinusExpBeta(param);
 
 
 }

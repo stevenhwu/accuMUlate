@@ -10,6 +10,7 @@ EmAlgorithmThreadMutation::EmAlgorithmThreadMutation(MutationModelMultiCategorie
     all_probs = Eigen::ArrayXXd::Zero(num_category, site_count);
     parameters = std::vector<double>(num_category, 0);
     cache_parameters = std::vector<double>(num_category, 0);
+    log_likelihood = 0;//std::numeric_limits<double>::lowest();
     cache_log_likelihood = std::numeric_limits<double>::lowest();
 
 
@@ -51,50 +52,6 @@ void EmAlgorithmThreadMutation::RunEM() {
 }
 
 
-void EmAlgorithmThreadMutation::InitialiseParameters() {
-    double low_rate = 1e-10;
-    double high_rate = 0.9;
-
-
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> rand_real(1,9);
-    std::uniform_int_distribution<> lower(3, 10);
-
-    const int lower_power = lower(gen);
-    low_rate = rand_real(gen)*pow(10, -lower_power);
-
-    do {
-        std::uniform_int_distribution<> upper(1, lower_power);
-        high_rate = rand_real(gen) * pow(10, -upper(gen));
-    } while (high_rate < low_rate);
-
-//    low_rate = 1e-10;
-//    high_rate = 0.9;
-//    low_rate = 1- 1e-10;
-//    high_rate = 1- 0.9;
-//    model_multi.U
-
-//EM Summary: Ln:-1405.19959316
-//Parameters: 3.7007533031e-01	6.5633711554e-09
-//Proportions: 1.4027775284e-02	9.8597222472e-01	8.8364417124e-01	5.1913335718e-01	9.8597221824e+01	6.4713016597e-07
-//================= END SUMMARY ============
-
-
-    high_rate =  3.7007533031e-01;
-    low_rate = 6.5633711554e-09;
-    parameters = {high_rate, low_rate};
-    cache_parameters = {high_rate, low_rate};
-//    parameters = {low_rate, high_rate};
-//    cache_parameters = {low_rate, high_rate};
-
-//FinalSummary: 2.53325e-06	7.12781e-01	9.99326e-01	6.74226e-04	-1471693.98632	7.80611e-11
-//FinalSummary: 7.12781e-01	2.53325e-06	6.74226e-04	9.99326e-01	-1471693.98632	7.81574e-11
-
-
-
-}
 
 
 void EmAlgorithmThreadMutation::InitialiseSummaryStat() {

@@ -73,59 +73,7 @@ void RunEmWithRealDataMultiThread(boost::program_options::variables_map map, siz
 
 //void PostFilterGenomeData(GenomeData &genome_data);
 
-void CustomFilterGenomeData(GenomeData &genome_data) {
 
-//    Custom filter, remove sample 47 51 44   ->  7 8 10
-
-    int read_lower_bound = 6;
-    int read_upper_bound = 150;
-    for (int g = genome_data.size()-1 ; g >= 0; --g) {
-
-        ReadDataVector &read_vector = genome_data[g].all_reads;
-        RemoveDescendantRDV(read_vector, 10);
-        RemoveDescendantRDV(read_vector, 8);
-        RemoveDescendantRDV(read_vector, 7);
-        read_vector.shrink_to_fit();
-//        std::cout << "\t" << data.all_reads.size() << "\t" << data.all_reads.capacity() << "\t" << std::endl;
-
-        int sum = 0;
-        for (int j = 0; j < 4; ++j) {
-            sum += read_vector[0].reads[j];
-        }
-
-        if(sum < read_lower_bound || sum > read_upper_bound){//Bad ref, remove site
-//            PrintModelInput(data);
-            RemoveSiteGenomeData(genome_data, g);
-        }
-
-        else {//Check each descendant
-            for (int i = read_vector.size()-1 ; i > 0; --i) {
-                int sum = 0;
-                for (int j = 0; j < 4; ++j) {
-                    sum += read_vector[i].reads[j];
-                }
-                if (sum < read_lower_bound || sum > read_upper_bound) {
-                    RemoveDescendantRDV(read_vector, i);
-//                    std::cout << g << "\t" << sum << "\t" << i << "\t" << data.all_reads.size() << "\t" << data.all_reads[i].key <<"\t" << data.all_reads[i-1].key <<"\t" << data.all_reads[i+1].key <<"\t";
-                }
-            }
-
-            if (read_vector.size() ==1) {
-//                std::cout << g << "\t" << data.all_reads.size() << std::endl;
-//                for (int i = 0; i < 9; ++i) {
-//                    PrintReads(data.all_reads[i]);
-//                }
-
-//                std::swap(genome_data[g], genome_data.back());
-//                genome_data.pop_back();
-                RemoveSiteGenomeData(genome_data, g);
-
-            }
-        }
-
-    }
-
-}
 
 
 void RefitData(boost::program_options::variables_map variables_map) {
@@ -143,34 +91,48 @@ void RefitData(boost::program_options::variables_map variables_map) {
 
     GenomeData genome_data = GetGenomeData(variables_map);
     SummariseRealData(genome_data);
-    CustomFilterGenomeData(genome_data);//TODO: Add this back
+    CustomFilterGenomeData(genome_data);//DEBUG: Add this back
     SummariseRealData(genome_data);
 
 //    std::vector<SiteGenotypesIndex> sgi;
 //    SequencingFactory sequencing_factory(params);
 //    sequencing_factory.CreateSequenceProbsVector(genome_data);
 
+//    for (int i = 0; i < genome_data.size(); ++i) {
+//        std::cout << genome_data[i].site_index << std::endl;
+//    }
+
+    SequencingFactory sequencing_factory(params);
+    printMemoryUsage("init factory");
+    sequencing_factory.CreateSequenceProbsVector(genome_data);
 
 
     cout << "Time: read genome data: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
     cout << "===== Setup EmData. Init site_count: " << genome_data.size() << endl;
     printMemoryUsage("Read genomeData");
 
-    std::exit(200);
+//    std::exit(200);
 
     t1 = clock();
 //    CreateMutationModel(mutation_model, genome_data, params);
-
+    MutationModelMultiCategories model_multi (2, evo_model0, sequencing_factory);
     cout << "Time Create Mutation Model: " << ((clock() - t1) / CLOCKS_PER_SEC) << "\t" << (clock() - t1) << endl;
     cout << "===== Done preprocess. Final site count: " << mutation_model.GetSiteCount() << endl;
     printMemoryUsage("Created Mutation Model");
 
+    cout << "===== Setup REFIT model" << endl;
+    double parameters[2] = {1e-4, 1e-10};
+    for (size_t r = 0; r < 2; ++r) {
+//        all_em_stats[r]->Reset();
+        model_multi.UpdateOneMinusExpBeta(r, parameters[r]); //1-exp_beta
+    }
+    double log_likelihood = 0;
 
-    cout << "===== Setup EM" << endl;
+
 //    std::vector<std::unique_ptr<EmModel>> em_model2;
 //    em_model2.emplace_back(new EmModelMutation(mutation_model));
 //    em_model2.emplace_back(new EmModelMutation(mutation_model));
-    const string &outfile_prefix = variables_map["outfile"].as<string>();
+//    const string &outfile_prefix = variables_map["outfile"].as<string>();
 
     clock_t t_start, t_end;
     t_start = clock();
@@ -185,6 +147,58 @@ void RefitData(boost::program_options::variables_map variables_map) {
 //    em_alg0.PrintSummary();
 //    std::string summary = em_alg0.GetEMSummary();
 //    std::cout << summary << std::endl;
+
+    double num_category = 2;
+    int site_start = 0;
+    int site_end = model_multi.GetSiteCount();
+//    site_end = 10;
+    double thread_likelihood = 0;
+//    std::vector<std::vector<double>> thread_stats(num_category, std::vector<double>(stat_count, 0));
+
+    double log_likelihood_scaler = 0;
+    double sum_prob = 0;
+    double stat_diff = 0;
+//    std::vector<std::vector<double>> temp_stats (num_category, std::vector<double>(stat_count, 0));
+    std::vector<double> temp_likelihood (num_category, 0);
+    std::vector<double> local_probs (num_category, 0);
+    std::vector<int> max_counter (2,0);
+    std::vector<int> keep_site_index;
+    for (size_t site = site_start; site < site_end; ++site) {
+        int descendant_count = model_multi.GetDescendantCount(site);
+        double sum = 0;
+        for (size_t r = 0; r < num_category; ++r) {
+            model_multi.CalculateAncestorToDescendant(r, site, sum_prob, stat_diff, log_likelihood_scaler);
+
+            temp_likelihood[r] = log(sum_prob) + log_likelihood_scaler;
+//            local_probs[r] = proportion[r] * sum_prob;
+//            sum += local_probs[r];
+        }
+//        thread_likelihood += log(sum) + log_likelihood_scaler;
+        int max = 0;
+        if(temp_likelihood[0] < temp_likelihood[1]){
+            max = 1;
+        }
+        max_counter[max]++;
+        if(max==0) {
+            std::cout << max << ":" << site << "\t" << temp_likelihood[0] << "\t" << temp_likelihood[1] << std::endl;
+//            PrintModelInput()
+            keep_site_index.push_back(site);
+        }
+    }
+
+    std::cout << "" << std::endl;
+    std::cout << max_counter[0] << "\t" << max_counter[1] << std::endl;
+
+
+    genome_data = GetGenomeData(variables_map);
+    SummariseRealData(genome_data);
+    CustomFilterGenomeData(genome_data);
+    keep_site_index.push_back(0);
+    for (auto site : keep_site_index) {
+        std::cout << "Site: " << site << "\t" <<  "REAL_INDEX:" << genome_data[site].site_index << std::endl;
+        PrintModelInput(genome_data[site]);
+        std::cout << "" << std::endl;
+    }
 
     t_end = clock();
     cout << "EM Clock time: " << (t_end - t_start) / CLOCKS_PER_SEC << "\t" << (t_end - t_start) << endl << endl;

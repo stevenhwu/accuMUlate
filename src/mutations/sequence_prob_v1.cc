@@ -170,7 +170,7 @@ HaploidProbs SequenceProb::HaploidSequencing(ReadData const &data) {
 //    return result.exp();
 }
 
-// FIXME : make sure it only take Eigen::Array class, pass by value or ref here?? Turn out it's not the C++ way, need to use static_cast
+// TODO : make sure it only take Eigen::Array class, pass by value or ref here?? Turn out it's not the C++ way, need to use static_cast
 template <class T>
 T SequenceProb::ScaleLogArray(T result) {
     double scale = result.maxCoeff();

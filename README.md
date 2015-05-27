@@ -1,17 +1,28 @@
 #Calling mutations from MA lines
 
 
-[![Build Status](https://travis-ci.org/stevenhwu/accuMUlate.svg?branch=EM_develop)](https://travis-ci.org/stevenhwu/accuMUlate)
+Travis: [![Build Status](https://travis-ci.org/stevenhwu/accuMUlate.svg?branch=EM_develop)](https://travis-ci.org/stevenhwu/accuMUlate)
+
+Jenkins: [![Build Status](http://jenkins.scit.us/job/accuMUlate/badge/icon)](http://jenkins.scit.us/job/accuMUlate/)
+
+<!---
+your comment goes here
+and here
+-->
+[//]: # (To improve platform compatibility (and to save one keystroke) it is also possible to use # (which is a legitimate hyperlink target) instead of <>:)
 
 ##Required libs
 
 Needs to be compiled/on path:
 * [bamtools](https://github.com/pezmaster31/bamtools)
 * [eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
-* [Boost::program_options](http://www.boost.org/doc/libs/1_55_0/doc/html/program_options.html)
+* [Boost](http://www.boost.org/)
+  * [Boost::program_options](http://www.boost.org/doc/libs/1_58_0/doc/html/program_options.html)
+  * [Boost::thread](http://www.boost.org/doc/libs/1_58_0/doc/html/thread.html)
+  * [Boost::system](http://www.boost.org/doc/libs/1_58_0/libs/system/doc/index.html)
 
 Provided in this repo
-* bamtools headers  (for bamtools-utils, not in the normal include headers) 
+* bamtools headers  (for bamtools-utils, not in the normal include headers)
 
 ##Compilation
 
@@ -19,7 +30,9 @@ At present `cmake` handles a basic build. Presuming bamtools and eigein are on
 your path you can do this
 
 ```sh
-cmake .
+mkdir -p build
+cd build
+cmake ..
 make
 ./accuMUlate -c test/test_params.ini -b test/test.bam -r test/test.fasta -o test/test.out
 ./pp -c test/pp_params.ini -b test/test.bam -i test/test.out 

@@ -22,7 +22,7 @@ public:
 
     virtual std::unique_ptr<EvolutionModel> Clone() const;
     virtual EvolutionModel *Clone2() const;
-    virtual void UpdateExpBeta(double exp_beta);
+    virtual void UpdateOneMinusExpBeta(double exp_beta);
 
     double m1();
     double m2();

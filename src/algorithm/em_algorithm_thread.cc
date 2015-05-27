@@ -25,7 +25,7 @@ void EmAlgorithmMultiThreading::ExpectationStepModelPtrMTMulti() {
 //    UpdateEmParameters();
     for (size_t r = 0; r < num_category; ++r) {
         all_em_stats[r]->Reset();
-        model_multi.UpdateExpBeta(r, parameters[r]); //exp_beta
+        model_multi.UpdateOneMinusExpBeta(r, parameters[r]); //1-exp_beta
     }
     log_likelihood = 0;
 
@@ -59,11 +59,11 @@ void EmAlgorithmMultiThreading::MultiCategories(size_t site_start, size_t site_e
     std::vector<double> temp_stats (num_category, 0);
     std::vector<double> local_probs (num_category, 0);
 
-    for (size_t s = site_start; s < site_end; ++s) {
+    for (size_t site = site_start; site < site_end; ++site) {
+        int descendant_count = model_multi.GetDescendantCount(site);
         double sum = 0;
         for (size_t r = 0; r < num_category; ++r) {
-            model_multi.CalculateAncestorToDescendant(r, s, sum_prob, stat_diff, log_likelihood_scaler);
-//            temp_stats[r][0] = 1-stat_diff;
+            model_multi.CalculateAncestorToDescendant(r, site, sum_prob, stat_diff, log_likelihood_scaler);
             temp_stats[r] = stat_diff;
 
             local_probs[r] = proportion[r] * sum_prob;
@@ -74,17 +74,15 @@ void EmAlgorithmMultiThreading::MultiCategories(size_t site_start, size_t site_e
 
         for (size_t r = 0; r < num_category; ++r) {
             double prob = local_probs[r] / sum;
-//            thread_stats[r][0] += prob * temp_stats[r][0];
 
             thread_stats[r][1] += prob * temp_stats[r];
-            thread_stats[r][0] += prob * (1-temp_stats[r]);
-            std::cout << temp_stats[r] << "\t" << prob << "\t" << (prob*temp_stats[r])<< std::endl;
-            all_probs(r,s) = local_probs[r];//threads
+            thread_stats[r][0] += prob * (descendant_count-temp_stats[r]);
+//            std::cout << descendant_count << "\t" << temp_stats[r] << "\t" << prob << "\t" << (prob*temp_stats[r])<< std::endl;
+            all_probs(r, site) = local_probs[r];//threads
         }
 
     }
-    std::cout << "" << std::endl;
-//    std::cout <<  << std::endl;
+
     auto current = log_likelihood.load();
     while (!log_likelihood.compare_exchange_weak(current, current + thread_likelihood));//threads
     for (size_t r = 0; r < num_category; ++r) {
@@ -206,7 +204,8 @@ void EmAlgorithmMultiThreading::ExpectationStepModelPtrMT() {
 //7.204842241669e-01	9.095599810937e-07	1.305992121779e-04	9.998694007878e-01	9.998694007878e-01	Time new: 61	61484826
 
 }
-
+//__attribute_deprecated__
+[[deprecated]]
 void EmAlgorithmMultiThreading::WorkingThread(size_t site_start, size_t site_end) {
 
     double log_likelihood_scaler = 0;

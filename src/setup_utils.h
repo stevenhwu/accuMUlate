@@ -22,7 +22,7 @@ void SummariseRealData(GenomeData &genome_data );
 
 void SummariseRealData(boost::program_options::variables_map map);
 
-void PostFilterGenomeData(GenomeData &genome_data);
+void CustomFilterGenomeData(GenomeData &genome_data);
 
 
 void RemoveDescendantRDV(ReadDataVector &read_vector, int d);

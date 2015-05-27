@@ -6,7 +6,7 @@ EmModelMutation::EmModelMutation(MutationModel &model) : mutation_model(model) {
 
 
 void EmModelMutation::UpdateParameter(double param) {
-    mutation_model.UpdateExpBeta(param);
+    mutation_model.UpdateOneMinusExpBeta(param);
 }
 
 

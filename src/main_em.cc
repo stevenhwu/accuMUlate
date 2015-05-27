@@ -11,11 +11,6 @@
 #include <evolution_models/F81.h>
 #include "setup_utils.h"
 
-//#include "api/BamReader.h"
-//#include "boost_input_utils.h"
-//#include "pileup_utils.h"
-
-//#include "em_algorithm.h"
 
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #pragma GCC diagnostic ignored "-Wdeprecated"
@@ -75,7 +70,7 @@ void RunEmWithRealData(boost::program_options::variables_map variables_map) {
     t1 = clock();
 
     GenomeData genome_data = GetGenomeData(variables_map);
-    PostFilterGenomeData(genome_data);//TODO: Add this back
+    CustomFilterGenomeData(genome_data);//TODO: Add this back
 
     printMemoryUsage("Read genomeData");
 
@@ -139,7 +134,7 @@ void RunEmWithRealDataMultiThread(boost::program_options::variables_map variable
 
     GenomeData genome_data = GetGenomeData(variables_map);
     SummariseRealData(genome_data);
-    PostFilterGenomeData(genome_data);//TODO: Add this back
+    CustomFilterGenomeData(genome_data);//TODO: Add this back
     SummariseRealData(genome_data);
     printMemoryUsage("Read genomeData");
 
@@ -243,6 +238,15 @@ void CreateMutationModel(MutationModel &mutation_model, GenomeData &genome_data,
 
 }
 
+struct ZZ{// Can probably stand to lose this, started out more complex..
+
+
+    ReadDataVector all_reads;
+    uint32_t site_index;
+    uint16_t reference;
+
+//
+};
 
 
 
@@ -255,14 +259,15 @@ int main(int argc, char** argv){
     boost::program_options::variables_map variables_map;
     BoostUtils::ParseCommandLinkeInput(argc, argv, variables_map);
 
+
 //    SummariseRealData(variables_map);
-//    exit(83);
+
     {
+        int thread_count = variables_map["thread"].as<int>();
 //        RunEmWithRealData(genome_data, params);
 
-        RunEmWithRealData(variables_map);
-//        int thread_count = variables_map["thread"].as<int>();
-//        RunEmWithRealDataMultiThread(variables_map, thread_count);
+//        RunEmWithRealData(variables_map);
+        RunEmWithRealDataMultiThread(variables_map, thread_count);
 
 
     }

@@ -60,7 +60,7 @@ public:
 
     void UpdateCache(int category_index);
 
-    void UpdateExpBeta(int category_index, double expBeta);
+    void UpdateOneMinusExpBeta(int category_index, double oneMinusExpBeta);
 
     void CalculateAncestorToDescendant(int category_index, int site_index, double &prob_reads,
                                                                      double &all_stats_diff, double &log_likelihood_scaler);
@@ -81,6 +81,8 @@ public:
 ////    void UpdateModel(EvolutionModel &evo_model);
 ////    void CalculateLikelihood(SequenceProbV1 &sequence_prob);
 //    void CalculateAllDescendantGivenAncestor(int a, double &product_prob_given_ancestor, double &summary_stat_diff_ancestor);
+
+    int GetDescendantCount(int site_index);
 
 private:
 

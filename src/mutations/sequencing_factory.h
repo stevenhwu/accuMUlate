@@ -29,8 +29,8 @@ public:
 
     std::vector<SiteGenotypesIndex> &&RemoveSiteGenotypeIndexVector();
 
-    const std::vector<HaploidProbs> RemoveConvertIndexKeyToHaploidUnnormalised();
-    const std::vector<DiploidProbsIndex10> RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
+//    const std::vector<HaploidProbs> RemoveConvertIndexKeyToHaploidUnnormalised();
+//    const std::vector<DiploidProbsIndex10> RemoveConvertIndexKeyToDiploidIndex10Unnormalised();
 
 //    void CreateSequenceProbsVector(std::vector<SiteGenotypes> &sp, GenomeData &data);
 
@@ -62,8 +62,8 @@ private:
     std::vector<double> convert_index_key_to_haploid_scaler;
     std::vector<double> convert_index_key_to_diploid_10_scaler;
 
-    std::vector<HaploidProbs> convert_index_key_to_haploid_unnormalised;
-    std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10_unnormalised;
+//    std::vector<HaploidProbs> convert_index_key_to_haploid_unnormalised;
+//    std::vector<DiploidProbsIndex10> convert_index_key_to_diploid_10_unnormalised;
 
 
     std::unordered_map<uint64_t, uint32_t> map_rd_to_index;

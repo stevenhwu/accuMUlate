@@ -28,37 +28,37 @@ void EmAlgorithmMutation::RunEM() {
     }
 
 }
-
-void EmAlgorithmMutation::InitialiseParameters() {
-    double lower_bound = 1e-10;
-    double upper_bound = 0.9;
-
-    lower_bound = 1e-10;
-    upper_bound = 0.9;
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> rand_real(1,9);
-    std::uniform_int_distribution<> lower(6, 10);
-    std::uniform_int_distribution<> upper(1, 4);
-    lower_bound = rand_real(gen)*pow(10, -lower(gen));
-    upper_bound = rand_real(gen)*pow(10, -upper(gen));
-
-    lower_bound = 1e-10;
-    upper_bound = 0.9;
-
-    if (num_category == 2) {
-        parameters = {upper_bound, lower_bound};
-        cache_parameters = {upper_bound, lower_bound};
-    }
-    else {
-        std::cout << "Not yet implemented for more than 2 categories" << std::endl;
-        exit(222);
-        //TODO: Should throw exception instead of exit, this will do for now
-    }
-
-//    em_model_ptr->at(0)->
-}
+//
+//void EmAlgorithmMutation::InitialiseParameters() {
+//    double lower_bound = 1e-10;
+//    double upper_bound = 0.9;
+//
+//    lower_bound = 1e-10;
+//    upper_bound = 0.9;
+//
+//    std::random_device rd;
+//    std::mt19937 gen(rd());
+//    std::uniform_real_distribution<> rand_real(1,9);
+//    std::uniform_int_distribution<> lower(6, 10);
+//    std::uniform_int_distribution<> upper(1, 4);
+//    lower_bound = rand_real(gen)*pow(10, -lower(gen));
+//    upper_bound = rand_real(gen)*pow(10, -upper(gen));
+//
+//    lower_bound = 1e-10;
+//    upper_bound = 0.9;
+//
+//    if (num_category == 2) {
+//        parameters = {upper_bound, lower_bound};
+//        cache_parameters = {upper_bound, lower_bound};
+//    }
+//    else {
+//        std::cout << "Not yet implemented for more than 2 categories" << std::endl;
+//        exit(222);
+//        //TODO: Should throw exception instead of exit, this will do for now
+//    }
+//
+////    em_model_ptr->at(0)->
+//}
 
 
 void EmAlgorithmMutation::InitialiseSummaryStat() {

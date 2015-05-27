@@ -42,7 +42,7 @@ F81::F81(F81 const &self) : EvolutionModel(self.GetMutationProb()) {
 //}
 
 
-void F81::UpdateExpBeta(double exp_beta) {
+void F81::UpdateOneMinusExpBeta(double exp_beta) {
 //FIXME: clarify expBeta or 1-expBeta, shoulde be 1-expBeta here
 	double mu = mu_prob.ConvertOneMinusExpBetaToMu(exp_beta);
 	UpdateMu(mu);

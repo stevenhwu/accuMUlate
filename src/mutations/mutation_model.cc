@@ -114,7 +114,8 @@ void MutationModel::MoveSequenceProb(std::vector<SiteGenotypesIndex> &&all) {
     site_count = all_sequence_prob_index.size();
     descendant_count = MutationModel::all_sequence_prob_index[0].GetDescendantCount();
     std::cout << "site_count: " << "\t" << site_count << "\tDescendant_count: " << descendant_count  << std::endl;
-    std::cout << "Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
+    std::cout << "WARNING!!! Assuming all data have the same number of descendants. If not, reimplement this!!." << std::endl;
+    //TODO: Check descendant count, after filter it won't be equal
 //    all_ancestor_genotype_prior.resize(all_sequence_prob_index.size());
 
 //    for (size_t i = 0; i < all_sequence_prob.size(); ++i) {
@@ -132,9 +133,9 @@ void MutationModel::MoveSequenceProb(std::vector<SiteGenotypesIndex> &&all) {
 }
 
 
-void MutationModel::UpdateExpBeta(double expBeta) {
+void MutationModel::UpdateOneMinusExpBeta(double oneMinusExpBeta) {
 
-    evo_model->UpdateExpBeta(expBeta);
+    evo_model->UpdateOneMinusExpBeta(oneMinusExpBeta);
 
     transition_matrix_a_to_d = evo_model->GetTranstionMatirxAToD();
     mutation_rate = evo_model->GetMutationRate();
@@ -416,8 +417,8 @@ void MutationModel::CalculateAncestorToDescendant(int site_index, double &prob_r
     }
 
     all_stats_diff /= prob_reads;
-    all_stats_diff /= descendant_genotypes_index.size();
-//    all_stats_diff /= descendant_count;//TODO: need this to auto calculate stat_same. sum to 1
+//    all_stats_diff /= descendant_genotypes_index.size();
+    all_stats_diff /= descendant_count;//TODO: need this to auto calculate stat_same. sum to 1
 
 //lock.unlock();
 #ifdef DEBUG7
