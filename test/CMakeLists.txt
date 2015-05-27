@@ -43,4 +43,8 @@ add_executable( UnitTests ${TEST_SOURCE_FILES} ${SOURCE_FILES} )
 target_link_libraries(UnitTests ${GTEST_BOTH_LIBRARIES} ${LIBS} ${LOCAL_LIBS})
 add_test( UnitTestsALL UnitTests )
 
+##
+## cd build/test
+## ctest
+
 
