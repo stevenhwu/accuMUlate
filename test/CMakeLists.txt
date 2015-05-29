@@ -40,9 +40,8 @@ SET(LOCAL_LIBS LibEvolutionModels LibDistributions LibIoData LibMutations)
 add_executable( UnitTests ${TEST_SOURCE_FILES} ${SOURCE_FILES} )
 # Link test executable against gtest & gtest_main
 # target_link_libraries(UnitTests gtest gtest_main ${LIBS} ${LOCAL_LIBS})
-target_link_libraries(UnitTests ${GTEST_BOTH_LIBRARIES} ${LIBS} ${LOCAL_LIBS})
+target_link_libraries(UnitTests ${GTEST_BOTH_LIBRARIES} ${LIBS} ${LOCAL_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
 add_test( UnitTestsALL UnitTests )
-
 ##
 ## cd build/test
 ## ctest
