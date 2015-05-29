@@ -153,12 +153,21 @@ message("==================== BUILD TYPE ${CMAKE_BUILD_TYPE} ===================
 ADD_SUBDIRECTORY(src)
 
 ########### Find/add GTest #################
+
 find_package (GTest) #not setup properly yet
 IF(GTEST_FOUND)
 
 #1
 #ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/include/googletest-trunk/")
 #SET(GTEST_ROOT "${CMAKE_SOURCE_DIR}/include/googletest-trunk")
+
+  find_package(Threads)
+  message("${Threads_FOUND}")
+  IF(THREADS_FOUND)
+    SET(GTEST_THREAD_LIB "-lpthread")
+    message("${ZLIB_INCLUDE_DIR}  ${ZLIB_LIBRARIES}  ${ZLIB_FOUND}")
+    message("${GTEST_THREAD_LIB}A${CMAKE_THREAD_LIBS_INIT}B${Threads}====")
+  ENDIF(THREADS_FOUND)
 
   ADD_SUBDIRECTORY(test)
 
