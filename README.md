@@ -1,4 +1,14 @@
+[![Build Status](https://travis-ci.org/dwinter/accuMUlate.svg?branch=master)](https://travis-ci.org/dwinter/accuMUlate)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.19942.svg)](http://dx.doi.org/10.5281/zenodo.19942)
 #Calling mutations from MA lines
+
+`accuMUlate` is a mutation caller designed with Mutation Accumulation (MA)
+experiments in mind. Up until recently the software has been developed with the
+goal of studying a specific MA experiment, but we are in the process of adapting
+the program to work on any MA dataset you might have. 
+
+Please [contact us](mailto:david.winter@gmail.com) if you are interested in using the software
+while we develop it.
 
 
 Travis: [![Build Status](https://travis-ci.org/stevenhwu/accuMUlate.svg?branch=EM_develop)](https://travis-ci.org/stevenhwu/accuMUlate)
@@ -41,28 +51,4 @@ make
 
 The last line will  run the caller on a test dateset with 6 000 bases, and
 show find mutations in each gene.
-
-##TODO
-
-
-* ~~have the main loop run the analysis from~~
-    * ~~BAM file~~
-    * ~~kist of sample IDs (one ancestor, rest descendants)~~
-    * ~~Model Params:~~
-        *~~theta~~
-        *~~mu~~
-        *~~nfreqs~~
-        *~~phi-haploid~~
-        *~~phi-diploid~~
-    * ~~[BED file of coords to include]~~
-    * ~~[probability threshold]~~
-    * ~~[quality cut-off]~~
-* ~~Boost PO/YAML/some other format to handle run variables~~
-* ~~Manage build across platforms w/ CMake~~
-
-* Optimize model code
-* Clean up sample mapping/base calling
-* Post-processor for putative mutations
-* Create `.vcf` and annotations files from snps
-* Make real test suite
 

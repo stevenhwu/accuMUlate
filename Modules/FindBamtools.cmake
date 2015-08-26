@@ -23,27 +23,23 @@
 #  Bamtools_LIBRARIES
 #  Bamtools_DEFINITIONS
 
-set(Bamtools_PREFIX "/usr/" "/usr/local/" "~/lib/" "~/local/lib/" CACHE PATH "Directory Bamtools resides in")
-message("PREFIX: ${Bamtools_PREFIX}")
+set(Bamtools_PREFIX "/usr/" "/usr/local/" "~/lib/" "~/local/lib/" "~/local/" CACHE PATH "Directory Bamtools resides in")
 find_path(Bamtools_INCLUDE_DIR api/api_global.h HINTS ${Bamtools_PREFIX}/include PATH_SUFFIXES bamtools)
 find_path(Bamtools_LINK_LIBRARY_DIR libbamtools.a HINTS ${Bamtools_PREFIX}/lib/ PATH_SUFFIXES bamtools)
 
-find_library(Bamtools_LIBRARY       NAMES libbamtools.a       HINTS ${Bamtools_PREFIX}/lib/ PATH_SUFFIXES bamtools)
-
-#Use this (libbamtools-utils.a for now, remove this later
+find_library(Bamtools_LIBRARY NAMES libbamtools.a HINTS ${Bamtools_PREFIX}/lib/ PATH_SUFFIXES bamtools)
 find_library(Bamtools_LIBRARY_UTILS NAMES libbamtools-utils.a HINTS ${Bamtools_PREFIX}/lib/ PATH_SUFFIXES bamtools)
+
 set(Bamtools_LIBRARIES ${Bamtools_LIBRARIES} ${Bamtools_LIBRARY} ${Bamtools_LIBRARY_UTILS} z)
 
-#Switch back to this one later
-#set(Bamtools_LIBRARIES ${Bamtools_LIBRARIES} ${Bamtools_LIBRARY}  z)
 
-message("Debug
-${Bamtools_INCLUDE_DIR}
-${Bamtools_LINK_LIBRARY_DIR}
-${Bamtools_LIBRARIES}
-")
-FILE(GLOB FFLIST "/usr/local/lib/bamtools/*")
-message("${FFLIST}")
+#message("Debug 
+#${Bamtools_INCLUDE_DIR}
+#${Bamtools_LINK_LIBRARY_DIR}
+#${Bamtools_LIBRARIES}
+#")
+
+
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set Bamtools_FOUND to TRUE
 # if all listed variables are TRUE

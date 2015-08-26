@@ -1,159 +1,151 @@
-#include "distributions/DirichletMultinomialDistribution.h"
+#include <iostream>
+#include <cstdint>
+#include <cmath>
+#include <vector>
+#include <initializer_list>
+#include <iostream>
+#include <map>
+#include <fstream>
+#include <memory>
+#include "Eigen/Dense"
+
+#include "model.h"
 
 
-void SimulateGenomeData(GenomeData &genome_data, int descendant_count, size_t fake_sample_count, double fake_prop) {
+using namespace std;
 
-	std::random_device rd;
-	std::mt19937 e2(rd());
-	std::uniform_int_distribution<uint16_t> uniform_dist(0, 5);
-	std::uniform_int_distribution<uint16_t> uniform3(0, 3);
-	uint16_t delta_reads = 20;
-
-	size_t fake_diff_count = fake_sample_count * fake_prop;
-	descendant_count++;// for ancestor
-
-	for (size_t s = 0; s < fake_sample_count; ++s) {
-
-		ReadDataVector bcalls(descendant_count, ReadData{0});
-		uint16_t ref_index = uniform3(e2);
-		for (int i = 0; i < descendant_count; ++i) {
-			bcalls[i].key=0;
-			for (int j = 0; j < 4; ++j) {
-				bcalls[i].reads[j] = uniform_dist(e2);
-			}
-			bcalls[i].reads[ref_index] = delta_reads + uniform_dist(e2);
+double DirichletMultinomialLogProbability(double alphas[4], ReadData data) {
+	// TODO: Cache most of the math here
+	// TODO: Does not include the multinomail coefficient
+	int read_count = data.reads[0]+data.reads[1]+data.reads[2]+data.reads[3];
+	double alpha_total = alphas[0]+alphas[1]+alphas[2]+alphas[3];
+	double result = 0.0;
+	for(int i : {0,1,2,3}) {
+		for(int x = 0; x < data.reads[i]; ++x) {
+			result += log(alphas[i]+x);
 		}
-
-
-		if(s < fake_diff_count) { //diff ref
-			uint16_t old_ref = ref_index;
-			do{
-				ref_index = uniform3(e2);
-			}while (ref_index == old_ref);
-			for (int j = 0; j < 4; ++j) {
-				bcalls[0].reads[j] = uniform_dist(e2);
-			}
-			bcalls[0].reads[ref_index] = delta_reads + uniform_dist(e2);
-		}
-
-		genome_data.emplace_back( ModelInput{(uint32_t)s, ref_index, bcalls} ) ;
 	}
-
+	for(int x = 0; x < read_count; ++x)
+		result -= log(alpha_total+x);
+	return result;
 }
 
-//using namespace std;
+//'Population' refers to the pop. from which the ancestor comes
+// We deal only with GC/AT bias and (in the diploid case) heterozygosity
 
-//double DirichletMultinomialLogProbability(double (&alphas)[4], ReadData &data) {
-//	// TODO: Cache most of the math here
-//	// TODO: Does not include the multinomail coefficient
-//
-////	for (int i = 0; i < 4; ++i) {
-////			data.reads[i] = 0;
-////			cout << alphas[i] << endl;
-////			alphas[i] = 0.25;
-////		}
-////	data.reads[0] = 3;
-//
-//	int read_count = data.reads[0]+data.reads[1]+data.reads[2]+data.reads[3];
-//
-////	printf("RC:%d\n",read_count);
-//	double alpha_total = alphas[0]+alphas[1]+alphas[2]+alphas[3];
-//	double result = 0.0;
-//	for(int i : {0,1,2,3}) {
-//		for(int x = 0; x < data.reads[i]; ++x) {
-//			result += log(alphas[i]+x);
-////			cout << alphas[i]+x << "\t";
-////			cout << lgamma(alphas[i]+x) << endl;
-//
-//		}
-////		cout<< result << "\n";
-//	}
-////	double sum = 0;
-//	for(int x = 0; x < read_count; ++x){
-//		result -= log(alpha_total+x);
-////		sum += log(alpha_total+x);
-//	}
-////	cout<< result << "\n";
-////	exit(-1);
-////	printf("sum denom:%f\n",sum);
-//	return result;
-//}
 
 DiploidProbs DiploidPopulation(const ModelParams &params, int ref_allele) {
 	ReadData d;
 	DiploidProbs result;
-
 	double alphas[4];
-	for(int i : {0,1,2,3}){
+	for(int i : {0,1,2,3})
 		alphas[i] = params.theta*params.nuc_freq[i];
-//		printf("A:%f\n",alphas[i]);
-	}
-//	printf("ref:%d\n", ref_allele);
 	for(int i : {0,1,2,3}) {
 		for(int j=0;j<i;++j) {
 			d.key = 0;
 			d.reads[ref_allele] = 1;
 			d.reads[i] += 1;
 			d.reads[j] += 1;
-//			printf("  %d %d: %u %u %u %u\n", i, j, d.reads[0], d.reads[1], d.reads[2], d.reads[3]);
 			result[i+j*4] = DirichletMultinomialLogProbability(alphas, d);
 			result[j+i*4] = result[i+j*4];
-//			result[i+j*4] = 5;
-//			result[j+i*4] = 3;
 		}
 		d.key = 0;
 		d.reads[ref_allele] = 1;
 		d.reads[i] += 2;
-//		printf("D:%d %d: %u %u %u %u\n", i, i, d.reads[0], d.reads[1], d.reads[2], d.reads[3]);
 		result[i+i*4] = DirichletMultinomialLogProbability(alphas, d);
 	}
-//	std::cout << result << std::endl;
-//	Eigen::Matrix4d m;
-//	for (int i = 0; i < result.rows(); ++i) {
-//		m(i)= result[i];
-//	}
-//	std::cout << m<< std::endl;
 	return result.exp();
 }
 
-MutationMatrix MutationAccumulation(const ModelParams &params, bool and_mut) {
+GenotypeProbs PopulationProbs(const ModelParams &params, int ref_allele){
+    if(params.ploidy_ancestor==2){
+        DiploidProbs result = DiploidPopulation(params, ref_allele);
+        return result;
+    }
+    HaploidProbs result;
+    for( int i :{0,1,2,3}) {
+       result[i] = params.nuc_freq[i];
+    }
+    return result;
+}
+
+
+//Create the mutation matrices which represent the probabilites of different
+//histories with or without mutation. 
+
+TransitionMatrix F81(const ModelParams &params){
 	double beta = 1.0;
-	for(auto d : params.nuc_freq){
-//		printf("%f\n",d);
+	for(auto d : params.nuc_freq)
 		beta -= d*d;
-	}
 	beta = 1.0/beta;
-//	printf("beta0:%f %.10e\n", beta0, params.mutation_rate );
-	beta = exp(-beta*params.mutation_rate); //~ close to 1 for small mu
-//	printf("beta0:%.10f\n", beta0); //0.9999999852
-	Eigen::Matrix4d m;
+	beta = exp(-beta*params.mutation_rate);
+	TransitionMatrix m;
 	for(int i : {0,1,2,3}) {
 		for(int j : {0,1,2,3}) {
 			m(i,j) = params.nuc_freq[i]*(1.0-beta);
 		}
 		m(i,i) += beta;
-	}
-//	std::cout << m << std::endl;
+    }
+    return m;
+}
 
-	//cerr << m << endl;
-	MutationMatrix result;
+
+
+MutationMatrix MutationAccumulation(const ModelParams &params, bool and_mut){
+	TransitionMatrix m = F81(params);
+    if(params.ploidy_ancestor == 1){//haploid->haploid design
+        if(!and_mut){
+            return m;
+        }
+        MutationMatrix result = MutationMatrix(4,4);           
+        //identity matrix initialzer is for Matrices only, these are (despite teh
+        //name) arrays so buid it up:
+        for(int i : {0,1,2,3}){
+            for (int j : {0,1,2,3}){
+                if(i != j){
+                    result(i,j) = m(i,j);
+                }
+                else{
+                    result(i,j) = 0.0;
+                }
+            }
+        }
+        return result;
+    }
+    if(params.ploidy_descendant == 1){//diploid -> haploid design
+        MutationMatrix result = MutationMatrix(16,4);
+        for(int i : {0,1,2,3}) {
+		    for(int j : {0,1,2,3}) {
+			    for(int k : {0,1,2,3}) {
+				    result(i*4+j,k) = 0.0;
+        				if(!and_mut || i != k)
+					result(i*4+j,k) += 0.5*m(i,k);
+		        		if(!and_mut || j != k)
+					result(i*4+j,k) += 0.5*m(j,k);
+                }
+            }
+	    }
+	    return result;
+    }
+    //only diploid->diploid left 
+    MutationMatrix result = MutationMatrix(16,16);
 	for(int i : {0,1,2,3}) {
 		for(int j : {0,1,2,3}) {
 			for(int k : {0,1,2,3}) {
-				result(i*4+j,k) = 0.0;
-				if(!and_mut || i != k)
-					result(i*4+j,k) += 0.5*m(i,k);
-				if(!and_mut || j != k)
-					result(i*4+j,k) += 0.5*m(j,k);
-			}
-		}
-	}
-//	printf("%d\n", and_mut);
-//	std::cout << result << std::endl;
-
-	return result;
+    			for(int l : {0,1,2,3}) {                
+    				result(i*4+j,k*4+l) = 0.0;
+    				if(!and_mut || i != k || j != l ){//TODO: check this is right transition prob
+					    result(i*4+j,k*4+l) += m(i,k) * m(j,l);
+                    }
+                }
+            }
+        }
+    }
+    return result;
 }
 
+//Calculate the genotype likelihoods. Again we have one function with returns 
+//differently sized results depending on the ploidy of experiment.
 
 
 DiploidProbs DiploidSequencing(const ModelParams &params, int ref_allele, ReadData data) {
@@ -185,101 +177,103 @@ DiploidProbs DiploidSequencing(const ModelParams &params, int ref_allele, ReadDa
 }
 
 HaploidProbs HaploidSequencing(const ModelParams &params, int ref_allele, ReadData data) {
-    HaploidProbs result;
-    double alphas_total = (1.0-params.phi_haploid)/params.phi_haploid;
-    for(int i : {0,1,2,3}) {
-        double alphas[4];
-        for(int k : {0,1,2,3}) {
-            if(k == i)
-                alphas[k] = (1.0-params.error_prob)*alphas_total;
-            else
-                alphas[k] = params.error_prob/3.0*alphas_total;
-        }
-        result[i] = DirichletMultinomialLogProbability(alphas, data);
-    }
-    double scale = result.maxCoeff();
-    return (result - scale).exp();
+	HaploidProbs result;
+	double alphas_total = (1.0-params.phi_haploid)/params.phi_haploid;
+	for(int i : {0,1,2,3}) {
+		double alphas[4];
+		for(int k : {0,1,2,3}) {
+			if(k == i)
+				alphas[k] = (1.0-params.error_prob)*alphas_total;
+			else
+				alphas[k] = params.error_prob/3.0*alphas_total;
+		}
+		result[i] = DirichletMultinomialLogProbability(alphas, data);
+	}
+	double scale = result.maxCoeff();
+	return (result - scale).exp();
 }
 
-double TetMAProbability(const ModelParams &params, const ModelInput site_data) {
-	MutationMatrix m = MutationAccumulation(params, false);
-	MutationMatrix mt = MutationAccumulation(params, true);
+GenotypeProbs Sequencing(const ModelParams &params, int ref_allele, ReadData data, int ploidy) {
+    if(ploidy == 2){
+        DiploidProbs result = DiploidSequencing(params, ref_allele, data);
+        return result;
+    }
+    HaploidProbs result = HaploidSequencing(params, ref_allele, data);
+    return result;
+}
 
 
-	MutationMatrix mn = m-mt;
-	DiploidProbs pop_genotypes = DiploidPopulation(params, site_data.reference);
-
+double TetMAProbability(const ModelParams &params, const ModelInput site_data, const MutationMatrix m, const MutationMatrix mn) {
+    GenotypeProbs pop_genotypes = PopulationProbs(params, site_data.reference);
 	auto it = site_data.all_reads.begin();
-	DiploidProbs anc_genotypes = DiploidSequencing(params, site_data.reference, *it);
+    GenotypeProbs anc_genotypes = Sequencing(params, site_data.reference, *it, params.ploidy_ancestor);
 	anc_genotypes *= pop_genotypes;
-	DiploidProbs num_genotypes = anc_genotypes;
+    GenotypeProbs num_genotypes = anc_genotypes;
 	for(++it; it != site_data.all_reads.end(); ++it) {
-		HaploidProbs p = HaploidSequencing(params, site_data.reference, *it);
-
+		GenotypeProbs p = Sequencing(params, site_data.reference, *it, params.ploidy_descendant);
 		anc_genotypes *= (m.matrix()*p.matrix()).array();
 		num_genotypes *= (mn.matrix()*p.matrix()).array();
 	}
 
-    //cerr << "\n" << ancestor_genotypes/ancestor_genotypes.sum() << endl;
-
 	return 1.0 - num_genotypes.sum()/anc_genotypes.sum();
 }
-void printMatrix(DiploidProbs d){
-	Eigen::Matrix4d m;
-	for (int i = 0; i < d.rows(); ++i) {
-		m(i)= d[i];
-	}
-	std::cout << m<< std::endl;
-}
-double TetMAProbOneMutation(const ModelParams &params, const ModelInput site_data) {
-    MutationMatrix m = MutationAccumulation(params, false);//TODO cache these
 
-	MutationMatrix mt = MutationAccumulation(params, true);//
-	MutationMatrix mn = m-mt;	                           //
-//	cout.precision(10);
-//	cout <<"+============"<< endl;
-//	cout << m << endl;cout <<"++============"<< endl;
-//	cout << mt << endl;cout <<"+++============"<< endl;
-//	cout << mn << endl;cout <<"++++============"<< endl;
-//	cout << "========="<<endl;
-	DiploidProbs pop_genotypes = DiploidPopulation(params, site_data.reference);
-
+double TetMAProbOneMutation(const ModelParams &params, const ModelInput site_data, const MutationMatrix m, const MutationMatrix mn) {
+	GenotypeProbs pop_genotypes = PopulationProbs(params, site_data.reference);	
 	auto it = site_data.all_reads.begin();
-	DiploidProbs anc_genotypes = DiploidSequencing(params, site_data.reference, *it);
-	printMatrix(pop_genotypes);
-	printMatrix(anc_genotypes);
+    GenotypeProbs anc_genotypes = Sequencing(params, site_data.reference, *it, params.ploidy_ancestor);
 	anc_genotypes *= pop_genotypes;
-	printMatrix(anc_genotypes);
-  	DiploidProbs denom = anc_genotypes;   //product of p(Ri|A)
-//  	printf("%u %u %u %u\n",(*it).reads[0],(*it).reads[1],(*it).reads[2],(*it).reads[3]);
-
-    DiploidProbs nomut_genotypes = anc_genotypes; //Product of p(Ri & noMutatoin|A)
-    DiploidProbs mut_genotypes = DiploidProbs::Zero();      //Sum of p(Ri&Mutation|A=x)
+  	GenotypeProbs denom = anc_genotypes;   //product of p(Ri|A)
+    GenotypeProbs nomut_genotypes = anc_genotypes; //Product of p(Ri & noMutatoin|A)
+    GenotypeProbs mut_genotypes = anc_genotypes;      //Sum of p(Ri&Mutation|A=x)
+    mut_genotypes.setZero();
 	for(++it; it != site_data.all_reads.end(); ++it) {
-//		printf("%u %u %u %u\n",(*it).reads[0],(*it).reads[1],(*it).reads[2],(*it).reads[3]);
-        HaploidProbs p = HaploidSequencing(params, site_data.reference, *it);
-        DiploidProbs dgen =  (mn.matrix()*p.matrix()).array();
-        DiploidProbs agen = (m.matrix()*p.matrix()).array();
+        GenotypeProbs p = Sequencing(params, site_data.reference, *it, params.ploidy_descendant);
+        GenotypeProbs dgen =  (mn.matrix()*p.matrix()).array();
+        GenotypeProbs agen = (m.matrix()*p.matrix()).array();
         nomut_genotypes *= dgen;
         mut_genotypes += (agen/dgen - 1); //(agen+dgen)/agen
         denom *= agen;
     }
-//	exit(-1);
-	printf("\n\n");
     double result = (nomut_genotypes * mut_genotypes).sum() / denom.sum();
     return(result);
 }
 
+
+//int main(){
+//      ModelParams p = { 
+//        0.0001, 
+//        {0.38, 0.12, 0.12, 0.38}, 
+//        1e-2,
+//        0.01,
+//        0.01,
+//        0.05, 
+//        1,1
+//};
+//   MutationMatrix mt = MutationAccumulation(p, true);
+//   MutationMatrix m = MutationAccumulation(p, false);
+//   cerr << m << endl << endl;
+//   cout << m -mt << endl;
+//   return 0;
+////}
+//// Uncommon and compile with this:
+//// clang++ -std=c++11 -Ithird-party/bamtools/src/ -Lboost_progam_options model.cc
+//
+// to play around with / debug results.
 //int main(){
 //    ModelParams p = { 
 //        0.0001, 
 //        {0.38, 0.12, 0.12, 0.38}, 
-//        1.0e-8,
+//        1e-8,
 //        0.01,
-//        0.001,
-//        0.001,
+//        0.01,
+//        0.05,
+//        2,2
 //    };
-//    ModelInput two_vars = {"scf0", 87, 1,
+//   MutationMatrix mt = MutationAccumulation(p, true);
+//   MutationMatrix m = MutationAccumulation(p, false);
+//   MutationMatrix mn = m - mt;
+//    ModelInput two_vars = { 2, 
 //        {
 //        { 0, 30,  0,  0},
 //        { 0, 30,  0,  0},
@@ -298,7 +292,7 @@ double TetMAProbOneMutation(const ModelParams &params, const ModelInput site_dat
 //    };
 //
 //
-//    ModelInput  one_vars = {"Scf0", 87, 1,
+//    ModelInput  one_vars = { 1,
 //        {
 //        { 0, 30,  0,  0},
 //        { 0,  0,  0, 30},
@@ -308,39 +302,41 @@ double TetMAProbOneMutation(const ModelParams &params, const ModelInput site_dat
 //        { 0, 30,  0, 0}}
 //    };    
 //
-//   ModelInput no_vars = {"Scf0", 87, 1,
-//
-//      {{8,   0,  0, 0},       
-//       {9,   0,  0, 4},       
-//       {3,   0,  0, 0},
-//       {7,   0,  0, 0},     
-//       {18,  0,  0, 0},       
-//       {17,  0,  0, 3},
-//       {32,  0,  0, 1},  
-//       {19,  0,  0, 3},       
-//       {25,  0,  0, 1},
-//       {37,  0,  0, 0},
-//       {17,  0,  0, 0},
-//       {3 ,  0,  0, 4}}
+//   ModelInput no_vars = {1,
+//      {{0,   0,  0, 5},       
+//       {3,   0,  0, 4},       
+//       {8,   0,  0, 0},
+//       {3,   0,  0, 3},     
+//       {0,  0,  0, 2},       
+//       {2,  0,  0, 3},
+//       {0,  0,  0, 0},  
+//       {0,  0,  0, 5},       
+//       {0,  0,  0, 4},
+//       {1,  0,  0, 3},
+//       {0,  0,  0, 28},
+//       {0 ,  0,  0, 3}}
 //   };
 //    
 //    cout << "___With the no-variant data___" << endl;
-//    cout << "P(one|data)= "<<  TetMAProbOneMutation(p,no_vars)<< endl;
-//    cout << "P(any|data)= " << TetMAProbability(p,no_vars) << endl;
+////    cout << "P(one|data)= "<<  TetMAProbOneMutation(p,no_vars)<< endl;
+////    cout << "P(any|data)= " << TetMAProbability(p,no_vars) << endl;
 //
+//    cout << TetMAProbability(p,no_vars,m,mn) << endl;
+//    
 //    cout << "___With the one-variant data___" << endl;  
-//    cout << "P(one|data)= "<<  TetMAProbOneMutation(p,one_vars)<< endl;
-//    cout << "P(any|data)= " << TetMAProbability(p,one_vars) << endl;
+////    cout << "P(one|data)= "<<  TetMAProbOneMutation(p,one_vars)<< endl;
+////    cout << "P(any|data)= " << TetMAProbability(p,one_vars) << endl;
+//      cout << TetMAProbability(p,one_vars,m,mn) << endl;
 //    
 //    cout << "___With the two-variant data___" << endl;
-//    cout << "P(one|data)= "<<  TetMAProbOneMutation(p,two_vars)<< endl;
-//    cout << "P(any|data)= " << TetMAProbability(p,two_vars) << endl;   
+////    cout << "P(one|data)= "<<  TetMAProbOneMutation(p,two_vars)<< endl;
+//    cout << "P(any|data)= " << TetMAProbability(p,two_vars,m,mn) << endl;   
 //
 //    
-//    cout << "calculating the same number once: " << TetMAProbOneMutation(p,two_vars) << endl;
-//    cout << "then another time: " << TetMAProbOneMutation(p,two_vars) << endl;
-//    TetMAProbOneMutation(p,no_vars);
-//    cout << "And once more after calling from the the no-vars data: " << TetMAProbOneMutation(p,two_vars) << endl;
+////    cout << "calculating the same number once: " << TetMAProbOneMutation(p,two_vars) << endl;
+////    cout << "then another time: " << TetMAProbOneMutation(p,two_vars) << endl;
+////    TetMAProbOneMutation(p,no_vars);
+////    cout << "And once more after calling from the the no-vars data: " << TetMAProbOneMutation(p,two_vars) << endl;
 //    return 0;
 //}
 //
@@ -350,67 +346,3 @@ double TetMAProbOneMutation(const ModelParams &params, const ModelInput site_dat
 
 
 
-void printMemoryUsage(char const *string1) {
-	std::cout << "Memory: " << string1 << " " << getMemoryUsageVmRSS()/1000.0 << "\t" << getMemoryUsageVmSize()/1000.0 << std::endl;
-}
-
-
-int getMemoryUsageVmSize() { //Note: this value is in KB!
-	FILE* file = fopen("/proc/self/status", "r");
-	int result = -1;
-	char line[128];
-
-
-	while (fgets(line, 128, file) != NULL){
-		if (strncmp(line, "VmSize:", 7) == 0){
-			result = parseLine(line);
-			break;
-		}
-	}
-	return result;
-};
-
-int getMemoryUsageVmRSS() { //Note: this value is in KB!
-	FILE* file = fopen("/proc/self/status", "r");
-	int result = -1;
-	char line[128];
-
-
-	while (fgets(line, 128, file) != NULL){
-		if (strncmp(line, "VmRSS:", 6) == 0){
-			result = parseLine(line);
-			break;
-		}
-
-	}
-	return result;
-};
-
-int parseLine(char* line) {
-	int i = strlen(line);
-	while (*line < '0' || *line > '9') line++;
-	line[i-3] = '\0';
-	i = atoi(line);
-	return i;
-}
-
-
-void PrintReads(ReadData read_data) {
-//	printf("%d %d %d %d\n", data.reads[0], data.reads[1], data.reads[2], data.reads[3]);
-	for (int j = 0; j < 4; ++j) {
-		std::cout << read_data.reads[j] << " ";
-	} std::cout << "" << std::endl;
-
-}
-
-
-
-void PrintModelInput(ModelInput model_input) {
-	std::cout << "Ref:\t";
-    PrintReads(model_input.all_reads[0]);
-    for (int i = 1; i < model_input.all_reads.size(); ++i) {
-        std::cout << " -D"<< i << "\t";
-        PrintReads(model_input.all_reads[i]);
-    }
-    std::cout << std::endl;
-}
