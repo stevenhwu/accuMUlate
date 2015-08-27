@@ -1,11 +1,21 @@
 cmake_minimum_required(VERSION 2.6)
 project(accuMUlate)
 
+# guard against in-source builds
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+  message(FATAL_ERROR "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from
+ there. You may need to remove CMakeCache.txt. ")
+endif()
+
+
+
+SET(CMAKE_CXX_FLAGS  "-std=c++11")
+
+SET(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ~/lib ~/include ${CMAKE_INSTALL_PREFIX} ~)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/Modules/")
-set(CMAKE_CXX_FLAGS  "-std=c++11")
 find_package( Boost COMPONENTS program_options REQUIRED )
 find_package( Bamtools REQUIRED )
-
+find_package( Eigen3 3 REQUIRED )
 
 
 set(LIBS ${LIBS} ${Boost_LIBRARIES} ${Bamtools_LIBRARIES})
