@@ -33,11 +33,12 @@ find_library(Bamtools_LIBRARY_UTILS NAMES libbamtools-utils.a HINTS ${Bamtools_P
 set(Bamtools_LIBRARIES ${Bamtools_LIBRARIES} ${Bamtools_LIBRARY} ${Bamtools_LIBRARY_UTILS} z)
 
 
-#message("Debug 
-#${Bamtools_INCLUDE_DIR}
-#${Bamtools_LINK_LIBRARY_DIR}
-#${Bamtools_LIBRARIES}
-#")
+message("Debug:
+${Bamtools_PREFIX} 
+${Bamtools_INCLUDE_DIR}
+${Bamtools_LINK_LIBRARY_DIR}
+${Bamtools_LIBRARIES}
+")
 
 
 include(FindPackageHandleStandardArgs)
